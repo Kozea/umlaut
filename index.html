@@ -8,28 +8,36 @@
         margin: 0;
         padding: 0;
       }
+
       text {
         dominant-baseline: text-before-edge;
         font-family: "sans";
       }
-      path {
+
+      path.link {
         fill: none;
         stroke: black;
       }
+
+      path.element {
+        cursor: move;
+      }
+
       path.shape {
         fill: white;
         stroke: black;
       }
-      .axis path, .axis line {
-        fill: none;
-        stroke: #ccc;
-      }
 
+      .selected path {
+        stroke: blue;
+      }
+      .selected text {
+        fill: blue;
+      }
     </style>
     <script type="text/javascript" src="http://d3js.org/d3.v3.js"></script>
   </head>
   <body>
-    <div id="viz"></div>
     <script type="text/javascript" src="umlaut.js"></script>
   </body>
 </html>
