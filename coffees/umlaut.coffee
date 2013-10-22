@@ -502,7 +502,8 @@ force
         generate_url()
     )
 
-@addEventListener("popstate", (e) ->
+
+history_pop = () ->
     try
         if location.hash
             load(atob(location.hash.slice(1)))
@@ -513,6 +514,10 @@ force
         data.lnks = []
     state.no_save = true
     sync()
-)
+
+@addEventListener("popstate", history_pop)
 
 
+# ff hack
+if @mozInnerScreenX != null
+    history_pop()
