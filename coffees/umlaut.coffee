@@ -245,7 +245,7 @@ generate_url = ->
 
 article = d3.select("article")
 width = article.node().clientWidth
-height = article.node().clientHeight
+height = article.node().clientHeight or 500
 
 svg = article
     .append("svg")

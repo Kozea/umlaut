@@ -366,7 +366,7 @@
 
   width = article.node().clientWidth;
 
-  height = article.node().clientHeight;
+  height = article.node().clientHeight || 500;
 
   svg = article.append("svg").attr("width", width).attr("height", height);
 
