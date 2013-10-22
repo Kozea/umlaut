@@ -1,56 +1,57 @@
 class @Element
     constructor: (@x, @y, @text, @fixed=true) ->
-        @_margin = x: 10, y: 5
+        @margin = x: 10, y: 5
 
-    center: ->
-        x: @x + (@_txt_bbox and @_txt_bbox.width or 0) / 2 + @_margin.x
-        y: @y + (@_txt_bbox and @_txt_bbox.height or 0) / 2 + @_margin.y
+    pos: ->
+        x: @x
+        y: @y
 
     width: ->
-        @_txt_bbox.width + 2 * @_margin.x
+        @_txt_bbox.width + 2 * @margin.x
 
     height: ->
-        @_txt_bbox.height + 2 * @_margin.y
+        @_txt_bbox.height + 2 * @margin.y
 
-    direction: (other) ->
+    direction: (x, y) ->
         delta = @height() / @width()
-        if @x <= other.x and @y <= other.y
-            if other.y > delta * (other.x - @x) + @y
+
+        if @x <= x and @y <= y
+            if y > delta * (x - @x) + @y
                 return 'S'
             else
                 return 'E'
-        if @x >= other.x and @y <= other.y
-            if other.y > delta * (@x - other.x) + @y
+        if @x >= x and @y <= y
+            if y > delta * (@x - x) + @y
                 return 'S'
             else
                 return 'O'
-        if @x <= other.x and @y >= other.y
-            if other.y > delta * (@x - other.x) + @y
+        if @x <= x and @y >= y
+            if y > delta * (@x - x) + @y
                 return 'E'
             else
                 return 'N'
-        if @x >= other.x and @y>= other.y
-            if other.y > delta * (other.x - @x) + @y
+        if @x >= x and @y >= y
+            if y > delta * (x - @x) + @y
                 return 'O'
             else
                 return 'N'
 
-    anchor: (other) ->
+    anchor: (x, y) ->
         rv =
-            direction: @direction(other)
+            direction: @direction(x, y)
         switch rv.direction
             when 'N'
-                rv.x = @x + @width() / 2
-                rv.y = @y
+                rv.x = @x
+                rv.y = @y - @height() / 2
             when 'S'
-                rv.x = @x + @width() / 2
-                rv.y = @y + @height()
-            when 'E'
-                rv.x = @x + @width()
-                rv.y = @y + @height() / 2
-            when 'O'
                 rv.x = @x
                 rv.y = @y + @height() / 2
+            when 'E'
+                rv.x = @x + @width() / 2
+                rv.y = @y
+            when 'O'
+                rv.x = @x - @width() / 2
+                rv.y = @y
         rv
 
     objectify: ->
@@ -60,14 +61,85 @@ class @Element
         text: @text
         fixed: @fixed
 
+E = {}
+L = {}
 
-class @Square extends Element
+class E.Process extends Element
     path: ->
-      "M 0 0 L #{@width()} 0 L #{@width()} #{@height()} L 0 #{@height()} z"
+        w2 = @width() / 2
+        h2 = @height() / 2
 
-class @Lozenge extends Element
+        "M #{-w2} #{-h2}
+         L #{w2} #{-h2}
+         L #{w2} #{h2}
+         L #{-w2} #{h2}
+         z"
+
+class E.DataIO extends Element
     path: ->
-      "M -5 0 L #{@width() - 5} 0 L #{@width() + 5} #{@height()} L 5 #{@height()} z"
+        w2 = @width() / 2
+        h2 = @height() / 2
+        shift = 5
+
+        "M #{-w2 - shift} #{-h2}
+         L #{w2 - shift} #{-h2}
+         L #{w2 + shift} #{h2}
+         L #{-w2 + shift} #{h2}
+         z"
+
+class E.Terminator extends Element
+    path: ->
+        w2 = @width() / 2
+        h2 = @height() / 2
+        shift = 10
+
+        "M #{-w2 + shift} #{-h2}
+         L #{w2 - shift} #{-h2}
+         Q #{w2} #{-h2} #{w2} #{-h2 + shift}
+         L #{w2} #{h2 - shift}
+         Q #{w2} #{h2} #{w2 - shift} #{h2}
+         L #{-w2 + shift} #{h2}
+         Q #{-w2} #{h2} #{-w2} #{h2 - shift}
+         L #{-w2} #{-h2 + shift}
+         Q #{-w2} #{-h2} #{-w2 + shift} #{-h2}"
+
+class E.Decision extends Element
+    constructor: ->
+        super
+        @margin.y = 0
+
+    width: ->
+        ow = super()
+        ow + Math.sqrt(ow * @_txt_bbox.height + 2 * @margin.y)
+
+    height: ->
+        oh = super()
+        oh + Math.sqrt(oh * @_txt_bbox.width + 2 * @margin.x)
+
+    path: ->
+        w2 = @width() / 2
+        h2 = @height() / 2
+        "M #{-w2} 0
+         L 0 #{-h2}
+         L #{w2} 0
+         L 0 #{h2}
+         z"
+
+class E.Delay extends Element
+    path: ->
+        w2 = @width() / 2
+        h2 = @height() / 2
+        shift = 10
+
+        "M #{-w2} #{-h2}
+         L #{w2 - shift} #{-h2}
+         Q #{w2} #{-h2} #{w2} #{-h2 + shift}
+         L #{w2} #{h2 - shift}
+         Q #{w2} #{h2} #{w2 - shift} #{h2}
+         L #{-w2} #{h2}
+         z"
+
+
 
 class @Link
     constructor: (@elt1, @elt2) ->
@@ -84,33 +156,36 @@ class @Link
         elt2: data.elts.indexOf(@elt2)
 
     path: ->
-        source = @source()
-        x1 = source.x
-        y1 = source.y
-        target = @target()
-        x2 = target.x
-        y2 = target.y
-        path = "M #{x1} #{y1} C"
-        xm = .5 * (x1 + x2)
-        ym = .5 * (y1 + y2)
+        c1 = @elt1.pos()
+        c2 = @elt2.pos()
 
-        if source.direction == 'N' or source.direction == 'S'
-            path = "#{path} #{x1} #{ym}"
+        a1 = @elt1.anchor(c2.x, c2.y)
+        a2 = @elt2.anchor(c1.x, c1.y)
+
+        path = "M #{a1.x} #{a1.y} C"
+        m =
+            x: .5 * (a1.x + a2.x)
+            y: .5 * (a1.y + a2.y)
+
+        if a1.direction == 'N' or a1.direction == 'S'
+            path = "#{path} #{a1.x} #{m.y}"
         else
-            path = "#{path} #{xm} #{y1}"
+            path = "#{path} #{m.x} #{a1.y}"
 
-        if target.direction == 'N' or target.direction == 'S'
-            path = "#{path} #{x2} #{ym}"
+        if a2.direction == 'N' or a2.direction == 'S'
+            path = "#{path} #{a2.x} #{m.y}"
         else
-            path = "#{path} #{xm} #{y2}"
+            path = "#{path} #{m.x} #{a2.y}"
 
-        "#{path} #{x2} #{y2}"
+        "#{path} #{a2.x} #{a2.y}"
 
 
 
 @data = data = {}
 @state =
     selection: []
+    snap: 25
+    no_save: false
     mouse:
         x: 0
         y: 0
@@ -134,20 +209,38 @@ class @Link
     result
 
 
-load = =>
+objectify = ->
+    JSON.stringify(
+        elts: data.elts.map((elt) -> elt.objectify())
+        lnks: data.lnks.map((lnk) -> lnk.objectify())
+    )
+
+load = (new_data=null) =>
     data.elts = []
     data.lnks = []
-    for elt in JSON.parse(localStorage.getItem('elts') or '[]')
-        data.elts.push(new @[elt.name](elt.x, elt.y, elt.text, elt.fixed))
-    for lnk in JSON.parse(localStorage.getItem('lnks') or '[]')
+    new_data = new_data or localStorage.getItem('data')
+    if not new_data
+        return
+
+    new_data = JSON.parse(new_data)
+    for elt in new_data.elts
+        data.elts.push(new E[elt.name](elt.x, elt.y, elt.text, elt.fixed))
+    for lnk in new_data.lnks
         data.lnks.push(new @[lnk.name](data.elts[lnk.elt1], data.elts[lnk.elt2]))
+
     state.selection = []
 
 save = =>
-    localStorage.setItem('elts', JSON.stringify(data.elts.map((elt) -> elt.objectify())))
-    localStorage.setItem('lnks', JSON.stringify(data.lnks.map((lnk) -> lnk.objectify())))
+    localStorage.setItem('data', objectify())
 
-load()
+
+generate_url = ->
+    if state.no_save
+        state.no_save = false
+        return
+    hash = '#' + btoa(objectify())
+    if location.hash != hash
+        history.pushState(null, null, hash)
 
 
 article = d3.select("article")
@@ -189,6 +282,15 @@ drag = force.drag()
             state.selection = [elt]
 
         d3.select(this).classed('selected', true)
+    )
+    .on("drag.force", (elt) ->
+        if d3.event.sourceEvent.shiftKey
+            elt.px = d3.event.x
+            elt.py = d3.event.y
+        else
+            elt.px = state.snap * Math.floor(d3.event.x / state.snap)
+            elt.py = state.snap * Math.floor(d3.event.y / state.snap)
+        force.resume()
     )
 
 element = null
@@ -240,8 +342,6 @@ sync = ->
         .attr('class', 'shape')
     g
         .append('text')
-        .attr('x', (elt) -> elt._margin.x)
-        .attr('y', (elt) -> elt._margin.y)
 
     # Update + Enter
     element
@@ -287,7 +387,7 @@ tick = ->
 
 
 element_add = (type) =>
-    new_elt = new type(undefined, undefined, 'New element', false)
+    new_elt = new E[type](undefined, undefined, 'New element', false)
     data.elts.push(new_elt)
     for elt in state.selection
         data.lnks.push(new Link(elt, new_elt))
@@ -302,18 +402,6 @@ commands =
             sync()
         label: 'Reorganize'
         hotkey: 'r'
-
-    square:
-        fun: ->
-            element_add Square
-        label: 'Add square element'
-        hotkey: 's'
-
-    lozenge:
-        fun: ->
-            element_add Lozenge
-        label: 'Add lozenge element'
-        hotkey: 'z'
 
     link:
         fun: ->
@@ -358,6 +446,22 @@ commands =
         label: 'Load locally'
         hotkey: 'ctrl+l'
 
+    undo:
+        fun: (e) ->
+            history.go(-1)
+            e?.preventDefault()
+
+        label: 'Undo'
+        hotkey: 'ctrl+z'
+
+    redo:
+        fun: (e) ->
+            history.go(1)
+            e?.preventDefault()
+
+        label: 'Redo'
+        hotkey: 'ctrl+y'
+
     remove:
         fun: ->
             for elt in state.selection
@@ -370,6 +474,14 @@ commands =
             sync()
         label: 'Remove elements'
         hotkey: 'del'
+
+for e of E
+    commands[e] =
+        ((elt) ->
+            fun: ->
+                element_add elt
+            label: elt
+            hotkey: elt[0])(e)
 
 aside = d3.select('aside')
 
@@ -387,6 +499,20 @@ force
             elt.fixed = true
         # Last adjustements
         tick()
+        generate_url()
     )
 
-sync()
+@addEventListener("popstate", (e) ->
+    try
+        if location.hash
+            load(atob(location.hash.slice(1)))
+        else
+            load()
+    catch
+        data.elts = []
+        data.lnks = []
+    state.no_save = true
+    sync()
+)
+
+
