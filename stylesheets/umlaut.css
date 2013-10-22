@@ -1,0 +1,60 @@
+/* line 8, ../sass/umlaut.sass */
+body, html {
+  color: black;
+  background-color: white;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+/* line 17, ../sass/umlaut.sass */
+body section, html section {
+  display: flex;
+  flex: 1;
+}
+/* line 21, ../sass/umlaut.sass */
+body section article, html section article {
+  flex: 1;
+}
+/* line 24, ../sass/umlaut.sass */
+body section aside, html section aside {
+  display: flex;
+  flex-direction: column;
+}
+
+/* line 29, ../sass/umlaut.sass */
+svg text {
+  dominant-baseline: text-before-edge;
+  font-family: "sans";
+}
+/* line 33, ../sass/umlaut.sass */
+svg .link {
+  fill: none;
+  stroke: black;
+}
+/* line 37, ../sass/umlaut.sass */
+svg .link.selected {
+  stroke: blue;
+}
+/* line 40, ../sass/umlaut.sass */
+svg .element {
+  cursor: move;
+}
+/* line 43, ../sass/umlaut.sass */
+svg .element .shape {
+  stroke: black;
+  fill: white;
+}
+/* line 48, ../sass/umlaut.sass */
+svg .element.moving .shape {
+  stroke: red;
+}
+/* line 52, ../sass/umlaut.sass */
+svg .element.selected .shape {
+  stroke: blue;
+}
+/* line 56, ../sass/umlaut.sass */
+svg .element.selected.moving .shape {
+  stroke: magenta;
+}

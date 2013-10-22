@@ -1,0 +1,57 @@
+$bg: #fff
+$fg: #000
+$sel: #00f
+$moving: #f00
+$selmoving: #f0f
+
+
+body, html
+  color: $fg
+  background-color: $bg
+  height: 100%
+  margin: 0
+  padding: 0
+  display: flex
+  flex-direction: column
+
+  section
+    display: flex
+    flex: 1
+
+    article
+      flex: 1
+
+    aside
+      display: flex
+      flex-direction: column
+
+svg
+  text
+    dominant-baseline: text-before-edge
+    font-family: "sans"
+
+  .link
+    fill: none
+    stroke: $fg
+
+    &.selected
+      stroke: $sel
+
+  .element
+    cursor: move
+
+    .shape
+      stroke: $fg
+      fill: $bg
+
+    &.moving
+      .shape
+        stroke: $moving
+
+    &.selected
+      .shape
+        stroke: $sel
+
+    &.selected.moving
+      .shape
+        stroke: $selmoving
