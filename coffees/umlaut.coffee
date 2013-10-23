@@ -158,7 +158,8 @@ class @Link
     path: ->
         c1 = @source.pos()
         c2 = @target.pos()
-
+        if undefined in [c1.x, c1.y, c2.x, c2.y]
+            return 'M 0 0'
         d1 = @source.direction(c2.x, c2.y)
         d2 = @target.direction(c1.x, c1.y)
 
@@ -166,18 +167,21 @@ class @Link
         a2 = @target.anchor(d2)
 
         path = "M #{a1.x} #{a1.y}"
+        vert = ['N', 'S']
+        horz = ['E', 'O']
+
         if state.linkstyle == 'curve'
             path = "#{path} C"
             m =
                 x: .5 * (a1.x + a2.x)
                 y: .5 * (a1.y + a2.y)
 
-            if d1 == 'N' or d1 == 'S'
+            if d1 in vert
                 path = "#{path} #{a1.x} #{m.y}"
             else
                 path = "#{path} #{m.x} #{a1.y}"
 
-            if d2 == 'N' or d2 == 'S'
+            if d2 in vert
                 path = "#{path} #{a2.x} #{m.y}"
             else
                 path = "#{path} #{m.x} #{a2.y}"
@@ -185,7 +189,16 @@ class @Link
             path = "#{path} L"
         else if state.linkstyle == 'rectangular'
             path = "#{path} L"
-            path = "#{path} #{a1.x} #{a2.y} L"
+            if d1 in vert and d2 in horz
+                path = "#{path} #{a1.x} #{a2.y} L"
+            else if d1 in horz and d2 in vert
+                path = "#{path} #{a2.x} #{a1.y} L"
+            else if d1 in horz and d2 in horz
+                mid = a1.x + .5 * (a2.x - a1.x)
+                path = "#{path} #{mid} #{a1.y} L #{mid} #{a2.y} L"
+            else if d1 in vert and d2 in vert
+                mid = a1.y + .5 * (a2.y - a1.y)
+                path = "#{path} #{a1.x} #{mid} L #{a2.x} #{mid} L"
 
         "#{path} #{a2.x} #{a2.y}"
 
@@ -198,7 +211,9 @@ class @Link
     dragging: false
     mouse: new Mouse(0, 0, '')
     linking: []
-    linkstyle: 'curve'
+    linkstyle: 'rectangular'
+    freemode: false
+
 
 objectify = ->
     JSON.stringify(
@@ -255,7 +270,7 @@ commands =
     edit:
         fun: ->
             for elt in state.selection
-                elt.text = prompt("Enter a name for #{elt.text}:")
+                elt.text = prompt("Enter a name for #{elt.text}:") or elt.text
             sync()
         label: 'Edit element text'
         hotkey: 'e'
@@ -325,6 +340,18 @@ commands =
             tick()
         label: 'Change link style'
         hotkey: 'space'
+
+    freemode:
+        fun: ->
+            for elt in data.elts
+                elt.fixed = state.freemode
+            if state.freemode
+                force.stop()
+            else
+                sync()
+            state.freemode = not state.freemode
+        label: 'Toggle free mode'
+        hotkey: 'tab'
 
 for e of E
     commands[e] =
@@ -548,7 +575,7 @@ sync = ->
             for lnk in state.linking
                 lnk.target = state.mouse)
         .on('dblclick', (elt) ->
-            elt.text = prompt("Enter a name for #{elt.text}:")
+            elt.text = prompt("Enter a name for #{elt.text}:") or elt.text
             sync())
 
     g
@@ -588,7 +615,7 @@ tick = ->
             need_force = true
             break
 
-    need_force = need_force and (force.alpha() or 1) > .03
+    need_force = need_force and state.freemode or (force.alpha() or 1) > .03
 
     if not need_force
         force.stop()
@@ -610,8 +637,9 @@ element_add = (type) =>
 force
     .on('tick', tick)
     .on('end', ->
-        for elt in data.elts
-            elt.fixed = true
+        if not state.freemode
+            for elt in data.elts
+                elt.fixed = true
         # Last adjustements
         tick()
         generate_url()

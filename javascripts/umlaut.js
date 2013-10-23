@@ -3,8 +3,8 @@
   var E, L, Mouse, article, aside, command, commands, data, drag, e, element, element_add, force, generate_url, height, history_pop, link, load, name, objectify, save, svg, sync, tick, width, _ref, _ref1, _ref2, _ref3, _ref4,
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
-    _this = this,
-    __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
+    __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; },
+    _this = this;
 
   this.Element = (function() {
     function Element(x, y, text, fixed) {
@@ -262,26 +262,31 @@
     };
 
     Link.prototype.path = function() {
-      var a1, a2, c1, c2, d1, d2, m, path;
+      var a1, a2, c1, c2, d1, d2, horz, m, mid, path, vert;
       c1 = this.source.pos();
       c2 = this.target.pos();
+      if (void 0 === c1.x || void 0 === c1.y || void 0 === c2.x || void 0 === c2.y) {
+        return 'M 0 0';
+      }
       d1 = this.source.direction(c2.x, c2.y);
       d2 = this.target.direction(c1.x, c1.y);
       a1 = this.source.anchor(d1);
       a2 = this.target.anchor(d2);
       path = "M " + a1.x + " " + a1.y;
+      vert = ['N', 'S'];
+      horz = ['E', 'O'];
       if (state.linkstyle === 'curve') {
         path = "" + path + " C";
         m = {
           x: .5 * (a1.x + a2.x),
           y: .5 * (a1.y + a2.y)
         };
-        if (d1 === 'N' || d1 === 'S') {
+        if (__indexOf.call(vert, d1) >= 0) {
           path = "" + path + " " + a1.x + " " + m.y;
         } else {
           path = "" + path + " " + m.x + " " + a1.y;
         }
-        if (d2 === 'N' || d2 === 'S') {
+        if (__indexOf.call(vert, d2) >= 0) {
           path = "" + path + " " + a2.x + " " + m.y;
         } else {
           path = "" + path + " " + m.x + " " + a2.y;
@@ -290,7 +295,17 @@
         path = "" + path + " L";
       } else if (state.linkstyle === 'rectangular') {
         path = "" + path + " L";
-        path = "" + path + " " + a1.x + " " + a2.y + " L";
+        if (__indexOf.call(vert, d1) >= 0 && __indexOf.call(horz, d2) >= 0) {
+          path = "" + path + " " + a1.x + " " + a2.y + " L";
+        } else if (__indexOf.call(horz, d1) >= 0 && __indexOf.call(vert, d2) >= 0) {
+          path = "" + path + " " + a2.x + " " + a1.y + " L";
+        } else if (__indexOf.call(horz, d1) >= 0 && __indexOf.call(horz, d2) >= 0) {
+          mid = a1.x + .5 * (a2.x - a1.x);
+          path = "" + path + " " + mid + " " + a1.y + " L " + mid + " " + a2.y + " L";
+        } else if (__indexOf.call(vert, d1) >= 0 && __indexOf.call(vert, d2) >= 0) {
+          mid = a1.y + .5 * (a2.y - a1.y);
+          path = "" + path + " " + a1.x + " " + mid + " L " + a2.x + " " + mid + " L";
+        }
       }
       return "" + path + " " + a2.x + " " + a2.y;
     };
@@ -308,7 +323,8 @@
     dragging: false,
     mouse: new Mouse(0, 0, ''),
     linking: [],
-    linkstyle: 'curve'
+    linkstyle: 'rectangular',
+    freemode: false
   };
 
   objectify = function() {
@@ -397,7 +413,7 @@
         _ref5 = state.selection;
         for (_i = 0, _len = _ref5.length; _i < _len; _i++) {
           elt = _ref5[_i];
-          elt.text = prompt("Enter a name for " + elt.text + ":");
+          elt.text = prompt("Enter a name for " + elt.text + ":") || elt.text;
         }
         return sync();
       },
@@ -484,6 +500,24 @@
       },
       label: 'Change link style',
       hotkey: 'space'
+    },
+    freemode: {
+      fun: function() {
+        var elt, _i, _len, _ref5;
+        _ref5 = data.elts;
+        for (_i = 0, _len = _ref5.length; _i < _len; _i++) {
+          elt = _ref5[_i];
+          elt.fixed = state.freemode;
+        }
+        if (state.freemode) {
+          force.stop();
+        } else {
+          sync();
+        }
+        return state.freemode = !state.freemode;
+      },
+      label: 'Toggle free mode',
+      hotkey: 'tab'
     }
   };
 
@@ -706,7 +740,7 @@
       }
       return _results;
     }).on('dblclick', function(elt) {
-      elt.text = prompt("Enter a name for " + elt.text + ":");
+      elt.text = prompt("Enter a name for " + elt.text + ":") || elt.text;
       return sync();
     });
     g.append('path').attr('class', 'shape');
@@ -736,7 +770,7 @@
         break;
       }
     }
-    need_force = need_force && (force.alpha() || 1) > .03;
+    need_force = need_force && state.freemode || (force.alpha() || 1) > .03;
     if (!need_force) {
       force.stop();
     }
@@ -764,10 +798,12 @@
 
   force.on('tick', tick).on('end', function() {
     var elt, _i, _len, _ref5;
-    _ref5 = data.elts;
-    for (_i = 0, _len = _ref5.length; _i < _len; _i++) {
-      elt = _ref5[_i];
-      elt.fixed = true;
+    if (!state.freemode) {
+      _ref5 = data.elts;
+      for (_i = 0, _len = _ref5.length; _i < _len; _i++) {
+        elt = _ref5[_i];
+        elt.fixed = true;
+      }
     }
     tick();
     return generate_url();
