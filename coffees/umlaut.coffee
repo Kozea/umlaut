@@ -36,23 +36,20 @@ class @Element
             else
                 return 'N'
 
-    anchor: (x, y) ->
-        rv =
-            direction: @direction(x, y)
-        switch rv.direction
+    anchor: (direction) ->
+        switch direction
             when 'N'
-                rv.x = @x
-                rv.y = @y - @height() / 2
+                x: @x
+                y: @y - @height() / 2
             when 'S'
-                rv.x = @x
-                rv.y = @y + @height() / 2
+                x: @x
+                y: @y + @height() / 2
             when 'E'
-                rv.x = @x + @width() / 2
-                rv.y = @y
+                x: @x + @width() / 2
+                y: @y
             when 'O'
-                rv.x = @x - @width() / 2
-                rv.y = @y
-        rv
+                x: @x - @width() / 2
+                y: @y
 
     in: (rect) ->
         rect.x < @x < rect.x + rect.width and rect.y < @y < rect.y + rect.height
@@ -63,6 +60,11 @@ class @Element
         y: @y
         text: @text
         fixed: @fixed
+
+class Mouse extends Element
+    width: -> 1
+    height: -> 1
+    weight: 1
 
 E = {}
 L = {}
@@ -145,45 +147,48 @@ class E.Delay extends Element
 
 
 class @Link
-    constructor: (@elt1, @elt2) ->
-
-    source: =>
-        @elt1.anchor(@elt2)
-
-    target: =>
-        @elt2.anchor(@elt1)
+    constructor: (@source, @target) ->
+        @lol = @target
 
     objectify: ->
         name: @constructor.name
-        elt1: data.elts.indexOf(@elt1)
-        elt2: data.elts.indexOf(@elt2)
+        source: data.elts.indexOf(@source)
+        target: data.elts.indexOf(@target)
 
     path: ->
-        c1 = @elt1.pos()
-        c2 = @elt2.pos()
+        c1 = @source.pos()
+        c2 = @target.pos()
 
-        a1 = @elt1.anchor(c2.x, c2.y)
-        a2 = @elt2.anchor(c1.x, c1.y)
+        d1 = @source.direction(c2.x, c2.y)
+        d2 = @target.direction(c1.x, c1.y)
 
-        path = "M #{a1.x} #{a1.y} C"
-        m =
-            x: .5 * (a1.x + a2.x)
-            y: .5 * (a1.y + a2.y)
+        a1 = @source.anchor(d1)
+        a2 = @target.anchor(d2)
 
-        if a1.direction == 'N' or a1.direction == 'S'
-            path = "#{path} #{a1.x} #{m.y}"
-        else
-            path = "#{path} #{m.x} #{a1.y}"
+        path = "M #{a1.x} #{a1.y}"
+        if state.linkstyle == 'curve'
+            path = "#{path} C"
+            m =
+                x: .5 * (a1.x + a2.x)
+                y: .5 * (a1.y + a2.y)
 
-        if a2.direction == 'N' or a2.direction == 'S'
-            path = "#{path} #{a2.x} #{m.y}"
-        else
-            path = "#{path} #{m.x} #{a2.y}"
+            if d1 == 'N' or d1 == 'S'
+                path = "#{path} #{a1.x} #{m.y}"
+            else
+                path = "#{path} #{m.x} #{a1.y}"
+
+            if d2 == 'N' or d2 == 'S'
+                path = "#{path} #{a2.x} #{m.y}"
+            else
+                path = "#{path} #{m.x} #{a2.y}"
+        else if state.linkstyle == 'diagonal'
+            path = "#{path} L"
+        else if state.linkstyle == 'rectangular'
+            path = "#{path} L"
+            path = "#{path} #{a1.x} #{a2.y} L"
 
         "#{path} #{a2.x} #{a2.y}"
 
-float = (s) ->
-    parseFloat(s)
 
 @data = data = {}
 @state =
@@ -191,28 +196,9 @@ float = (s) ->
     snap: 25
     no_save: false
     dragging: false
-    mouse:
-        x: 0
-        y: 0
-
-
-@combinations = (elts, n) ->
-    return [] if elts.length < n
-    return [elts] if elts.length == n
-    result = []
-    f = (prefix, elts) ->
-        i = 0
-
-        while i < elts.length
-            combination = prefix.concat(elts[i])
-            if combination.length == n
-                result.push combination
-            f combination, elts.slice(i + 1)
-            i++
-
-    f [], elts
-    result
-
+    mouse: new Mouse(0, 0, '')
+    linking: []
+    linkstyle: 'curve'
 
 objectify = ->
     JSON.stringify(
@@ -231,7 +217,7 @@ load = (new_data=null) =>
     for elt in new_data.elts
         data.elts.push(new E[elt.name](elt.x, elt.y, elt.text, elt.fixed))
     for lnk in new_data.lnks
-        data.lnks.push(new @[lnk.name](data.elts[lnk.elt1], data.elts[lnk.elt2]))
+        data.lnks.push(new @[lnk.name](data.elts[lnk.source], data.elts[lnk.target]))
 
     state.selection = []
 
@@ -259,8 +245,9 @@ commands =
 
     link:
         fun: ->
-            for combination in combinations(state.selection, 2)
-                data.lnks.push(new Link(combination[0], combination[1]))
+            state.linking = []
+            for elt in state.selection
+                state.linking.push(new Link(elt, state.mouse))
             sync()
         label: 'Link elements'
         hotkey: 'l'
@@ -321,13 +308,23 @@ commands =
             for elt in state.selection
                 data.elts.splice(data.elts.indexOf(elt), 1)
                 for lnk in data.lnks.slice()
-                    if elt == lnk.elt1 or elt == lnk.elt2
+                    if elt == lnk.source or elt == lnk.target
                         data.lnks.splice(data.lnks.indexOf(lnk), 1)
             state.selection = []
             d3.selectAll('g.element').classed('selected', false)
             sync()
         label: 'Remove elements'
         hotkey: 'del'
+
+    linkstyle:
+        fun: ->
+            state.linkstyle = switch state.linkstyle
+                when 'curve' then 'diagonal'
+                when 'diagonal' then 'rectangular'
+                when 'rectangular' then 'curve'
+            tick()
+        label: 'Change link style'
+        hotkey: 'space'
 
 for e of E
     commands[e] =
@@ -372,12 +369,14 @@ svg
 
 force = d3.layout.force()
     .gravity(.2)
-    .linkDistance(100)
+    .linkDistance(300)
     .charge(-2000)
     .size([width, height])
 
 drag = force.drag()
     .on("drag.force", (elt) ->
+        return if not state.dragging
+
         if not elt in state.selection
             state.selection.push elt
 
@@ -396,7 +395,8 @@ drag = force.drag()
 
         force.resume()
     ).on('dragstart', ->
-        state.dragging = true
+        unless d3.event.sourceEvent.which is 3
+            state.dragging = true
     ).on('dragend', ->
         state.dragging = false
     )
@@ -407,25 +407,39 @@ link = null
 svg.on("mousedown", ->
     return if state.dragging
 
-    if not d3.event.shiftKey
-        d3.selectAll('.selected').classed('selected', false)
-        state.selection = []
+    if d3.event.which is 3
+        state.linking = []
+        for elt in state.selection
+             state.linking.push(new Link(elt, state.mouse))
+        sync()
+    else
+        if not d3.event.shiftKey
+            d3.selectAll('.selected').classed('selected', false)
+            state.selection = []
 
-    mouse = d3.mouse(@)
-    svg.select('g.overlay')
-        .append("rect").attr
-            class: "selection"
-            x: mouse[0]
-            y: mouse[1]
-            width: 0
-            height: 0
+        mouse = d3.mouse(@)
+        svg.select('g.overlay')
+            .append("rect").attr
+                class: "selection"
+                x: mouse[0]
+                y: mouse[1]
+                width: 0
+                height: 0
+    d3.event.preventDefault()
+).on('contextmenu', ->
     d3.event.preventDefault()
 )
 
 d3.select(@).on("mousemove", ->
+    mouse = d3.mouse(svg.node())
+    state.mouse.x = mouse[0]
+    state.mouse.y = mouse[1]
+    if state.linking.length
+        tick()
+        return
+
     sel = svg.select("rect.selection")
     unless sel.empty()
-        mouse = d3.mouse(svg.node())
         rect =
             x: + sel.attr("x")
             y: + sel.attr("y")
@@ -460,6 +474,10 @@ d3.select(@).on("mousemove", ->
         d3.event.preventDefault()
 
 ).on("mouseup", ->
+    if state.linking.length
+        state.linking = []
+        sync()
+
     svg.selectAll("rect.selection").remove()
     d3.event.preventDefault()
 )
@@ -485,7 +503,7 @@ sync = ->
         .links(data.lnks)
 
     link = svg.select('g.links').selectAll('path.link')
-        .data(data.lnks)
+        .data(data.lnks.concat(state.linking))
 
     link
         .enter()
@@ -505,13 +523,30 @@ sync = ->
         .attr('class', 'element')
         .call(drag)
         .on("mouseup", (elt) ->
-            if d3.event.shiftKey
-                state.selection.push(elt)
-            else
+            if state.linking.length
+                for lnk in state.linking
+                    if lnk.source != elt
+                        data.lnks.push(new Link(lnk.source, elt))
+                state.linking = []
+                sync()
+                d3.event.preventDefault())
+        .on("mousedown", (elt) ->
+            g = d3.select @
+            selected = g.classed 'selected'
+            if (selected and not state.dragging) or (not selected) and not d3.event.shiftKey
                 d3.selectAll('.selected').classed('selected', false)
                 state.selection = [elt]
+                d3.select(this).classed('selected', true)
 
-            d3.select(this).classed('selected', true))
+            if d3.event.shiftKey and not selected
+                d3.select(this).classed('selected', true)
+                state.selection.push(elt))
+        .on("mousemove", (elt) ->
+            for lnk in state.linking
+                lnk.target = elt)
+        .on("mouseout", (elt) ->
+            for lnk in state.linking
+                lnk.target = state.mouse)
         .on('dblclick', (elt) ->
             elt.text = prompt("Enter a name for #{elt.text}:")
             sync())
