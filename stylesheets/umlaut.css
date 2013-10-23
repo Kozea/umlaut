@@ -66,3 +66,9 @@ svg .element.selected .shape {
 svg .element.selected.moving .shape {
   stroke: magenta;
 }
+/* line 68, ../sass/umlaut.sass */
+svg .overlay .selection {
+  fill: rgba(0, 0, 255, 0.05);
+  stroke: rgba(0, 0, 255, 0.3);
+  stroke-width: 2;
+}

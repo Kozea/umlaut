@@ -54,6 +54,9 @@ class @Element
                 rv.y = @y
         rv
 
+    in: (rect) ->
+        rect.x < @x < rect.x + rect.width and rect.y < @y < rect.y + rect.height
+
     objectify: ->
         name: @constructor.name
         x: @x
@@ -179,13 +182,15 @@ class @Link
 
         "#{path} #{a2.x} #{a2.y}"
 
-
+float = (s) ->
+    parseFloat(s)
 
 @data = data = {}
 @state =
     selection: []
     snap: 25
     no_save: false
+    dragging: false
     mouse:
         x: 0
         y: 0
@@ -241,157 +246,6 @@ generate_url = ->
     hash = '#' + btoa(objectify())
     if location.hash != hash
         history.pushState(null, null, hash)
-
-
-article = d3.select("article")
-width = article.node().clientWidth
-height = article.node().clientHeight or 500
-
-svg = article
-    .append("svg")
-    .attr("width", width)
-    .attr("height", height)
-
-svg
-    .append("svg:defs")
-    .append("svg:marker")
-    .attr("id", 'arrow')
-    .attr("viewBox", "0 0 10 10")
-    .attr("refX", 10)
-    .attr("refY", 5)
-    .attr("markerUnits", 'strokeWidth')
-    .attr("markerWidth", 10)
-    .attr("markerHeight", 10)
-    .attr("orient", "auto")
-    .append("svg:path")
-    .attr("d", "M 0 0 L 10 5 L 0 10")
-
-
-force = d3.layout.force()
-    .gravity(.2)
-    .linkDistance(100)
-    .charge(-2000)
-    .size([width, height])
-
-drag = force.drag()
-    .on("dragstart", (elt) ->
-        if d3.event.sourceEvent.shiftKey
-            state.selection.push(elt)
-        else
-            d3.selectAll('.selected').classed('selected', false)
-            state.selection = [elt]
-
-        d3.select(this).classed('selected', true)
-    )
-    .on("drag.force", (elt) ->
-        if d3.event.sourceEvent.shiftKey
-            elt.px = d3.event.x
-            elt.py = d3.event.y
-        else
-            elt.px = state.snap * Math.floor(d3.event.x / state.snap)
-            elt.py = state.snap * Math.floor(d3.event.y / state.snap)
-        force.resume()
-    )
-
-element = null
-link = null
-
-svg
-    .on('click', ->
-        if d3.event.target == @
-            d3.selectAll('.selected').classed('selected', false)
-            state.selection = []
-    )
-svg
-    .append('g')
-    .attr('class', 'links')
-
-svg
-    .append('g')
-    .attr('class', 'elements')
-
-
-sync = ->
-    force.nodes(data.elts)
-        .links(data.lnks)
-
-    link = svg.select('g.links').selectAll('path.link')
-        .data(data.lnks)
-
-    link
-        .enter()
-            .append("path")
-            .attr("class", "link")
-            .attr("marker-end", "url(#arrow)")
-            .on('click', ->
-                d3.select(this).classed('selected', true))
-
-    element = svg.select('g.elements').selectAll('g.element')
-        .data(data.elts)
-
-
-    # Update
-
-    # Enter
-    g = element.enter()
-        .append('g')
-        .attr('class', 'element')
-        .call(drag)
-    g
-        .append('path')
-        .attr('class', 'shape')
-    g
-        .append('text')
-
-    # Update + Enter
-    element
-        .select('text')
-        .text((elt) -> elt.text)
-        .each((elt) -> elt._txt_bbox = @getBBox())
-
-    element
-        .select('path.shape')
-        .attr('d', (elt) -> elt.path())
-
-    # Exit
-    element.exit()
-        .remove()
-
-    link.exit()
-        .remove()
-
-    tick()
-
-    force.start()
-
-
-
-tick = ->
-    need_force = false
-
-    for elt in data.elts
-        if not elt.fixed
-            need_force = true
-            break
-
-    need_force = need_force and (force.alpha() or 1) > .03
-
-    if not need_force
-        force.stop()
-
-    element
-        .attr("transform", ((elt) -> "translate(" + elt.x + "," + elt.y + ")"))
-        .each((elt) -> d3.select(this).classed('moving', not elt.fixed))
-    link
-        .attr("d", (elt) -> elt.path())
-
-
-element_add = (type) =>
-    new_elt = new E[type](undefined, undefined, 'New element', false)
-    data.elts.push(new_elt)
-    for elt in state.selection
-        data.lnks.push(new Link(elt, new_elt))
-    sync()
 
 commands =
     reorganize:
@@ -491,6 +345,232 @@ for name, command of commands
         .text(command.label)
         .on 'click', command.fun
     Mousetrap.bind command.hotkey, command.fun
+
+article = d3.select("article")
+width = article.node().clientWidth
+height = article.node().clientHeight or 500
+
+svg = article
+    .append("svg")
+    .attr("width", width)
+    .attr("height", height)
+
+svg
+    .append("svg:defs")
+    .append("svg:marker")
+    .attr("id", 'arrow')
+    .attr("viewBox", "0 0 10 10")
+    .attr("refX", 10)
+    .attr("refY", 5)
+    .attr("markerUnits", 'strokeWidth')
+    .attr("markerWidth", 10)
+    .attr("markerHeight", 10)
+    .attr("orient", "auto")
+    .append("svg:path")
+    .attr("d", "M 0 0 L 10 5 L 0 10")
+
+
+force = d3.layout.force()
+    .gravity(.2)
+    .linkDistance(100)
+    .charge(-2000)
+    .size([width, height])
+
+drag = force.drag()
+    .on("drag.force", (elt) ->
+        if not elt in state.selection
+            state.selection.push elt
+
+        if d3.event.sourceEvent.shiftKey
+            delta =
+                x: elt.px - d3.event.x
+                y: elt.py - d3.event.y
+        else
+            delta =
+                x: elt.px - state.snap * Math.floor(d3.event.x / state.snap)
+                y: elt.py - state.snap * Math.floor(d3.event.y / state.snap)
+
+        for elt in state.selection
+            elt.px -= delta.x
+            elt.py -= delta.y
+
+        force.resume()
+    ).on('dragstart', ->
+        state.dragging = true
+    ).on('dragend', ->
+        state.dragging = false
+    )
+
+element = null
+link = null
+
+svg.on("mousedown", ->
+    return if state.dragging
+
+    if not d3.event.shiftKey
+        d3.selectAll('.selected').classed('selected', false)
+        state.selection = []
+
+    mouse = d3.mouse(@)
+    svg.select('g.overlay')
+        .append("rect").attr
+            class: "selection"
+            x: mouse[0]
+            y: mouse[1]
+            width: 0
+            height: 0
+    d3.event.preventDefault()
+)
+
+d3.select(@).on("mousemove", ->
+    sel = svg.select("rect.selection")
+    unless sel.empty()
+        mouse = d3.mouse(svg.node())
+        rect =
+            x: + sel.attr("x")
+            y: + sel.attr("y")
+            width: + sel.attr("width")
+            height: + sel.attr("height")
+
+        move =
+            x: mouse[0] - rect.x
+            y: mouse[1] - rect.y
+
+        if move.x < 1 or (move.x * 2 < rect.width)
+            rect.x = mouse[0]
+            rect.width -= move.x
+        else
+            rect.width = move.x
+        if move.y < 1 or (move.y * 2 < rect.height)
+            rect.y = mouse[1]
+            rect.height -= move.y
+        else
+            rect.height = move.y
+        sel.attr rect
+        d3.selectAll('g.element').each((elt) ->
+            g = d3.select @
+            selected = g.classed 'selected'
+            if elt.in(rect) and not selected
+                state.selection.push(elt)
+                g.classed 'selected', true
+            else if not elt.in(rect) and selected and not d3.event.shiftKey
+                state.selection.splice(state.selection.indexOf(elt), 1)
+                g.classed 'selected', false
+        )
+        d3.event.preventDefault()
+
+).on("mouseup", ->
+    svg.selectAll("rect.selection").remove()
+    d3.event.preventDefault()
+)
+
+svg
+    .append('g')
+    .attr('class', 'underlay')
+
+svg
+    .append('g')
+    .attr('class', 'links')
+
+svg
+    .append('g')
+    .attr('class', 'elements')
+
+svg
+    .append('g')
+    .attr('class', 'overlay')
+
+sync = ->
+    force.nodes(data.elts)
+        .links(data.lnks)
+
+    link = svg.select('g.links').selectAll('path.link')
+        .data(data.lnks)
+
+    link
+        .enter()
+            .append("path")
+            .attr("class", "link")
+            .attr("marker-end", "url(#arrow)")
+
+    element = svg.select('g.elements').selectAll('g.element')
+        .data(data.elts)
+
+
+    # Update
+
+    # Enter
+    g = element.enter()
+        .append('g')
+        .attr('class', 'element')
+        .call(drag)
+        .on("mouseup", (elt) ->
+            if d3.event.shiftKey
+                state.selection.push(elt)
+            else
+                d3.selectAll('.selected').classed('selected', false)
+                state.selection = [elt]
+
+            d3.select(this).classed('selected', true))
+        .on('dblclick', (elt) ->
+            elt.text = prompt("Enter a name for #{elt.text}:")
+            sync())
+
+    g
+        .append('path')
+        .attr('class', 'shape')
+    g
+        .append('text')
+
+    # Update + Enter
+    element
+        .select('text')
+        .text((elt) -> elt.text)
+        .each((elt) -> elt._txt_bbox = @getBBox())
+
+    element
+        .select('path.shape')
+        .attr('d', (elt) -> elt.path())
+
+    # Exit
+    element.exit()
+        .remove()
+
+    link.exit()
+        .remove()
+
+    tick()
+
+    force.start()
+
+
+
+tick = ->
+    need_force = false
+
+    for elt in data.elts
+        if not elt.fixed
+            need_force = true
+            break
+
+    need_force = need_force and (force.alpha() or 1) > .03
+
+    if not need_force
+        force.stop()
+
+    element
+        .attr("transform", ((elt) -> "translate(" + elt.x + "," + elt.y + ")"))
+        .each((elt) -> d3.select(this).classed('moving', not elt.fixed))
+    link
+        .attr("d", (elt) -> elt.path())
+
+
+element_add = (type) =>
+    new_elt = new E[type](undefined, undefined, 'New element', false)
+    data.elts.push(new_elt)
+    for elt in state.selection
+        data.lnks.push(new Link(elt, new_elt))
+    sync()
 
 force
     .on('tick', tick)
