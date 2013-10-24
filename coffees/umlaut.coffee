@@ -427,25 +427,41 @@ underlay = underlay_g
     .attr('class', 'underlay')
     .attr('width', width)
     .attr('height', height)
+    .attr('fill', 'url(#grid)')
 
 root = underlay_g
     .append('g')
     .attr('class', 'root')
 
-svg
-    .append("svg:defs")
-    .append("svg:marker")
-    .attr("id", 'arrow')
-    .attr("viewBox", "0 0 10 10")
-    .attr("refX", 10)
-    .attr("refY", 5)
-    .attr("markerUnits", 'strokeWidth')
-    .attr("markerWidth", 10)
-    .attr("markerHeight", 10)
-    .attr("orient", "auto")
-    .append("svg:path")
-    .attr("d", "M 0 0 L 10 5 L 0 10")
+defs = svg
+    .append('svg:defs')
 
+defs
+    .append('svg:marker')
+    .attr('id', 'arrow')
+    .attr('viewBox', '0 0 10 10')
+    .attr('refX', 10)
+    .attr('refY', 5)
+    .attr('markerUnits', 'strokeWidth')
+    .attr('markerWidth', 10)
+    .attr('markerHeight', 10)
+    .attr('orient', 'auto')
+    .append('svg:path')
+    .attr('d', 'M 0 0 L 10 5 L 0 10')
+
+pattern = defs
+    .append('svg:pattern')
+    .attr('id', 'grid')
+    .attr('viewBox', '0 0 10 10')
+    .attr('x', 0)
+    .attr('y', 0)
+    .attr('width', state.snap)
+    .attr('height', state.snap)
+    .attr('patternUnits', 'userSpaceOnUse')
+
+pattern
+    .append('svg:path')
+    .attr('d', 'M 10 0 L 0 0 L 0 10')
 
 force = d3.layout.force()
     .gravity(.2)
@@ -588,6 +604,7 @@ zoom = d3.behavior.zoom()
             state.translate = d3.event.translate
             state.scale = d3.event.scale
             root.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")")
+            pattern.attr("patternTransform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")")
         else
             zoom.scale(state.scale)
             zoom.translate(state.translate)

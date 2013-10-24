@@ -25,12 +25,14 @@ body, html
     article
       -webkit-flex: 1
       flex: 1
+      margin: 1em .5em
 
     aside
       display: -webkit-flex
       display: flex
       -webkit-flex-direction: column
       flex-direction: column
+      margin: 1em .5em
 
   footer
     display: -webkit-flex
@@ -46,11 +48,14 @@ body, html
         text-align: right
 
 svg
-  .underlay
-    fill: transparent
+  box-shadow: 0 0 15px #aaa inset
+  #grid
+    path
+      fill: transparent
+      stroke: rgba(0, 0, 255, .12)
 
-    &.move
-      cursor: move
+  .underlay.move
+    cursor: move
 
   text
     dominant-baseline: central
