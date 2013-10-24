@@ -32,7 +32,26 @@ body, html
       -webkit-flex-direction: column
       flex-direction: column
 
+  footer
+    display: -webkit-flex
+    display: flex
+
+    h4
+      -webkit-flex: 1
+      flex: 1
+      margin: 0
+      padding: 0
+
+      &:last-of-type
+        text-align: right
+
 svg
+  .underlay
+    fill: transparent
+
+    &.move
+      cursor: move
+
   text
     dominant-baseline: central
     text-anchor: middle

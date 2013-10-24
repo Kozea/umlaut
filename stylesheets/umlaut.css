@@ -29,44 +29,68 @@ body section aside, html section aside {
   -webkit-flex-direction: column;
   flex-direction: column;
 }
+/* line 35, ../sass/umlaut.sass */
+body footer, html footer {
+  display: -webkit-flex;
+  display: flex;
+}
+/* line 39, ../sass/umlaut.sass */
+body footer h4, html footer h4 {
+  -webkit-flex: 1;
+  flex: 1;
+  margin: 0;
+  padding: 0;
+}
+/* line 45, ../sass/umlaut.sass */
+body footer h4:last-of-type, html footer h4:last-of-type {
+  text-align: right;
+}
 
-/* line 36, ../sass/umlaut.sass */
+/* line 49, ../sass/umlaut.sass */
+svg .underlay {
+  fill: transparent;
+}
+/* line 52, ../sass/umlaut.sass */
+svg .underlay.move {
+  cursor: move;
+}
+/* line 55, ../sass/umlaut.sass */
 svg text {
   dominant-baseline: central;
   text-anchor: middle;
   font-family: "sans";
 }
-/* line 41, ../sass/umlaut.sass */
+/* line 60, ../sass/umlaut.sass */
 svg .link {
   fill: none;
   stroke: black;
 }
-/* line 45, ../sass/umlaut.sass */
+/* line 64, ../sass/umlaut.sass */
 svg .link.selected {
   stroke: blue;
 }
-/* line 48, ../sass/umlaut.sass */
+/* line 67, ../sass/umlaut.sass */
 svg .element {
   cursor: move;
 }
-/* line 51, ../sass/umlaut.sass */
+/* line 70, ../sass/umlaut.sass */
 svg .element .shape {
   stroke: black;
   fill: white;
 }
-/* line 56, ../sass/umlaut.sass */
+/* line 75, ../sass/umlaut.sass */
 svg .element.moving .shape {
   stroke: red;
 }
-/* line 60, ../sass/umlaut.sass */
+/* line 79, ../sass/umlaut.sass */
 svg .element.selected .shape {
   stroke: blue;
 }
-/* line 64, ../sass/umlaut.sass */
+/* line 83, ../sass/umlaut.sass */
 svg .element.selected.moving .shape {
   stroke: magenta;
 }
-/* line 68, ../sass/umlaut.sass */
+/* line 87, ../sass/umlaut.sass */
 svg .overlay .selection {
   fill: rgba(0, 0, 255, 0.05);
   stroke: rgba(0, 0, 255, 0.3);

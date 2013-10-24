@@ -213,6 +213,14 @@ class @Link
     linking: []
     linkstyle: 'rectangular'
     freemode: false
+    scale: 1
+    translate: [0, 0]
+
+mouse_xy = (e) ->
+    m = d3.mouse(e)
+
+    x: (m[0] - state.translate[0]) / state.scale
+    y: (m[1] - state.translate[1]) / state.scale
 
 
 objectify = ->
@@ -353,19 +361,51 @@ commands =
         label: 'Toggle free mode'
         hotkey: 'tab'
 
+    recenter:
+        fun: ->
+            zoom.translate([0, 0])
+            zoom.event(underlay_g)
+        label: 'Recenter'
+        hotkey: 'ctrl+home'
+
+    defaultscale:
+        fun: ->
+            zoom.scale(1)
+            zoom.event(underlay_g)
+        label: 'Default zoom'
+        hotkey: 'ctrl+0'
+
+    defaultscale:
+        fun: ->
+            zoom.scale(1)
+            zoom.translate([0, 0])
+            zoom.event(underlay_g)
+        label: 'Reset view'
+        hotkey: 'ctrl+backspace'
+
+
+taken_hotkeys = []
 for e of E
+    i = 1
+    key = e[0].toLowerCase()
+    while i < e.length and key in taken_hotkeys
+        key = e[i++].toLowerCase()
+
+    taken_hotkeys.push(key)
+
     commands[e] =
         ((elt) ->
             fun: ->
                 element_add elt
             label: elt
-            hotkey: elt[0])(e)
+            hotkey: "a #{key}")(e)
 
 aside = d3.select('aside')
 
 for name, command of commands
     aside
         .append('button')
+        .attr('title', "#{command.label} [#{command.hotkey}]")
         .text(command.label)
         .on 'click', command.fun
     Mousetrap.bind command.hotkey, command.fun
@@ -378,6 +418,19 @@ svg = article
     .append("svg")
     .attr("width", width)
     .attr("height", height)
+
+underlay_g = svg
+    .append('g')
+
+underlay = underlay_g
+    .append('rect')
+    .attr('class', 'underlay')
+    .attr('width', width)
+    .attr('height', height)
+
+root = underlay_g
+    .append('g')
+    .attr('class', 'root')
 
 svg
     .append("svg:defs")
@@ -397,12 +450,12 @@ svg
 force = d3.layout.force()
     .gravity(.2)
     .linkDistance(300)
-    .charge(-2000)
+    .charge(-5000)
     .size([width, height])
 
 drag = force.drag()
     .on("drag.force", (elt) ->
-        return if not state.dragging
+        return if not state.dragging or d3.event.sourceEvent.ctrlKey
 
         if not elt in state.selection
             state.selection.push elt
@@ -422,8 +475,8 @@ drag = force.drag()
 
         force.resume()
     ).on('dragstart', ->
-        unless d3.event.sourceEvent.which is 3
-            state.dragging = true
+        return if d3.event.sourceEvent.which is 3 or d3.event.sourceEvent.ctrlKey
+        state.dragging = true
     ).on('dragend', ->
         state.dragging = false
     )
@@ -432,7 +485,7 @@ element = null
 link = null
 
 svg.on("mousedown", ->
-    return if state.dragging
+    return if state.dragging or d3.event.ctrlKey
 
     if d3.event.which is 3
         state.linking = []
@@ -444,12 +497,12 @@ svg.on("mousedown", ->
             d3.selectAll('.selected').classed('selected', false)
             state.selection = []
 
-        mouse = d3.mouse(@)
+        mouse = mouse_xy(@)
         svg.select('g.overlay')
             .append("rect").attr
                 class: "selection"
-                x: mouse[0]
-                y: mouse[1]
+                x: mouse.x
+                y: mouse.y
                 width: 0
                 height: 0
     d3.event.preventDefault()
@@ -458,9 +511,9 @@ svg.on("mousedown", ->
 )
 
 d3.select(@).on("mousemove", ->
-    mouse = d3.mouse(svg.node())
-    state.mouse.x = mouse[0]
-    state.mouse.y = mouse[1]
+    return if d3.event.ctrlKey
+    mouse = mouse_xy(svg.node())
+    state.mouse = mouse
     if state.linking.length
         tick()
         return
@@ -474,16 +527,16 @@ d3.select(@).on("mousemove", ->
             height: + sel.attr("height")
 
         move =
-            x: mouse[0] - rect.x
-            y: mouse[1] - rect.y
+            x: mouse.x - rect.x
+            y: mouse.y - rect.y
 
         if move.x < 1 or (move.x * 2 < rect.width)
-            rect.x = mouse[0]
+            rect.x = mouse.x
             rect.width -= move.x
         else
             rect.width = move.x
         if move.y < 1 or (move.y * 2 < rect.height)
-            rect.y = mouse[1]
+            rect.y = mouse.y
             rect.height -= move.y
         else
             rect.height = move.y
@@ -501,29 +554,46 @@ d3.select(@).on("mousemove", ->
         d3.event.preventDefault()
 
 ).on("mouseup", ->
+    return if d3.event.ctrlKey
     if state.linking.length
         state.linking = []
         sync()
 
     svg.selectAll("rect.selection").remove()
     d3.event.preventDefault()
+).on("keydown", ->
+    if d3.event.ctrlKey
+        underlay.classed('move', true)
+).on("keyup", ->
+    underlay.classed('move', false)
 )
 
-svg
-    .append('g')
-    .attr('class', 'underlay')
 
-svg
+root
     .append('g')
     .attr('class', 'links')
 
-svg
+root
     .append('g')
     .attr('class', 'elements')
 
-svg
+root
     .append('g')
     .attr('class', 'overlay')
+
+zoom = d3.behavior.zoom()
+    .scale(1)
+    .on("zoom", ->
+        if not d3.event.sourceEvent or d3.event.sourceEvent.type in ['wheel', 'click'] or d3.event.sourceEvent.ctrlKey
+            state.translate = d3.event.translate
+            state.scale = d3.event.scale
+            root.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")")
+        else
+            zoom.scale(state.scale)
+            zoom.translate(state.translate)
+    )
+
+underlay_g.call(zoom)
 
 sync = ->
     force.nodes(data.elts)
@@ -538,7 +608,8 @@ sync = ->
             .attr("class", "link")
             .attr("marker-end", "url(#arrow)")
 
-    element = svg.select('g.elements').selectAll('g.element')
+    element = svg.select('g.elements')
+        .selectAll('g.element')
         .data(data.elts)
 
 
@@ -549,15 +620,8 @@ sync = ->
         .append('g')
         .attr('class', 'element')
         .call(drag)
-        .on("mouseup", (elt) ->
-            if state.linking.length
-                for lnk in state.linking
-                    if lnk.source != elt
-                        data.lnks.push(new Link(lnk.source, elt))
-                state.linking = []
-                sync()
-                d3.event.preventDefault())
         .on("mousedown", (elt) ->
+            return if d3.event.ctrlKey
             g = d3.select @
             selected = g.classed 'selected'
             if (selected and not state.dragging) or (not selected) and not d3.event.shiftKey
@@ -569,12 +633,24 @@ sync = ->
                 d3.select(this).classed('selected', true)
                 state.selection.push(elt))
         .on("mousemove", (elt) ->
+            return if d3.event.ctrlKey
             for lnk in state.linking
                 lnk.target = elt)
         .on("mouseout", (elt) ->
+            return if d3.event.ctrlKey
             for lnk in state.linking
                 lnk.target = state.mouse)
+        .on("mouseup", (elt) ->
+            return if d3.event.ctrlKey
+            if state.linking.length
+                for lnk in state.linking
+                    if lnk.source != elt
+                        data.lnks.push(new Link(lnk.source, elt))
+                state.linking = []
+                sync()
+                d3.event.preventDefault())
         .on('dblclick', (elt) ->
+            return if d3.event.ctrlKey
             elt.text = prompt("Enter a name for #{elt.text}:") or elt.text
             sync())
 
