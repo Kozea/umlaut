@@ -351,15 +351,8 @@
 
   load = function(new_data) {
     var elt, lnk, _i, _j, _len, _len1, _ref5, _ref6;
-    if (new_data == null) {
-      new_data = null;
-    }
     data.elts = [];
     data.lnks = [];
-    new_data = new_data || localStorage.getItem('data');
-    if (!new_data) {
-      return;
-    }
     new_data = JSON.parse(new_data);
     _ref5 = new_data.elts;
     for (_i = 0, _len = _ref5.length; _i < _len; _i++) {
@@ -424,7 +417,7 @@
         _ref5 = state.selection;
         for (_i = 0, _len = _ref5.length; _i < _len; _i++) {
           elt = _ref5[_i];
-          elt.text = prompt("Enter a name for " + elt.text + ":") || elt.text;
+          elt.text = prompt("Enter a name for " + elt.text + ":", elt.text) || elt.text;
         }
         return sync();
       },
@@ -661,8 +654,11 @@
       return;
     }
     return state.dragging = true;
-  }).on('dragend', function() {
-    return state.dragging = false;
+  }).on('dragend', function(elt) {
+    state.dragging = false;
+    if (!state.freemode) {
+      return elt.fixed = true;
+    }
   });
 
   element = null;
@@ -707,7 +703,8 @@
       return;
     }
     mouse = mouse_xy(svg.node());
-    state.mouse = mouse;
+    state.mouse.x = mouse.x;
+    state.mouse.y = mouse.y;
     if (state.linking.length) {
       tick();
       return;
@@ -857,7 +854,7 @@
       if (d3.event.ctrlKey) {
         return;
       }
-      elt.text = prompt("Enter a name for " + elt.text + ":") || elt.text;
+      elt.text = prompt("Enter a name for " + elt.text + ":", elt.text) || elt.text;
       return sync();
     });
     g.append('path').attr('class', 'shape');
@@ -927,11 +924,16 @@
   });
 
   history_pop = function() {
+    var local_data;
     try {
       if (location.hash) {
         load(atob(location.hash.slice(1)));
       } else {
-        load();
+        local_data = localStorage.getItem('data');
+        if (!local_data) {
+          local_data = atob('eyJlbHRzIjpbeyJuYW1lIjoiUHJvY2VzcyIsIngiOjIwMCwieSI6NzUsInRleHQiOiJTdGFydCIsImZpeGVkIjp0cnVlfSx7Im5hbWUiOiJEZWNpc2lvbiIsIngiOjIwMCwieSI6MjI1LCJ0ZXh0IjoiRG8geW91IHVuZGVyc3RhbmQgZmxvdyBjaGFydHM/IiwiZml4ZWQiOnRydWV9LHsibmFtZSI6IlByb2Nlc3MiLCJ4Ijo2NzUsInkiOjIyNSwidGV4dCI6Ikdvb2QiLCJmaXhlZCI6dHJ1ZX0seyJuYW1lIjoiUHJvY2VzcyIsIngiOjEwMjUsInkiOjIyNSwidGV4dCI6IkxldCdzIGdvIGRyaW5rLiIsImZpeGVkIjp0cnVlfSx7Im5hbWUiOiJQcm9jZXNzIiwieCI6MTAyNSwieSI6MTAwLCJ0ZXh0IjoiSGV5IEkgc2hvdWxkIHRyeSBpbnN0YWxsaW5nIEZyZWVCU0QhIiwiZml4ZWQiOnRydWV9LHsibmFtZSI6IkRlY2lzaW9uIiwieCI6MjAwLCJ5Ijo0MjUsInRleHQiOiJPa2F5LiBZb3Ugc2VlIHRoZSBsaW5lIGxhYmVsZWQgXCJ5ZXNcIj8iLCJmaXhlZCI6dHJ1ZX0seyJuYW1lIjoiRGVjaXNpb24iLCJ4IjoyMDAsInkiOjU3NSwidGV4dCI6IkJ1dCB5b3Ugc2VlIHRoZSBvbmVzIGxhYmVsZWQgXCJub1wiLiIsImZpeGVkIjp0cnVlfSx7Im5hbWUiOiJQcm9jZXNzIiwieCI6MjAwLCJ5Ijo3MDAsInRleHQiOiJMaXN0ZW4uIiwiZml4ZWQiOnRydWV9LHsibmFtZSI6IlByb2Nlc3MiLCJ4IjozNTAsInkiOjcwMCwidGV4dCI6IkkgaGF0ZSB5b3UiLCJmaXhlZCI6dHJ1ZX0seyJuYW1lIjoiUHJvY2VzcyIsIngiOjUyNSwieSI6NjUwLCJ0ZXh0IjoiV2FpdCwgd2hhdD8iLCJmaXhlZCI6dHJ1ZX0seyJuYW1lIjoiRGVjaXNpb24iLCJ4Ijo2NzUsInkiOjQyNSwidGV4dCI6Ii4uLmFuZCB5b3UgY2FuIHNlZSB0aGUgb25lcyBsYWJlbGVkIFwibm9cIj8iLCJmaXhlZCI6dHJ1ZX0seyJuYW1lIjoiRGVjaXNpb24iLCJ4Ijo2NzUsInkiOjU3NSwidGV4dCI6IkJ1dCB5b3UganVzdCBmb2xsb3dlZCB0aGVtIHR3aWNlISIsImZpeGVkIjp0cnVlfSx7Im5hbWUiOiJQcm9jZXNzIiwieCI6MTAyNSwieSI6NTc1LCJ0ZXh0IjoiKFRoYXQgd2Fzbid0IGEgcXVlc3Rpb24uKSIsImZpeGVkIjp0cnVlfSx7Im5hbWUiOiJQcm9jZXNzIiwieCI6MTAyNSwieSI6NDUwLCJ0ZXh0IjoiU2NyZXcgaXQuIiwiZml4ZWQiOnRydWV9XSwibG5rcyI6W3sibmFtZSI6IkxpbmsiLCJzb3VyY2UiOjAsInRhcmdldCI6MX0seyJuYW1lIjoiTGluayIsInNvdXJjZSI6MSwidGFyZ2V0IjoyfSx7Im5hbWUiOiJMaW5rIiwic291cmNlIjoyLCJ0YXJnZXQiOjN9LHsibmFtZSI6IkxpbmsiLCJzb3VyY2UiOjMsInRhcmdldCI6NH0seyJuYW1lIjoiTGluayIsInNvdXJjZSI6MSwidGFyZ2V0Ijo1fSx7Im5hbWUiOiJMaW5rIiwic291cmNlIjo1LCJ0YXJnZXQiOjZ9LHsibmFtZSI6IkxpbmsiLCJzb3VyY2UiOjYsInRhcmdldCI6N30seyJuYW1lIjoiTGluayIsInNvdXJjZSI6NywidGFyZ2V0Ijo4fSx7Im5hbWUiOiJMaW5rIiwic291cmNlIjo2LCJ0YXJnZXQiOjl9LHsibmFtZSI6IkxpbmsiLCJzb3VyY2UiOjUsInRhcmdldCI6MTB9LHsibmFtZSI6IkxpbmsiLCJzb3VyY2UiOjEwLCJ0YXJnZXQiOjExfSx7Im5hbWUiOiJMaW5rIiwic291cmNlIjoxMSwidGFyZ2V0IjoxMn0seyJuYW1lIjoiTGluayIsInNvdXJjZSI6MTIsInRhcmdldCI6MTN9LHsibmFtZSI6IkxpbmsiLCJzb3VyY2UiOjEzLCJ0YXJnZXQiOjN9LHsibmFtZSI6IkxpbmsiLCJzb3VyY2UiOjEwLCJ0YXJnZXQiOjJ9XX0=');
+        }
+        load(local_data);
       }
     } catch (_error) {
       data.elts = [];
