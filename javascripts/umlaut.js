@@ -443,7 +443,7 @@
     },
     load: {
       fun: function(e) {
-        load();
+        load(localStorage.getItem('data') || '');
         sync();
         return e != null ? e.preventDefault() : void 0;
       },
@@ -884,7 +884,7 @@
         break;
       }
     }
-    need_force = need_force && state.freemode || (force.alpha() || 1) > .03;
+    need_force = need_force && (state.freemode || (force.alpha() || 1) > .03);
     if (!need_force) {
       force.stop();
     }

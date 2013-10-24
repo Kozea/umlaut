@@ -300,7 +300,7 @@ commands =
 
     load:
         fun: (e) ->
-            load()
+            load(localStorage.getItem('data') or '')
             sync()
             e?.preventDefault()
 
@@ -728,7 +728,7 @@ tick = ->
             need_force = true
             break
 
-    need_force = need_force and state.freemode or (force.alpha() or 1) > .03
+    need_force = need_force and (state.freemode or (force.alpha() or 1) > .03)
 
     if not need_force
         force.stop()
