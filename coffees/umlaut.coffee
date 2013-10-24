@@ -383,6 +383,15 @@ commands =
         label: 'Reset view'
         hotkey: 'ctrl+backspace'
 
+    snaptogrid:
+        fun: ->
+            for elt in data.elts
+                elt.x = elt.px = state.snap * Math.floor(elt.x / state.snap)
+                elt.y = elt.py = state.snap * Math.floor(elt.y / state.snap)
+            tick()
+        label: 'Snap to grid'
+        hotkey: 'ctrl+space'
+
 
 taken_hotkeys = []
 for e of E
@@ -428,6 +437,17 @@ underlay = underlay_g
     .attr('width', width)
     .attr('height', height)
     .attr('fill', 'url(#grid)')
+
+d3.select(@).on('resize', ->
+    width = article.node().clientWidth
+    height = article.node().clientHeight or 500
+    svg
+        .attr("width", width)
+        .attr("height", height)
+    underlay
+        .attr("width", width)
+        .attr("height", height)
+)
 
 root = underlay_g
     .append('g')

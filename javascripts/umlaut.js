@@ -554,6 +554,20 @@
       },
       label: 'Reset view',
       hotkey: 'ctrl+backspace'
+    },
+    snaptogrid: {
+      fun: function() {
+        var elt, _i, _len, _ref5;
+        _ref5 = data.elts;
+        for (_i = 0, _len = _ref5.length; _i < _len; _i++) {
+          elt = _ref5[_i];
+          elt.x = elt.px = state.snap * Math.floor(elt.x / state.snap);
+          elt.y = elt.py = state.snap * Math.floor(elt.y / state.snap);
+        }
+        return tick();
+      },
+      label: 'Snap to grid',
+      hotkey: 'ctrl+space'
     }
   };
 
@@ -596,6 +610,13 @@
   underlay_g = svg.append('g');
 
   underlay = underlay_g.append('rect').attr('class', 'underlay').attr('width', width).attr('height', height).attr('fill', 'url(#grid)');
+
+  d3.select(this).on('resize', function() {
+    width = article.node().clientWidth;
+    height = article.node().clientHeight || 500;
+    svg.attr("width", width).attr("height", height);
+    return underlay.attr("width", width).attr("height", height);
+  });
 
   root = underlay_g.append('g').attr('class', 'root');
 
