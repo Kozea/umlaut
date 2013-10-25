@@ -47,8 +47,36 @@ body, html
       &:last-of-type
         text-align: right
 
+#overlay
+  visibility: hidden
+  position: absolute
+  left: 0px
+  top: 0px
+  width: 100%
+  height: 100%
+  text-align: center
+  z-index: 1000
+  background-color: rgba(0, 0, 0, .2)
+
+  &.visible
+    visibility: visible
+
+  div
+    width: 30%
+    margin: 100px auto
+    background-color: rgba(255, 255, 255, .6)
+    border: 1px solid #000
+    padding: 15px
+    text-align: center
+
+  textarea
+    border: 1px solid #888
+    width: 100%
+    height: 75px
+
 svg
   box-shadow: 0 0 15px #aaa inset
+
   #grid
     path
       fill: transparent
@@ -58,9 +86,11 @@ svg
     cursor: move
 
   text
-    dominant-baseline: central
     text-anchor: middle
     font-family: "sans"
+
+    tspan
+      dominant-baseline: text-before-edge
 
   .link
     fill: none
