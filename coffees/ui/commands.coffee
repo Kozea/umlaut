@@ -1,12 +1,15 @@
 
 
 element_add = (type) =>
-    if state.freemode
+    free = state.freemode or d3.event?.type == 'click'
+    if free
         x = y = undefined
     else
         x = state.mouse.x
         y = state.mouse.y
-    new_elt = new E[type](x, y, 'New element', not state.freemode)
+    Type = E[type]
+    nth = data.elts.filter((elt) -> elt instanceof Type).length + 1
+    new_elt = new Type(x, y, "#{type} ##{nth}", not free)
     data.elts.push(new_elt)
     for elt in state.selection
         data.lnks.push(new Link(elt, new_elt))
@@ -166,7 +169,7 @@ for e of E
             hotkey: "a #{key}")(e)
 
 for name, command of commands
-    aside
+    d3.select('aside')
         .append('button')
         .attr('title', "#{command.label} [#{command.hotkey}]")
         .text(command.label)

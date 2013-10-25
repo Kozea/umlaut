@@ -1,3 +1,5 @@
+@import compass/css3
+
 $bg: #fff
 $fg: #000
 $sel: #00f
@@ -93,11 +95,19 @@ svg
       dominant-baseline: text-before-edge
 
   .link
+    +transition(stroke-width 500ms)
     fill: none
     stroke: $fg
 
+    text
+      fill: $fg
+      stroke: none
+
     &.selected
       stroke: $sel
+
+    &:hover
+      stroke-width: 3
 
   .element
     cursor: move

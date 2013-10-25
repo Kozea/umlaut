@@ -1,6 +1,6 @@
 
 
-edit = (elt) ->
+edit = (getter, setter) ->
     overlay = d3.select('#overlay')
         .classed('visible', true)
     textarea = overlay
@@ -8,7 +8,7 @@ edit = (elt) ->
     textarea_node = textarea.node()
     textarea
         .on('input', ->
-            elt.text = @value
+            setter(@value)
             sync()
         )
         .on('keydown', ->
@@ -17,7 +17,7 @@ edit = (elt) ->
                 textarea.on('keydown', null)
                 textarea_node.value = ''
                 overlay.classed('visible', false))
-    textarea_node.value = elt.text
+    textarea_node.value = getter()
     textarea_node.select()
     textarea_node.focus()
     overlay

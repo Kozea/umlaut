@@ -1,5 +1,5 @@
-@data = data = {}
-@state =
+data = data = {}
+state =
     selection: []
     snap: 25
     no_save: false
@@ -18,17 +18,7 @@ mouse_xy = (e) ->
     y: (m[1] - state.translate[1]) / state.scale
 
 
-objectify = ->
-    JSON.stringify(
-        elts: data.elts.map((elt) -> elt.objectify())
-        lnks: data.lnks.map((lnk) -> lnk.objectify())
-    )
-
-
-
 aside = d3.select('aside')
-
-
 article = d3.select("article")
 width = article.node().clientWidth
 height = article.node().clientHeight or 500
@@ -59,10 +49,6 @@ d3.select(@).on('resize', ->
         .attr("height", height)
 )
 
-root = underlay_g
-    .append('g')
-    .attr('class', 'root')
-
 defs = svg
     .append('svg:defs')
 
@@ -72,7 +58,7 @@ defs
     .attr('viewBox', '0 0 10 10')
     .attr('refX', 10)
     .attr('refY', 5)
-    .attr('markerUnits', 'strokeWidth')
+    .attr('markerUnits', 'userSpaceOnUse')
     .attr('markerWidth', 10)
     .attr('markerHeight', 10)
     .attr('orient', 'auto')
@@ -92,6 +78,11 @@ pattern = defs
 pattern
     .append('svg:path')
     .attr('d', 'M 10 0 L 0 0 L 0 10')
+
+
+root = underlay_g
+    .append('g')
+    .attr('class', 'root')
 
 force = d3.layout.force()
     .gravity(.2)
@@ -133,7 +124,7 @@ element = null
 link = null
 
 svg.on("mousedown", ->
-    return if state.dragging or d3.event.ctrlKey
+    return if state.dragging or d3.event.ctrlKey or d3.event.which is 2
 
     if d3.event.which is 3
         state.linking = []
@@ -235,7 +226,7 @@ zoom = d3.behavior.zoom()
     .scale(1)
     .scaleExtent([.15, 5])
     .on("zoom", ->
-        if not d3.event.sourceEvent or d3.event.sourceEvent.type in ['wheel', 'click'] or d3.event.sourceEvent.ctrlKey
+        if not d3.event.sourceEvent or d3.event.sourceEvent.type in ['wheel', 'click'] or d3.event.sourceEvent.ctrlKey or d3.event.sourceEvent.which is 2
             state.translate = d3.event.translate
             state.scale = d3.event.scale
             root.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")")
@@ -269,6 +260,15 @@ sync = ->
     link_g
         .append("text")
         .attr('class', "end")
+
+    link_g
+        .on('dblclick', (lnk) ->
+            return if d3.event.ctrlKey
+            nearest = lnk.nearest state.mouse
+            if nearest is lnk.source
+                edit((-> lnk.text.source), ((txt) -> lnk.text.source = txt))
+            else
+                edit((-> lnk.text.target), ((txt) -> lnk.text.target = txt)))
 
     element = svg.select('g.elements')
         .selectAll('g.element')
@@ -312,7 +312,7 @@ sync = ->
                 d3.event.preventDefault())
         .on('dblclick', (elt) ->
             return if d3.event.ctrlKey
-            edit(elt))
+            edit((-> elt.text), ((txt) -> elt.text = txt)))
 
     element_g
         .append('path')
@@ -322,42 +322,11 @@ sync = ->
         .append('text')
 
     # Update + Enter
-    link
-        .select('text.start')
-        .each((lnk) ->
-            return if not lnk.text_source
-            txt = d3.select @
-            txt.selectAll('tspan').remove()
-            for line, i in lnk.text_source.split('\n')
-                tspan = txt.append('tspan')
-                    .text(line)
-                if i != 0
-                    tspan
-                        .attr('dy', '1.2em'))
-        .each((lnk) -> lnk._txt_bbox = @getBBox())
-        .attr('x', (lnk) -> lnk.a1.x)
-        .attr('y', (lnk) -> lnk.a1.y)
-
-    link
-        .select('text.end')
-        .each((lnk) ->
-            return if not lnk.text_target
-            txt = d3.select @
-            txt.selectAll('tspan').remove()
-            for line, i in lnk.target.split('\n')
-                tspan = txt.append('tspan')
-                    .text(line)
-                if i != 0
-                    tspan
-                        .attr('dy', '1.2em'))
-        .each((lnk) -> lnk._txt_bbox = @getBBox())
-        .attr('x', (lnk) -> lnk.a2.x)
-        .attr('y', (lnk) -> lnk.a2.y)
-
     element
         .select('text')
         .each((elt) ->
             txt = d3.select @
+            return if elt.text == txt.text
             txt.selectAll('tspan').remove()
             for line, i in elt.text.split('\n')
                 tspan = txt.append('tspan')
@@ -368,6 +337,38 @@ sync = ->
                         .attr('dy', '1.2em'))
         .each((elt) -> elt._txt_bbox = @getBBox())
         .attr('y', (elt) -> - elt._txt_bbox.height / 2)
+
+    link
+        .select('path')
+        .attr("d", (lnk) -> lnk.path())
+
+    link
+        .select('text.start')
+        .each((lnk) ->
+            txt = d3.select @
+            return if lnk.text.source == txt.text
+            txt.selectAll('tspan').remove()
+            for line, i in lnk.text.source.split('\n')
+                tspan = txt.append('tspan')
+                    .text(line)
+                    .attr('x', 0)
+                if i != 0
+                    tspan
+                        .attr('dy', '1.2em'))
+
+    link
+        .select('text.end')
+        .each((lnk) ->
+            txt = d3.select @
+            return if not lnk.text.target == txt.text
+            txt.selectAll('tspan').remove()
+            for line, i in lnk.text.target.split('\n')
+                tspan = txt.append('tspan')
+                    .text(line)
+                    .attr('x', 0)
+                if i != 0
+                    tspan
+                        .attr('dy', '1.2em'))
 
     element
         .select('path.shape')
@@ -407,6 +408,34 @@ tick = ->
         .select('path')
         .attr("d", (lnk) -> lnk.path())
 
+    link
+        .select('text.start')
+        .attr('transform', (lnk) -> "translate(#{lnk.a1.x}, #{lnk.a1.y})")
+        .attr('dx', (lnk) ->
+            if lnk.d1 in ['N', 'E']
+                lnk.text_margin + @getBBox().width / 2
+            else
+                - (lnk.text_margin + @getBBox().width / 2))
+        .attr('dy', (lnk) ->
+            if lnk.d1 in ['N', 'E']
+                 - (@getBBox().height + lnk.text_margin)
+            else
+                lnk.text_margin)
+
+
+    link
+        .select('text.end')
+        .attr('transform', (lnk) -> "translate(#{lnk.a2.x}, #{lnk.a2.y})")
+        .attr('dx', (lnk) ->
+            if lnk.d2 in ['N', 'E']
+                lnk.text_margin + @getBBox().width / 2
+            else
+                - (lnk.text_margin + @getBBox().width / 2))
+        .attr('dy', (lnk) ->
+            if lnk.d2 in ['N', 'E']
+                 - (@getBBox().height + lnk.text_margin)
+            else
+                lnk.text_margin)
 
 force
     .on('tick', tick)
@@ -418,24 +447,3 @@ force
         tick()
         generate_url()
     )
-
-
-history_pop = () ->
-    try
-        if location.hash
-            load(atob(location.hash.slice(1)))
-        else
-             load(localStorage.getItem('data'))
-    catch
-        data.elts = []
-        data.lnks = []
-    state.no_save = true
-    sync()
-
-@addEventListener("popstate", history_pop)
-
-
-# ff hack
-if @mozInnerScreenX != null
-    history_pop()
- 

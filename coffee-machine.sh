@@ -1,7 +1,8 @@
 #!/bin/bash
 
-coffee -wc -j umlaut.js -o javascripts/ \
-    coffees/diagrams/*                  \
-    coffees/svg.coffee                  \
-    coffees/ui/*                        \
-    coffees/storage/*                   \
+coffee -wcb -j umlaut.js -o javascripts/ \
+    coffees/utils.coffee                 \
+    coffees/diagrams/*                   \
+    coffees/ui/*                         \
+    coffees/svg.coffee                   \
+    coffees/storage/*                    \

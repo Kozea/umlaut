@@ -1,4 +1,4 @@
-/* line 8, ../sass/umlaut.sass */
+/* line 10, ../sass/umlaut.sass */
 body, html {
   color: black;
   background-color: white;
@@ -10,20 +10,20 @@ body, html {
   -webkit-flex-direction: column;
   flex-direction: column;
 }
-/* line 19, ../sass/umlaut.sass */
+/* line 21, ../sass/umlaut.sass */
 body section, html section {
   display: -webkit-flex;
   display: flex;
   -webkit-flex: 1;
   flex: 1;
 }
-/* line 25, ../sass/umlaut.sass */
+/* line 27, ../sass/umlaut.sass */
 body section article, html section article {
   -webkit-flex: 1;
   flex: 1;
   margin: 1em 0.5em;
 }
-/* line 30, ../sass/umlaut.sass */
+/* line 32, ../sass/umlaut.sass */
 body section aside, html section aside {
   display: -webkit-flex;
   display: flex;
@@ -31,24 +31,24 @@ body section aside, html section aside {
   flex-direction: column;
   margin: 1em 0.5em;
 }
-/* line 37, ../sass/umlaut.sass */
+/* line 39, ../sass/umlaut.sass */
 body footer, html footer {
   display: -webkit-flex;
   display: flex;
 }
-/* line 41, ../sass/umlaut.sass */
+/* line 43, ../sass/umlaut.sass */
 body footer h4, html footer h4 {
   -webkit-flex: 1;
   flex: 1;
   margin: 0;
   padding: 0;
 }
-/* line 47, ../sass/umlaut.sass */
+/* line 49, ../sass/umlaut.sass */
 body footer h4:last-of-type, html footer h4:last-of-type {
   text-align: right;
 }
 
-/* line 50, ../sass/umlaut.sass */
+/* line 52, ../sass/umlaut.sass */
 #overlay {
   visibility: hidden;
   position: absolute;
@@ -60,11 +60,11 @@ body footer h4:last-of-type, html footer h4:last-of-type {
   z-index: 1000;
   background-color: rgba(0, 0, 0, 0.2);
 }
-/* line 61, ../sass/umlaut.sass */
+/* line 63, ../sass/umlaut.sass */
 #overlay.visible {
   visibility: visible;
 }
-/* line 64, ../sass/umlaut.sass */
+/* line 66, ../sass/umlaut.sass */
 #overlay div {
   width: 30%;
   margin: 100px auto;
@@ -73,66 +73,79 @@ body footer h4:last-of-type, html footer h4:last-of-type {
   padding: 15px;
   text-align: center;
 }
-/* line 72, ../sass/umlaut.sass */
+/* line 74, ../sass/umlaut.sass */
 #overlay textarea {
   border: 1px solid #888888;
   width: 100%;
   height: 75px;
 }
 
-/* line 77, ../sass/umlaut.sass */
+/* line 79, ../sass/umlaut.sass */
 svg {
   box-shadow: 0 0 15px #aaaaaa inset;
 }
-/* line 81, ../sass/umlaut.sass */
+/* line 83, ../sass/umlaut.sass */
 svg #grid path {
   fill: transparent;
   stroke: rgba(0, 0, 255, 0.12);
 }
-/* line 85, ../sass/umlaut.sass */
+/* line 87, ../sass/umlaut.sass */
 svg .underlay.move {
   cursor: move;
 }
-/* line 88, ../sass/umlaut.sass */
+/* line 90, ../sass/umlaut.sass */
 svg text {
   text-anchor: middle;
   font-family: "sans";
 }
-/* line 92, ../sass/umlaut.sass */
+/* line 94, ../sass/umlaut.sass */
 svg text tspan {
   dominant-baseline: text-before-edge;
 }
-/* line 95, ../sass/umlaut.sass */
+/* line 97, ../sass/umlaut.sass */
 svg .link {
+  -webkit-transition: stroke-width 500ms;
+  -moz-transition: stroke-width 500ms;
+  -o-transition: stroke-width 500ms;
+  transition: stroke-width 500ms;
   fill: none;
   stroke: black;
 }
-/* line 99, ../sass/umlaut.sass */
+/* line 102, ../sass/umlaut.sass */
+svg .link text {
+  fill: black;
+  stroke: none;
+}
+/* line 106, ../sass/umlaut.sass */
 svg .link.selected {
   stroke: blue;
 }
-/* line 102, ../sass/umlaut.sass */
+/* line 109, ../sass/umlaut.sass */
+svg .link:hover {
+  stroke-width: 3;
+}
+/* line 112, ../sass/umlaut.sass */
 svg .element {
   cursor: move;
 }
-/* line 105, ../sass/umlaut.sass */
+/* line 115, ../sass/umlaut.sass */
 svg .element .shape {
   stroke: black;
   fill: white;
 }
-/* line 110, ../sass/umlaut.sass */
+/* line 120, ../sass/umlaut.sass */
 svg .element.moving .shape {
   stroke: red;
 }
-/* line 114, ../sass/umlaut.sass */
+/* line 124, ../sass/umlaut.sass */
 svg .element.selected .shape {
   stroke: blue;
 }
-/* line 118, ../sass/umlaut.sass */
+/* line 128, ../sass/umlaut.sass */
 svg .element.selected.moving .shape {
   stroke: magenta;
 }
-/* line 122, ../sass/umlaut.sass */
+/* line 132, ../sass/umlaut.sass */
 svg .overlay .selection {
   fill: rgba(0, 0, 255, 0.05);
   stroke: rgba(0, 0, 255, 0.3);
