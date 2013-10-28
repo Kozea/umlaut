@@ -1324,6 +1324,9 @@ list_diagrams = function() {
   for (key in localStorage) {
     b64_diagram = localStorage[key];
     _ref9 = key.split('|'), type = _ref9[0], title = _ref9[1];
+    if (title == null) {
+      continue;
+    }
     $tbody.append($tr = $('<tr>'));
     $tr.addClass('local').append($('<td>').text(title), $('<td>').text(Diagram.diagrams[type].label), $('<td>').append($('<a>').attr('href', "#" + b64_diagram).text('⬈')));
   }

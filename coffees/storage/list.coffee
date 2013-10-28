@@ -3,6 +3,8 @@ list_diagrams = ->
     $tbody.find('.local').remove()
     for key, b64_diagram of localStorage
         [type, title] = key.split('|')
+        if not title?
+            continue
         $tbody.append($tr = $('<tr>'))
         $tr.addClass('local').append(
             $('<td>').text(title),
@@ -16,3 +18,4 @@ list_diagrams = ->
         $ul.append(
             $('<li>').append(
                 $('<a>').attr('href', "##{b64_diagram}").text("New #{diagram.label}")))
+
