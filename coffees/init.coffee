@@ -1,6 +1,5 @@
 $ =>
     list_diagrams()
-    @svg = new Svg()
 
     @addEventListener("popstate", history_pop)
     # ff hack

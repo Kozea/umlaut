@@ -10,6 +10,8 @@ history_pop = () ->
     else
         $editor.removeClass('hidden')
         $diagrams.addClass('hidden')
+        if not svg?
+            window.svg = new Svg()
 
     load(JSON.parse(atob(location.hash.slice(1))))
     if diagram.constructor.name != $('aside h3').attr('id')

@@ -7,7 +7,7 @@ list_diagrams = ->
         $tr.addClass('local').append(
             $('<td>').text(title),
             $('<td>').text(Diagram.diagrams[type].label),
-            $('<td>').append($('<a>').attr('href', "##{b64_diagram}").text('->')))
+            $('<td>').append($('<a>').attr('href', "##{b64_diagram}").text('⬈')))
 
     $ul = $('#diagrams ul')
     $ul.children().remove()

@@ -6,7 +6,6 @@ class State
         @dragging = false
         @mouse = new Mouse(0, 0, '')
         @linking = []
-        @linkstyle = 'rectangular'
         @freemode = false
         @scale = 1
         @translate = [0, 0]
@@ -29,7 +28,7 @@ class Svg
         @width = @article.node().clientWidth
         @height = @article.node().clientHeight or 500
         @title = d3.select('#editor h2')
-            .on('click', ->
+            .on('dblclick', ->
                 edit((-> diagram.title), ((txt) -> diagram.title = txt))
         )
 
@@ -48,7 +47,7 @@ class Svg
             .attr('height', @height)
             .attr('fill', 'url(#grid)')
 
-        d3.select(window).on('resize', @resize)
+        d3.select(window).on('resize', => @resize())
 
         @defs = @svg
             .append('svg:defs')
@@ -407,7 +406,7 @@ class Svg
 
         need_force = need_force and (state.freemode or (@force.alpha() or 1) > .03)
 
-        if not need_force
+        if not need_force and not state.dragging
             @force.stop()
 
         @element

@@ -3,6 +3,7 @@ load = (data) =>
     window.diagram = new Type()
 
     diagram.title = data.title
+    diagram.linkstyle = data.linkstyle
 
     for elt in data.elements
         element = diagram.element(elt.name)

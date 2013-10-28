@@ -9,6 +9,9 @@ $selmoving: #f0f
 .hidden
   display: none
 
+.draggable
+  cursor: move !important
+
 body, html
   color: $fg
   background-color: $bg
@@ -28,9 +31,6 @@ body, html
     -webkit-flex-direction: column
     flex-direction: column
 
-    table
-      width: 100%
-
     header
       h2
         text-align: center
@@ -47,14 +47,18 @@ body, html
       article
         -webkit-flex: 1
         flex: 1
-        margin: 1em .5em
+        margin: 1em 0 .5em
 
       aside
-        display: -webkit-flex
-        display: flex
-        -webkit-flex-direction: column
-        flex-direction: column
         margin: 1em .5em
+        width: 100px
+        text-align: center
+
+        .btn
+          margin: 0 3px 6px 3px
+
+          .glyphicon
+            font-size: 20px
 
   footer
     display: -webkit-flex

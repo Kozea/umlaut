@@ -31,7 +31,7 @@ class Link
         vert = ['N', 'S']
         horz = ['E', 'O']
 
-        if state.linkstyle == 'curve'
+        if diagram.linkstyle == 'curve'
             path = "#{path} C"
             m =
                 x: .5 * (@a1.x + @a2.x)
@@ -46,9 +46,9 @@ class Link
                 path = "#{path} #{@a2.x} #{m.y}"
             else
                 path = "#{path} #{m.x} #{@a2.y}"
-        else if state.linkstyle == 'diagonal'
+        else if diagram.linkstyle == 'diagonal'
             path = "#{path} L"
-        else if state.linkstyle == 'rectangular'
+        else if diagram.linkstyle == 'rectangular'
             path = "#{path} L"
             if @d1 in vert and @d2 in horz
                 path = "#{path} #{@a1.x} #{@a2.y} L"
