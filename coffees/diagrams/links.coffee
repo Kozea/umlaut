@@ -9,8 +9,8 @@ class Link
 
     objectify: ->
         name: @constructor.name
-        source: data.elts.indexOf(@source)
-        target: data.elts.indexOf(@target)
+        source: diagram.elements.indexOf(@source)
+        target: diagram.elements.indexOf(@target)
         text: @text
 
     nearest: (pos) ->

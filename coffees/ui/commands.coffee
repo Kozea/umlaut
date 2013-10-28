@@ -1,5 +1,3 @@
-
-
 element_add = (type) =>
     free = state.freemode or d3.event?.type == 'click'
     if free
@@ -7,21 +5,18 @@ element_add = (type) =>
     else
         x = state.mouse.x
         y = state.mouse.y
-    Type = E[type]
-    nth = data.elts.filter((elt) -> elt instanceof Type).length + 1
-    new_elt = new Type(x, y, "#{type} ##{nth}", not free)
-    data.elts.push(new_elt)
-    for elt in state.selection
-        data.lnks.push(new Link(elt, new_elt))
-    sync()
+    nth = diagram.elements.filter((elt) -> elt instanceof type).length + 1
+    new_elt = new type(x, y, "#{type} ##{nth}", not free)
+    diagram.elements.push(new_elt)
+    svg.sync()
 
 commands =
     reorganize:
         fun: ->
-            sel = if state.selection.length > 0 then state.selection else data.elts
+            sel = if state.selection.length > 0 then state.selection else diagram.elements
             for elt in sel
                 elt.fixed = false
-            sync()
+            svg.sync()
         label: 'Reorganize'
         hotkey: 'r'
 
@@ -30,7 +25,7 @@ commands =
             state.linking = []
             for elt in state.selection
                 state.linking.push(new Link(elt, state.mouse))
-            sync()
+            svg.sync()
         label: 'Link elements'
         hotkey: 'l'
 
@@ -38,14 +33,14 @@ commands =
         fun: ->
             for elt in state.selection
                 elt.text = prompt("Enter a name for #{elt.text}:", elt.text) or elt.text
-            sync()
+            svg.sync()
         label: 'Edit element text'
         hotkey: 'e'
 
 
     select_all:
         fun: (e) ->
-            state.selection = data.elts.slice()
+            state.selection = diagram.elements.slice()
             d3.selectAll('g.element').classed('selected', true)
             e?.preventDefault()
 
@@ -63,7 +58,7 @@ commands =
     load:
         fun: (e) ->
             load(localStorage.getItem('data') or '')
-            sync()
+            svg.sync()
             e?.preventDefault()
 
         label: 'Load locally'
@@ -88,13 +83,13 @@ commands =
     remove:
         fun: ->
             for elt in state.selection
-                data.elts.splice(data.elts.indexOf(elt), 1)
-                for lnk in data.lnks.slice()
+                diagram.elements.splice(diagram.elements.indexOf(elt), 1)
+                for lnk in diagram.links.slice()
                     if elt == lnk.source or elt == lnk.target
-                        data.lnks.splice(data.lnks.indexOf(lnk), 1)
+                        diagram.links.splice(diagram.links.indexOf(lnk), 1)
             state.selection = []
             d3.selectAll('g.element').classed('selected', false)
-            sync()
+            svg.sync()
         label: 'Remove elements'
         hotkey: 'del'
 
@@ -110,12 +105,12 @@ commands =
 
     freemode:
         fun: ->
-            for elt in data.elts
+            for elt in diagram.elements
                 elt.fixed = state.freemode
             if state.freemode
                 force.stop()
             else
-                sync()
+                svg.sync()
             state.freemode = not state.freemode
         label: 'Toggle free mode'
         hotkey: 'tab'
@@ -144,7 +139,7 @@ commands =
 
     snaptogrid:
         fun: ->
-            for elt in data.elts
+            for elt in diagram.elements
                 elt.x = elt.px = state.snap * Math.floor(elt.x / state.snap)
                 elt.y = elt.py = state.snap * Math.floor(elt.y / state.snap)
             tick()
@@ -152,26 +147,36 @@ commands =
         hotkey: 'ctrl+space'
 
 
-taken_hotkeys = []
-for e of E
-    i = 1
-    key = e[0].toLowerCase()
-    while i < e.length and key in taken_hotkeys
-        key = e[i++].toLowerCase()
+init_commands = ->
+    taken_hotkeys = []
+    commands['diagram'] =
+        label: diagram.name
 
-    taken_hotkeys.push(key)
+    for e in diagram.types.elements
+        i = 1
+        key = e.name[0].toLowerCase()
+        while i < e.length and key in taken_hotkeys
+            key = e[i++].toLowerCase()
 
-    commands[e] =
-        ((elt) ->
-            fun: ->
-                element_add elt
-            label: elt
-            hotkey: "a #{key}")(e)
+        taken_hotkeys.push(key)
 
-for name, command of commands
-    d3.select('aside')
-        .append('button')
-        .attr('title', "#{command.label} [#{command.hotkey}]")
-        .text(command.label)
-        .on 'click', command.fun
-    Mousetrap.bind command.hotkey, command.fun
+        commands[e.name] =
+            ((elt) ->
+                fun: ->
+                    element_add elt
+                label: elt
+                hotkey: "a #{key}")(e)
+
+    aside = d3.select('aside')
+    for name, command of commands
+        if not command.fun
+            aside
+                .append('h3')
+                .text(command.label)
+        else
+            aside
+                .append('button')
+                .attr('title', "#{command.label} [#{command.hotkey}]")
+                .text(command.label)
+                .on 'click', command.fun
+            Mousetrap.bind command.hotkey, command.fun

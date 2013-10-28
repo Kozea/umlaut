@@ -1,34 +1,24 @@
-load = (new_data) =>
-    data.elts = []
-    data.lnks = []
+load = (data) =>
+    Type = Diagram.diagrams[data.name]
+    window.diagram = new Type()
 
-    new_data = JSON.parse(new_data)
-    for elt in new_data.elts
-        data.elts.push(new E[elt.name](elt.x, elt.y, elt.text, elt.fixed))
-    for lnk in new_data.lnks
-        data.lnks.push(new @[lnk.name](data.elts[lnk.source], data.elts[lnk.target], lnk.text))
+    for elt in data.elements
+        element = diagram.element(elt.name)
+        diagram.elements.push(new element(elt.x, elt.y, elt.text, elt.fixed))
+    for lnk in data.links
+        link = diagram.link(lnk.name)
+        diagram.links.push(new link(diagram.elements[lnk.source], diagram.elements[lnk.target], lnk.text))
 
     state.selection = []
 
 save = =>
-    localStorage.setItem('data', objectify())
+    localStorage.setItem("#{diagram.constructor.name}|#{diagram.title}", diagram.hash())
 
-
-objectify = ->
-    JSON.stringify(
-        elts: data.elts.map((elt) -> elt.objectify())
-        lnks: data.lnks.map((lnk) -> lnk.objectify())
-    )
 
 generate_url = ->
     if state.no_save
         state.no_save = false
         return
-    hash = '#' + btoa(objectify())
+    hash = '#' + diagram.hash()
     if location.hash != hash
         history.pushState(null, null, hash)
-
-default_hash = atob('eyJlbHRzIjpbeyJuYW1lIjoiUHJvY2VzcyIsIngiOjIwMCwieSI6NzUsInRleHQiOiJTdGFydCIsImZpeGVkIjp0cnVlfSx7Im5hbWUiOiJEZWNpc2lvbiIsIngiOjIwMCwieSI6MjAwLCJ0ZXh0IjoiRG8geW91XG51bmRlcnN0YW5kXG5mbG93IGNoYXJ0cz8iLCJmaXhlZCI6dHJ1ZX0seyJuYW1lIjoiUHJvY2VzcyIsIngiOjU3NSwieSI6MjAwLCJ0ZXh0IjoiR29vZCIsImZpeGVkIjp0cnVlfSx7Im5hbWUiOiJQcm9jZXNzIiwieCI6ODI1LCJ5IjoyMDAsInRleHQiOiJMZXQncyBnb1xuIGRyaW5rLiIsImZpeGVkIjp0cnVlfSx7Im5hbWUiOiJQcm9jZXNzIiwieCI6MTAyNSwieSI6MjAwLCJ0ZXh0IjoiSGV5LCBJIHNob3VsZFxudHJ5IGluc3RhbGxpbmdcbkZyZWVCU0QhIiwiZml4ZWQiOnRydWV9LHsibmFtZSI6IkRlY2lzaW9uIiwieCI6MjAwLCJ5Ijo0MDAsInRleHQiOiJPa2F5LlxuWW91IHNlZSB0aGVcbmxpbmUgbGFiZWxlZFxuXCJ5ZXNcIj8iLCJmaXhlZCI6dHJ1ZX0seyJuYW1lIjoiRGVjaXNpb24iLCJ4IjoyMDAsInkiOjYwMCwidGV4dCI6IkJ1dCB5b3VcbnNlZSB0aGUgb25lc1xubGFiZWxlZCBcIk5vXCIuIiwiZml4ZWQiOnRydWV9LHsibmFtZSI6IlByb2Nlc3MiLCJ4IjoyMDAsInkiOjcyNSwidGV4dCI6Ikxpc3Rlbi4iLCJmaXhlZCI6dHJ1ZX0seyJuYW1lIjoiUHJvY2VzcyIsIngiOjM1MCwieSI6NzI1LCJ0ZXh0IjoiSSBoYXRlXG55b3UuIiwiZml4ZWQiOnRydWV9LHsibmFtZSI6IlByb2Nlc3MiLCJ4Ijo0MDAsInkiOjYwMCwidGV4dCI6IldhaXQsXG53aGF0PyIsImZpeGVkIjp0cnVlfSx7Im5hbWUiOiJEZWNpc2lvbiIsIngiOjU3NSwieSI6NDAwLCJ0ZXh0IjoiLi4uYW5kIHlvdSBjYW5cbnNlZSB0aGUgb25lc1xubGFiZWxlZCBcIm5vXCI/IiwiZml4ZWQiOnRydWV9LHsibmFtZSI6IkRlY2lzaW9uIiwieCI6NTc1LCJ5Ijo2MDAsInRleHQiOiJCdXQgeW91XG5qdXN0IGZvbGxvd2VkXG50aGVtIHR3aWNlISIsImZpeGVkIjp0cnVlfSx7Im5hbWUiOiJQcm9jZXNzIiwieCI6ODI1LCJ5Ijo2MDAsInRleHQiOiIoVGhhdCB3YXNuJ3QgYSBxdWVzdGlvbi4pIiwiZml4ZWQiOnRydWV9LHsibmFtZSI6IlByb2Nlc3MiLCJ4Ijo4MjUsInkiOjQyNSwidGV4dCI6IlNjcmV3IGl0LiIsImZpeGVkIjp0cnVlfV0sImxua3MiOlt7Im5hbWUiOiJMaW5rIiwic291cmNlIjowLCJ0YXJnZXQiOjEsInRleHQiOnsic291cmNlIjoiIiwidGFyZ2V0IjoiIn19LHsibmFtZSI6IkxpbmsiLCJzb3VyY2UiOjEsInRhcmdldCI6MiwidGV4dCI6eyJzb3VyY2UiOiJZZXMiLCJ0YXJnZXQiOiIifX0seyJuYW1lIjoiTGluayIsInNvdXJjZSI6MiwidGFyZ2V0IjozLCJ0ZXh0Ijp7InNvdXJjZSI6IlllcyIsInRhcmdldCI6IiJ9fSx7Im5hbWUiOiJMaW5rIiwic291cmNlIjozLCJ0YXJnZXQiOjQsInRleHQiOnsic291cmNlIjoiNiBkcmlua3MiLCJ0YXJnZXQiOiIifX0seyJuYW1lIjoiTGluayIsInNvdXJjZSI6MSwidGFyZ2V0Ijo1LCJ0ZXh0Ijp7InNvdXJjZSI6Ik5vXG4iLCJ0YXJnZXQiOiIifX0seyJuYW1lIjoiTGluayIsInNvdXJjZSI6NSwidGFyZ2V0Ijo2LCJ0ZXh0Ijp7InNvdXJjZSI6Ik5vIiwidGFyZ2V0IjoiIn19LHsibmFtZSI6IkxpbmsiLCJzb3VyY2UiOjYsInRhcmdldCI6NywidGV4dCI6eyJzb3VyY2UiOiIiLCJ0YXJnZXQiOiJObyJ9fSx7Im5hbWUiOiJMaW5rIiwic291cmNlIjo3LCJ0YXJnZXQiOjgsInRleHQiOnsic291cmNlIjoiIiwidGFyZ2V0IjoiIn19LHsibmFtZSI6IkxpbmsiLCJzb3VyY2UiOjYsInRhcmdldCI6OSwidGV4dCI6eyJzb3VyY2UiOiJZZXNcbiIsInRhcmdldCI6IiJ9fSx7Im5hbWUiOiJMaW5rIiwic291cmNlIjo1LCJ0YXJnZXQiOjEwLCJ0ZXh0Ijp7InNvdXJjZSI6Illlc1xuIiwidGFyZ2V0IjoiIn19LHsibmFtZSI6IkxpbmsiLCJzb3VyY2UiOjEwLCJ0YXJnZXQiOjExLCJ0ZXh0Ijp7InNvdXJjZSI6Ik5vXG4iLCJ0YXJnZXQiOiIifX0seyJuYW1lIjoiTGluayIsInNvdXJjZSI6MTEsInRhcmdldCI6MTIsInRleHQiOnsic291cmNlIjoiIiwidGFyZ2V0IjoiIn19LHsibmFtZSI6IkxpbmsiLCJzb3VyY2UiOjEyLCJ0YXJnZXQiOjEzLCJ0ZXh0Ijp7InNvdXJjZSI6IiIsInRhcmdldCI6IiJ9fSx7Im5hbWUiOiJMaW5rIiwic291cmNlIjoxMywidGFyZ2V0IjozLCJ0ZXh0Ijp7InNvdXJjZSI6IiIsInRhcmdldCI6IiJ9fSx7Im5hbWUiOiJMaW5rIiwic291cmNlIjoxMCwidGFyZ2V0IjoyLCJ0ZXh0Ijp7InNvdXJjZSI6IlllcyIsInRhcmdldCI6IiJ9fV19')
-
-if not localStorage.getItem('data')
-    localStorage.setItem('data', default_hash)

@@ -4,14 +4,32 @@
     <title>Umlaut</title>
     <meta charset="utf-8">
     <link href="stylesheets/umlaut.css" rel="stylesheet" type="text/css">
+    <script type="text/javascript" src="javascripts/jquery-2.0.3.js"></script>
     <script type="text/javascript" src="javascripts/d3.v3.js"></script>
     <script type="text/javascript" src="javascripts/mousetrap.min.js"></script>
+    <script type="text/javascript" src="javascripts/umlaut.js"></script>
   </head>
   <body>
     <header>
       <h1>Umlaut</h1>
     </header>
-    <section>
+    <section id="diagrams">
+      <table>
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Diagram type</th>
+            <th>Open</th>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Xkcd #518 example</td>
+            <td>Flow Chart</td>
+            <td><a href="#eyJuYW1lIjoiRmxvd0NoYXJ0IiwiZWxlbWVudHMiOlt7Im5hbWUiOiJQcm9jZXNzIiwieCI6MjAwLCJ5Ijo3NSwidGV4dCI6IlN0YXJ0IiwiZml4ZWQiOnRydWV9LHsibmFtZSI6IkRlY2lzaW9uIiwieCI6MjAwLCJ5IjoyMDAsInRleHQiOiJEbyB5b3VcbnVuZGVyc3RhbmRcbmZsb3cgY2hhcnRzPyIsImZpeGVkIjp0cnVlfSx7Im5hbWUiOiJQcm9jZXNzIiwieCI6NTc1LCJ5IjoyMDAsInRleHQiOiJHb29kIiwiZml4ZWQiOnRydWV9LHsibmFtZSI6IlByb2Nlc3MiLCJ4Ijo4MjUsInkiOjIwMCwidGV4dCI6IkxldCdzIGdvXG4gZHJpbmsuIiwiZml4ZWQiOnRydWV9LHsibmFtZSI6IlByb2Nlc3MiLCJ4IjoxMDI1LCJ5IjoyMDAsInRleHQiOiJIZXksIEkgc2hvdWxkXG50cnkgaW5zdGFsbGluZ1xuRnJlZUJTRCEiLCJmaXhlZCI6dHJ1ZX0seyJuYW1lIjoiRGVjaXNpb24iLCJ4IjoyMDAsInkiOjQwMCwidGV4dCI6Ik9rYXkuXG5Zb3Ugc2VlIHRoZVxubGluZSBsYWJlbGVkXG5cInllc1wiPyIsImZpeGVkIjp0cnVlfSx7Im5hbWUiOiJEZWNpc2lvbiIsIngiOjIwMCwieSI6NjAwLCJ0ZXh0IjoiQnV0IHlvdVxuc2VlIHRoZSBvbmVzXG5sYWJlbGVkIFwiTm9cIi4iLCJmaXhlZCI6dHJ1ZX0seyJuYW1lIjoiUHJvY2VzcyIsIngiOjIwMCwieSI6NzI1LCJ0ZXh0IjoiTGlzdGVuLiIsImZpeGVkIjp0cnVlfSx7Im5hbWUiOiJQcm9jZXNzIiwieCI6MzUwLCJ5Ijo3MjUsInRleHQiOiJJIGhhdGVcbnlvdS4iLCJmaXhlZCI6dHJ1ZX0seyJuYW1lIjoiUHJvY2VzcyIsIngiOjQwMCwieSI6NjAwLCJ0ZXh0IjoiV2FpdCxcbndoYXQ/IiwiZml4ZWQiOnRydWV9LHsibmFtZSI6IkRlY2lzaW9uIiwieCI6NTc1LCJ5Ijo0MDAsInRleHQiOiIuLi5hbmQgeW91IGNhblxuc2VlIHRoZSBvbmVzXG5sYWJlbGVkIFwibm9cIj8iLCJmaXhlZCI6dHJ1ZX0seyJuYW1lIjoiRGVjaXNpb24iLCJ4Ijo1NzUsInkiOjYwMCwidGV4dCI6IkJ1dCB5b3Vcbmp1c3QgZm9sbG93ZWRcbnRoZW0gdHdpY2UhIiwiZml4ZWQiOnRydWV9LHsibmFtZSI6IlByb2Nlc3MiLCJ4Ijo4MjUsInkiOjYwMCwidGV4dCI6IihUaGF0IHdhc24ndCBhIHF1ZXN0aW9uLikiLCJmaXhlZCI6dHJ1ZX0seyJuYW1lIjoiUHJvY2VzcyIsIngiOjgyNSwieSI6NDI1LCJ0ZXh0IjoiU2NyZXcgaXQuIiwiZml4ZWQiOnRydWV9XSwibGlua3MiOlt7Im5hbWUiOiJBcnJvdyIsInNvdXJjZSI6MCwidGFyZ2V0IjoxLCJ0ZXh0Ijp7InNvdXJjZSI6IiIsInRhcmdldCI6IiJ9fSx7Im5hbWUiOiJBcnJvdyIsInNvdXJjZSI6MSwidGFyZ2V0IjoyLCJ0ZXh0Ijp7InNvdXJjZSI6IlllcyIsInRhcmdldCI6IiJ9fSx7Im5hbWUiOiJBcnJvdyIsInNvdXJjZSI6MiwidGFyZ2V0IjozLCJ0ZXh0Ijp7InNvdXJjZSI6IlllcyIsInRhcmdldCI6IiJ9fSx7Im5hbWUiOiJBcnJvdyIsInNvdXJjZSI6MywidGFyZ2V0Ijo0LCJ0ZXh0Ijp7InNvdXJjZSI6IjYgZHJpbmtzIiwidGFyZ2V0IjoiIn19LHsibmFtZSI6IkFycm93Iiwic291cmNlIjoxLCJ0YXJnZXQiOjUsInRleHQiOnsic291cmNlIjoiTm9cbiIsInRhcmdldCI6IiJ9fSx7Im5hbWUiOiJBcnJvdyIsInNvdXJjZSI6NSwidGFyZ2V0Ijo2LCJ0ZXh0Ijp7InNvdXJjZSI6Ik5vIiwidGFyZ2V0IjoiIn19LHsibmFtZSI6IkFycm93Iiwic291cmNlIjo2LCJ0YXJnZXQiOjcsInRleHQiOnsic291cmNlIjoiIiwidGFyZ2V0IjoiTm8ifX0seyJuYW1lIjoiQXJyb3ciLCJzb3VyY2UiOjcsInRhcmdldCI6OCwidGV4dCI6eyJzb3VyY2UiOiIiLCJ0YXJnZXQiOiIifX0seyJuYW1lIjoiQXJyb3ciLCJzb3VyY2UiOjYsInRhcmdldCI6OSwidGV4dCI6eyJzb3VyY2UiOiJZZXNcbiIsInRhcmdldCI6IiJ9fSx7Im5hbWUiOiJBcnJvdyIsInNvdXJjZSI6NSwidGFyZ2V0IjoxMCwidGV4dCI6eyJzb3VyY2UiOiJZZXNcbiIsInRhcmdldCI6IiJ9fSx7Im5hbWUiOiJBcnJvdyIsInNvdXJjZSI6MTAsInRhcmdldCI6MTEsInRleHQiOnsic291cmNlIjoiTm9cbiIsInRhcmdldCI6IiJ9fSx7Im5hbWUiOiJBcnJvdyIsInNvdXJjZSI6MTEsInRhcmdldCI6MTIsInRleHQiOnsic291cmNlIjoiIiwidGFyZ2V0IjoiIn19LHsibmFtZSI6IkFycm93Iiwic291cmNlIjoxMiwidGFyZ2V0IjoxMywidGV4dCI6eyJzb3VyY2UiOiIiLCJ0YXJnZXQiOiIifX0seyJuYW1lIjoiQXJyb3ciLCJzb3VyY2UiOjEzLCJ0YXJnZXQiOjMsInRleHQiOnsic291cmNlIjoiIiwidGFyZ2V0IjoiIn19LHsibmFtZSI6IkFycm93Iiwic291cmNlIjoxMCwidGFyZ2V0IjoyLCJ0ZXh0Ijp7InNvdXJjZSI6IlllcyIsInRhcmdldCI6IiJ9fV19">-></a></td>
+        </tbody>
+      </table>
+    </section>
+    <section id="editor" class="hidden">
       <article>
       </article>
       <aside>
@@ -28,6 +46,5 @@
         (Use [Esc] to close)
       </div>
     </div>
-    <script type="text/javascript" src="javascripts/umlaut.js"></script>
   </body>
 </html>
