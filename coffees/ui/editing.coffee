@@ -9,7 +9,7 @@ edit = (getter, setter) ->
     textarea
         .on('input', ->
             setter(@value)
-            sync()
+            svg.sync()
         )
         .on('keydown', ->
             if d3.event.keyCode is 27

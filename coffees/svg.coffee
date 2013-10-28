@@ -28,6 +28,10 @@ class Svg
         @article = d3.select("article")
         @width = @article.node().clientWidth
         @height = @article.node().clientHeight or 500
+        @title = d3.select('#editor h2')
+            .on('click', ->
+                edit((-> diagram.title), ((txt) -> diagram.title = txt))
+        )
 
         @svg = @article
             .append("svg")
@@ -132,7 +136,7 @@ class Svg
                     d3.selectAll('.selected').classed('selected', false)
                     state.selection = []
 
-                mouse = mouse_xy(d3.event.target)
+                mouse = mouse_xy(@svg.node())
                 @svg.select('g.overlay')
                     .append("rect").attr
                         class: "selection"
@@ -251,6 +255,8 @@ class Svg
         @link = @svg.select('g.links').selectAll('g.link')
             .data(diagram.links.concat(state.linking))
 
+        @title.text(diagram.title)
+
         link_g = @link.enter()
             .append('g')
             .attr("class", "link")
@@ -289,7 +295,7 @@ class Svg
             .call(@drag)
             .on("mousedown", (elt) ->
                 return if d3.event.ctrlKey
-                    selected = d3.select(@).classed 'selected'
+                selected = d3.select(@).classed 'selected'
                 if (selected and not state.dragging) or (not selected) and not d3.event.shiftKey
                     d3.selectAll('.selected').classed('selected', false)
                     state.selection = [elt]
@@ -306,14 +312,14 @@ class Svg
                 return if d3.event.ctrlKey
                 for lnk in state.linking
                     lnk.target = state.mouse)
-            .on("mouseup", (elt) ->
+            .on("mouseup", (elt) =>
                 return if d3.event.ctrlKey
                 if state.linking.length
                     for lnk in state.linking
                         if lnk.source != elt
-                            diagram.links.push(new Link(lnk.source, elt))
+                            diagram.links.push(new Arrow(lnk.source, elt))
                     state.linking = []
-                    sync()
+                    @sync()
                     d3.event.preventDefault())
             .on('dblclick', (elt) ->
                 return if d3.event.ctrlKey
@@ -449,3 +455,4 @@ class Svg
         @underlay
             .attr("width", @width)
             .attr("height", @height)
+

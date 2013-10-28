@@ -2,6 +2,8 @@ load = (data) =>
     Type = Diagram.diagrams[data.name]
     window.diagram = new Type()
 
+    diagram.title = data.title
+
     for elt in data.elements
         element = diagram.element(elt.name)
         diagram.elements.push(new element(elt.x, elt.y, elt.text, elt.fixed))

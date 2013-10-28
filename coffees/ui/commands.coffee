@@ -6,7 +6,7 @@ element_add = (type) =>
         x = state.mouse.x
         y = state.mouse.y
     nth = diagram.elements.filter((elt) -> elt instanceof type).length + 1
-    new_elt = new type(x, y, "#{type} ##{nth}", not free)
+    new_elt = new type(x, y, "#{type.name} ##{nth}", not free)
     diagram.elements.push(new_elt)
     svg.sync()
 
@@ -99,7 +99,7 @@ commands =
                 when 'curve' then 'diagonal'
                 when 'diagonal' then 'rectangular'
                 when 'rectangular' then 'curve'
-            tick()
+            svg.tick()
         label: 'Change link style'
         hotkey: 'space'
 
@@ -142,15 +142,14 @@ commands =
             for elt in diagram.elements
                 elt.x = elt.px = state.snap * Math.floor(elt.x / state.snap)
                 elt.y = elt.py = state.snap * Math.floor(elt.y / state.snap)
-            tick()
+            svg.tick()
         label: 'Snap to grid'
         hotkey: 'ctrl+space'
 
 
 init_commands = ->
     taken_hotkeys = []
-    commands['diagram'] =
-        label: diagram.name
+    commands['diagram'] = '---'
 
     for e in diagram.types.elements
         i = 1
@@ -164,15 +163,17 @@ init_commands = ->
             ((elt) ->
                 fun: ->
                     element_add elt
-                label: elt
+                label: elt.name
                 hotkey: "a #{key}")(e)
 
     aside = d3.select('aside')
+    aside.selectAll('*').remove()
     for name, command of commands
-        if not command.fun
+        if command is '---'
             aside
                 .append('h3')
-                .text(command.label)
+                .attr('id', diagram.constructor.name)
+                .text(diagram.constructor.label)
         else
             aside
                 .append('button')

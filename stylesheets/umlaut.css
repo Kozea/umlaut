@@ -17,47 +17,63 @@ body, html {
 }
 /* line 23, ../sass/umlaut.sass */
 body section, html section {
-  display: -webkit-flex;
-  display: flex;
   -webkit-flex: 1;
   flex: 1;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-flex-direction: column;
+  flex-direction: column;
 }
-/* line 29, ../sass/umlaut.sass */
+/* line 31, ../sass/umlaut.sass */
 body section table, html section table {
   width: 100%;
 }
-/* line 32, ../sass/umlaut.sass */
-body section article, html section article {
+/* line 35, ../sass/umlaut.sass */
+body section header h2, html section header h2 {
+  text-align: center;
+  margin: 0;
+}
+/* line 39, ../sass/umlaut.sass */
+body section section, html section section {
+  -webkit-flex: 1;
+  flex: 1;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-flex-direction: row;
+  flex-direction: row;
+}
+/* line 47, ../sass/umlaut.sass */
+body section section article, html section section article {
   -webkit-flex: 1;
   flex: 1;
   margin: 1em 0.5em;
 }
-/* line 37, ../sass/umlaut.sass */
-body section aside, html section aside {
+/* line 52, ../sass/umlaut.sass */
+body section section aside, html section section aside {
   display: -webkit-flex;
   display: flex;
   -webkit-flex-direction: column;
   flex-direction: column;
   margin: 1em 0.5em;
 }
-/* line 44, ../sass/umlaut.sass */
+/* line 59, ../sass/umlaut.sass */
 body footer, html footer {
   display: -webkit-flex;
   display: flex;
 }
-/* line 48, ../sass/umlaut.sass */
+/* line 63, ../sass/umlaut.sass */
 body footer h4, html footer h4 {
   -webkit-flex: 1;
   flex: 1;
   margin: 0;
   padding: 0;
 }
-/* line 54, ../sass/umlaut.sass */
+/* line 69, ../sass/umlaut.sass */
 body footer h4:last-of-type, html footer h4:last-of-type {
   text-align: right;
 }
 
-/* line 57, ../sass/umlaut.sass */
+/* line 72, ../sass/umlaut.sass */
 #overlay {
   visibility: hidden;
   position: absolute;
@@ -69,11 +85,11 @@ body footer h4:last-of-type, html footer h4:last-of-type {
   z-index: 1000;
   background-color: rgba(0, 0, 0, 0.2);
 }
-/* line 68, ../sass/umlaut.sass */
+/* line 83, ../sass/umlaut.sass */
 #overlay.visible {
   visibility: visible;
 }
-/* line 71, ../sass/umlaut.sass */
+/* line 86, ../sass/umlaut.sass */
 #overlay div {
   width: 30%;
   margin: 100px auto;
@@ -82,36 +98,36 @@ body footer h4:last-of-type, html footer h4:last-of-type {
   padding: 15px;
   text-align: center;
 }
-/* line 79, ../sass/umlaut.sass */
+/* line 94, ../sass/umlaut.sass */
 #overlay textarea {
   border: 1px solid #888888;
   width: 100%;
   height: 75px;
 }
 
-/* line 84, ../sass/umlaut.sass */
+/* line 99, ../sass/umlaut.sass */
 svg {
   box-shadow: 0 0 15px #aaaaaa inset;
 }
-/* line 88, ../sass/umlaut.sass */
+/* line 103, ../sass/umlaut.sass */
 svg #grid path {
   fill: transparent;
   stroke: rgba(0, 0, 255, 0.12);
 }
-/* line 92, ../sass/umlaut.sass */
+/* line 107, ../sass/umlaut.sass */
 svg .underlay.move {
   cursor: move;
 }
-/* line 95, ../sass/umlaut.sass */
+/* line 110, ../sass/umlaut.sass */
 svg text {
   text-anchor: middle;
   font-family: "sans";
 }
-/* line 99, ../sass/umlaut.sass */
+/* line 114, ../sass/umlaut.sass */
 svg text tspan {
   dominant-baseline: text-before-edge;
 }
-/* line 102, ../sass/umlaut.sass */
+/* line 117, ../sass/umlaut.sass */
 svg .link {
   -webkit-transition: stroke-width 500ms;
   -moz-transition: stroke-width 500ms;
@@ -120,41 +136,41 @@ svg .link {
   fill: none;
   stroke: black;
 }
-/* line 107, ../sass/umlaut.sass */
+/* line 122, ../sass/umlaut.sass */
 svg .link text {
   fill: black;
   stroke: none;
 }
-/* line 111, ../sass/umlaut.sass */
+/* line 126, ../sass/umlaut.sass */
 svg .link.selected {
   stroke: blue;
 }
-/* line 114, ../sass/umlaut.sass */
+/* line 129, ../sass/umlaut.sass */
 svg .link:hover {
   stroke-width: 3;
 }
-/* line 117, ../sass/umlaut.sass */
+/* line 132, ../sass/umlaut.sass */
 svg .element {
   cursor: move;
 }
-/* line 120, ../sass/umlaut.sass */
+/* line 135, ../sass/umlaut.sass */
 svg .element .shape {
   stroke: black;
   fill: white;
 }
-/* line 125, ../sass/umlaut.sass */
+/* line 140, ../sass/umlaut.sass */
 svg .element.moving .shape {
   stroke: red;
 }
-/* line 129, ../sass/umlaut.sass */
+/* line 144, ../sass/umlaut.sass */
 svg .element.selected .shape {
   stroke: blue;
 }
-/* line 133, ../sass/umlaut.sass */
+/* line 148, ../sass/umlaut.sass */
 svg .element.selected.moving .shape {
   stroke: magenta;
 }
-/* line 137, ../sass/umlaut.sass */
+/* line 152, ../sass/umlaut.sass */
 svg .overlay .selection {
   fill: rgba(0, 0, 255, 0.05);
   stroke: rgba(0, 0, 255, 0.3);

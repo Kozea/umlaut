@@ -77,7 +77,7 @@ class Arrow extends Link
 
 
 class FlowChart extends Diagram
-    label: 'Flow Chart'
+    @label: 'Flow Chart'
 
     constructor: ->
         super

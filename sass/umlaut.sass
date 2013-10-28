@@ -21,25 +21,40 @@ body, html
   flex-direction: column
 
   section
-    display: -webkit-flex
-    display: flex
     -webkit-flex: 1
     flex: 1
+    display: -webkit-flex
+    display: flex
+    -webkit-flex-direction: column
+    flex-direction: column
 
     table
       width: 100%
 
-    article
+    header
+      h2
+        text-align: center
+        margin: 0
+
+    section
       -webkit-flex: 1
       flex: 1
-      margin: 1em .5em
-
-    aside
       display: -webkit-flex
       display: flex
-      -webkit-flex-direction: column
-      flex-direction: column
-      margin: 1em .5em
+      -webkit-flex-direction: row
+      flex-direction: row
+
+      article
+        -webkit-flex: 1
+        flex: 1
+        margin: 1em .5em
+
+      aside
+        display: -webkit-flex
+        display: flex
+        -webkit-flex-direction: column
+        flex-direction: column
+        margin: 1em .5em
 
   footer
     display: -webkit-flex

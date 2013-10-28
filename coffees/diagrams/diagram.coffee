@@ -2,8 +2,6 @@ class Diagram
     @diagrams: {}
 
     constructor: ->
-        name = @.constructor.name
-        @label = '?'
         @title = 'Untitled ' + name
         @types = {}
         @elements = []
@@ -21,6 +19,7 @@ class Diagram
 
     objectify: ->
         name: @constructor.name
+        title: @title
         elements: @elements.map (elt) -> elt.objectify()
         links: @links.map (lnk) -> lnk.objectify()
 

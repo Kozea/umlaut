@@ -1,15 +1,6 @@
 $ =>
-    $diagrams = $('#diagrams')
-    $editor = $('#editor')
-
-    $tbody = $diagrams.find('tbody')
-    for key, b64_diagram of localStorage
-        [type, title] = key.split('|')
-        $tbody.append($tr = $('<tr>'))
-        $tr.append(
-            $('<td>').text(title),
-            $('<td>').text(@[type].label),
-            $('<td>').text($('<a>').attr('href', "##{b64_diagram}")))
+    list_diagrams()
+    @svg = new Svg()
 
     @addEventListener("popstate", history_pop)
     # ff hack
