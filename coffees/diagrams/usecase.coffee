@@ -44,6 +44,8 @@ class UseCase extends Diagram
 
     constructor: ->
         super
+
+        @linkstyle = 'diagonal'
         @types =
             elements: [Actor, Case]
             links: [Arrow]

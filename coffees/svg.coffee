@@ -1,24 +1,8 @@
-class State
-    constructor: ->
-        @selection = []
-        @snap = 25
-        @no_save = false
-        @dragging = false
-        @mouse = new Mouse(0, 0, '')
-        @linking = []
-        @freemode = false
-        @scale = 1
-        @translate = [0, 0]
-
-
-state = new State()
-
-
 mouse_xy = (e) ->
     m = d3.mouse(e)
 
-    x: (m[0] - state.translate[0]) / state.scale
-    y: (m[1] - state.translate[1]) / state.scale
+    x: (m[0] - diagram.zoom.translate[0]) / diagram.zoom.scale
+    y: (m[1] - diagram.zoom.translate[1]) / diagram.zoom.scale
 
 
 class Svg
@@ -71,8 +55,8 @@ class Svg
             .attr('viewBox', '0 0 10 10')
             .attr('x', 0)
             .attr('y', 0)
-            .attr('width', state.snap)
-            .attr('height', state.snap)
+            .attr('width', diagram.snap)
+            .attr('height', diagram.snap)
             .attr('patternUnits', 'userSpaceOnUse')
 
         @pattern
@@ -91,10 +75,10 @@ class Svg
 
         @drag = @force.drag()
             .on("drag.force", (elt) =>
-                return if not state.dragging or d3.event.sourceEvent.ctrlKey
+                return if not diagram.dragging or d3.event.sourceEvent.ctrlKey
 
-                if not elt in state.selection
-                    state.selection.push elt
+                if not elt in diagram.selection
+                    diagram.selection.push elt
 
                 if d3.event.sourceEvent.shiftKey
                     delta =
@@ -102,20 +86,20 @@ class Svg
                         y: elt.py - d3.event.y
                 else
                     delta =
-                        x: elt.px - state.snap * Math.floor(d3.event.x / state.snap)
-                        y: elt.py - state.snap * Math.floor(d3.event.y / state.snap)
+                        x: elt.px - diagram.snap * Math.floor(d3.event.x / diagram.snap)
+                        y: elt.py - diagram.snap * Math.floor(d3.event.y / diagram.snap)
 
-                for elt in state.selection
+                for elt in diagram.selection
                     elt.px -= delta.x
                     elt.py -= delta.y
 
                 @force.resume()
             ).on('dragstart', ->
                 return if d3.event.sourceEvent.which is 3 or d3.event.sourceEvent.ctrlKey
-                state.dragging = true
+                diagram.dragging = true
             ).on('dragend', (elt) ->
-                state.dragging = false
-                if not state.freemode
+                diagram.dragging = false
+                if not diagram.freemode
                     elt.fixed = true
             )
 
@@ -123,17 +107,17 @@ class Svg
         @link = null
 
         @svg.on("mousedown", (event) =>
-            return if state.dragging or d3.event.ctrlKey or d3.event.which is 2
+            return if diagram.dragging or d3.event.ctrlKey or d3.event.which is 2
 
             if d3.event.which is 3
-                state.linking = []
-                for elt in state.selection
-                     state.linking.push(new Arrow(elt, state.mouse))
+                diagram.linking = []
+                for elt in diagram.selection
+                     diagram.linking.push(new Arrow(elt, diagram.mouse))
                 @sync()
             else
                 if not d3.event.shiftKey
                     d3.selectAll('.selected').classed('selected', false)
-                    state.selection = []
+                    diagram.selection = []
 
                 mouse = mouse_xy(@svg.node())
                 @svg.select('g.overlay')
@@ -152,9 +136,9 @@ class Svg
         d3.select(window).on("mousemove", =>
             return if d3.event.ctrlKey
             mouse = mouse_xy(@svg.node())
-            state.mouse.x = mouse.x
-            state.mouse.y = mouse.y
-            if state.linking.length
+            diagram.mouse.x = mouse.x
+            diagram.mouse.y = mouse.y
+            if diagram.linking.length
                 @tick()
                 return
 
@@ -185,18 +169,18 @@ class Svg
                     g = d3.select @
                     selected = g.classed 'selected'
                     if elt.in(rect) and not selected
-                        state.selection.push(elt)
+                        diagram.selection.push(elt)
                         g.classed 'selected', true
                     else if not elt.in(rect) and selected and not d3.event.shiftKey
-                        state.selection.splice(state.selection.indexOf(elt), 1)
+                        diagram.selection.splice(diagram.selection.indexOf(elt), 1)
                         g.classed 'selected', false
                 )
                 d3.event.preventDefault()
 
         ).on("mouseup", =>
             return if d3.event.ctrlKey
-            if state.linking.length
-                state.linking = []
+            if diagram.linking.length
+                diagram.linking = []
                 @sync()
 
             @svg.selectAll("rect.selection").remove()
@@ -221,17 +205,18 @@ class Svg
             .attr('class', 'overlay')
 
         @zoom = d3.behavior.zoom()
-            .scale(1)
+            .scale(diagram.zoom.scale)
+            .translate(diagram.zoom.translate)
             .scaleExtent([.15, 5])
             .on("zoom", =>
                 if not d3.event.sourceEvent or d3.event.sourceEvent.type in ['wheel', 'click'] or d3.event.sourceEvent.ctrlKey or d3.event.sourceEvent.which is 2
-                    state.translate = d3.event.translate
-                    state.scale = d3.event.scale
+                    diagram.zoom.translate = d3.event.translate
+                    diagram.zoom.scale = d3.event.scale
                     @root.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")")
                     @pattern.attr("patternTransform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")")
                 else
-                    @zoom.scale(state.scale)
-                    @zoom.translate(state.translate)
+                    @zoom.scale(diagram.zoom.scale)
+                    @zoom.translate(diagram.zoom.translate)
             )
 
         @underlay_g.call(@zoom)
@@ -239,7 +224,7 @@ class Svg
         @force
             .on('tick', @tick)
             .on('end', =>
-                if not state.freemode
+                if not diagram.freemode
                     for elt in diagram.elements
                         elt.fixed = true
                 # Last adjustements
@@ -252,7 +237,7 @@ class Svg
             .links(diagram.links)
 
         @link = @svg.select('g.links').selectAll('g.link')
-            .data(diagram.links.concat(state.linking))
+            .data(diagram.links.concat(diagram.linking))
 
         @title.text(diagram.title)
 
@@ -275,7 +260,7 @@ class Svg
         link_g
             .on('dblclick', (lnk) ->
                 return if d3.event.ctrlKey
-                nearest = lnk.nearest state.mouse
+                nearest = lnk.nearest diagram.mouse
                 if nearest is lnk.source
                     edit((-> lnk.text.source), ((txt) -> lnk.text.source = txt))
                 else
@@ -295,29 +280,29 @@ class Svg
             .on("mousedown", (elt) ->
                 return if d3.event.ctrlKey
                 selected = d3.select(@).classed 'selected'
-                if (selected and not state.dragging) or (not selected) and not d3.event.shiftKey
+                if (selected and not diagram.dragging) or (not selected) and not d3.event.shiftKey
                     d3.selectAll('.selected').classed('selected', false)
-                    state.selection = [elt]
+                    diagram.selection = [elt]
                     d3.select(this).classed('selected', true)
 
                 if d3.event.shiftKey and not selected
                     d3.select(this).classed('selected', true)
-                    state.selection.push(elt))
+                    diagram.selection.push(elt))
             .on("mousemove", (elt) ->
                 return if d3.event.ctrlKey
-                for lnk in state.linking
+                for lnk in diagram.linking
                     lnk.target = elt)
             .on("mouseout", (elt) ->
                 return if d3.event.ctrlKey
-                for lnk in state.linking
-                    lnk.target = state.mouse)
+                for lnk in diagram.linking
+                    lnk.target = diagram.mouse)
             .on("mouseup", (elt) =>
                 return if d3.event.ctrlKey
-                if state.linking.length
-                    for lnk in state.linking
+                if diagram.linking.length
+                    for lnk in diagram.linking
                         if lnk.source != elt
                             diagram.links.push(new Arrow(lnk.source, elt))
-                    state.linking = []
+                    diagram.linking = []
                     @sync()
                     d3.event.preventDefault())
             .on('dblclick', (elt) ->
@@ -404,9 +389,9 @@ class Svg
                 need_force = true
                 break
 
-        need_force = need_force and (state.freemode or (@force.alpha() or 1) > .03)
+        need_force = need_force and (diagram.freemode or (@force.alpha() or 1) > .03)
 
-        if not need_force and not state.dragging
+        if not need_force and not diagram.dragging
             @force.stop()
 
         @element

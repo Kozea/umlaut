@@ -1,12 +1,12 @@
 element_add = (type) =>
-    x = state.mouse.x
-    y = state.mouse.y
+    x = diagram.mouse.x
+    y = diagram.mouse.y
     nth = diagram.elements.filter((elt) -> elt instanceof type).length + 1
     new_elt = new type(x, y, "#{type.name} ##{nth}", true)
     diagram.elements.push(new_elt)
     if d3.event
         d3.select('.selected').classed('selected', false)
-        state.selection = [new_elt]
+        diagram.selection = [new_elt]
 
     svg.sync()
 
@@ -56,11 +56,11 @@ commands =
     edit:
         fun: ->
             edit((->
-                if state.selection.length == 1
-                    state.selection[0].txt
+                if diagram.selection.length == 1
+                    diagram.selection[0].txt
                 else
                     ''), ((txt) ->
-                for elt in state.selection
+                for elt in diagram.selection
                     elt.text = txt))
             svg.sync()
         label: 'Edit elements text'
@@ -69,12 +69,12 @@ commands =
 
     remove:
         fun: ->
-            for elt in state.selection
+            for elt in diagram.selection
                 diagram.elements.splice(diagram.elements.indexOf(elt), 1)
                 for lnk in diagram.links.slice()
                     if elt == lnk.source or elt == lnk.target
                         diagram.links.splice(diagram.links.indexOf(lnk), 1)
-            state.selection = []
+            diagram.selection = []
             d3.selectAll('g.element').classed('selected', false)
             svg.sync()
         label: 'Remove elements'
@@ -83,7 +83,7 @@ commands =
 
     select_all:
         fun: (e) ->
-            state.selection = diagram.elements.slice()
+            diagram.selection = diagram.elements.slice()
             d3.selectAll('g.element').classed('selected', true)
             e?.preventDefault()
 
@@ -93,7 +93,7 @@ commands =
 
     reorganize:
         fun: ->
-            sel = if state.selection.length > 0 then state.selection else diagram.elements
+            sel = if diagram.selection.length > 0 then diagram.selection else diagram.elements
             for elt in sel
                 elt.fixed = false
             svg.sync()
@@ -104,21 +104,21 @@ commands =
     freemode:
         fun: ->
             for elt in diagram.elements
-                elt.fixed = state.freemode
-            if state.freemode
+                elt.fixed = diagram.freemode
+            if diagram.freemode
                 svg.force.stop()
             else
                 svg.sync()
-            state.freemode = not state.freemode
+            diagram.freemode = not diagram.freemode
         label: 'Toggle free mode'
         glyph: 'send'
         hotkey: 'tab'
 
     link:
         fun: ->
-            state.linking = []
-            for elt in state.selection
-                state.linking.push(new Link(elt, state.mouse))
+            diagram.linking = []
+            for elt in diagram.selection
+                diagram.linking.push(new Link(elt, diagram.mouse))
             svg.sync()
         label: 'Link elements'
         glyph: 'arrow-right'
@@ -147,8 +147,8 @@ commands =
     snaptogrid:
         fun: ->
             for elt in diagram.elements
-                elt.x = elt.px = state.snap * Math.floor(elt.x / state.snap)
-                elt.y = elt.py = state.snap * Math.floor(elt.y / state.snap)
+                elt.x = elt.px = diagram.snap * Math.floor(elt.x / diagram.snap)
+                elt.y = elt.py = diagram.snap * Math.floor(elt.y / diagram.snap)
             svg.tick()
         label: 'Snap to grid'
         glyph: 'magnet'

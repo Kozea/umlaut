@@ -7,15 +7,18 @@ history_pop = () ->
         $editor.addClass('hidden')
         list_diagrams()
         return
-    else
-        $editor.removeClass('hidden')
-        $diagrams.addClass('hidden')
-        if not svg?
-            window.svg = new Svg()
+
+    $editor.removeClass('hidden')
+    $diagrams.addClass('hidden')
 
     load(JSON.parse(atob(location.hash.slice(1))))
+
+    if not svg?
+        window.svg = new Svg()
+
     if diagram.constructor.name != $('aside h3').attr('id')
         init_commands()
         svg.resize()
-    state.no_save = true
+
+    diagram.no_save = true
     svg.sync()
