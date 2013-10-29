@@ -1,15 +1,6 @@
-class Process extends Element
-    path: ->
-        w2 = @width() / 2
-        h2 = @height() / 2
+class Process extends Rect
 
-        "M #{-w2} #{-h2}
-         L #{w2} #{-h2}
-         L #{w2} #{h2}
-         L #{-w2} #{h2}
-         z"
-
-class DataIO extends Element
+class IO extends Element
     shift: 5
 
     path: ->
@@ -39,45 +30,60 @@ class Terminator extends Element
          L #{-w2} #{-h2 + @shift}
          Q #{-w2} #{-h2} #{-w2 + @shift} #{-h2}"
 
-class Decision extends Element
-    constructor: ->
-        super
-        @margin.y = 0
-
-    width: ->
-        ow = super()
-        ow + Math.sqrt(ow * @_txt_bbox.height + 2 * @margin.y)
-
-    height: ->
-        oh = super()
-        oh + Math.sqrt(oh * @_txt_bbox.width + 2 * @margin.x)
-
-    path: ->
-        w2 = @width() / 2
-        h2 = @height() / 2
-        "M #{-w2} 0
-         L 0 #{-h2}
-         L #{w2} 0
-         L 0 #{h2}
-         z"
+class Decision extends Lozenge
 
 class Delay extends Element
-    shift: 10
+    txt_x: ->
+        super() - @height() / 4
+
+    width: ->
+        super() + @height() / 2
 
     path: ->
         w2 = @width() / 2
         h2 = @height() / 2
 
         "M #{-w2} #{-h2}
-         L #{w2 - @shift} #{-h2}
-         Q #{w2} #{-h2} #{w2} #{-h2 + @shift}
-         L #{w2} #{h2 - @shift}
-         Q #{w2} #{h2} #{w2 - @shift} #{h2}
+         L #{w2 - h2} #{-h2}
+         A #{h2} #{h2} 0 1 1 #{w2 - h2} #{h2}
          L #{-w2} #{h2}
          z"
 
-class Arrow extends Link
-    marker: 'arrow'
+class SubProcess extends Process
+    shift: 10
+
+    width: ->
+        super() + 2 * @shift
+
+    path: ->
+        w2 = @width() / 2
+        h2 = @height() / 2
+        "#{super()}
+         M #{-w2 + @shift} #{-h2}
+         L #{-w2 + @shift} #{h2}
+         M #{w2 - @shift} #{-h2}
+         L #{w2 - @shift} #{h2}
+        "
+
+class Document extends Element
+    height: ->
+        super() * 1.25
+
+    txt_y: ->
+        super() - @height() / 16
+
+    path: ->
+        w2 = @width() / 2
+        h2 = @height() / 2
+
+        "M #{-w2} #{-h2}
+         L #{w2} #{-h2}
+         L #{w2} #{h2}
+         Q #{w2 / 2} #{h2 / 2} 0 #{h2}
+         T #{-w2} #{h2}
+         z"
+
+class Flow extends Link
 
 class FlowChart extends Diagram
     label: 'Flow Chart'
@@ -85,7 +91,7 @@ class FlowChart extends Diagram
     constructor: ->
         super()
         @types =
-            elements: [Process, DataIO, Terminator, Decision, Delay]
-            links: [Arrow]
+            elements: [Process, IO, Terminator, Decision, Delay, SubProcess, Document]
+            links: [Flow]
 
 Diagram.diagrams['FlowChart'] = FlowChart

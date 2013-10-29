@@ -1,4 +1,6 @@
 class Link
+    @marker: 'arrow'
+    
     text_margin: 10
 
     constructor: (@source, @target, text) ->

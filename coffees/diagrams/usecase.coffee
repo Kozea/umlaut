@@ -1,18 +1,4 @@
-class Case extends Element
-    width: ->
-        2 * super() / Math.sqrt(2)
-
-    height: ->
-        2 * super() / Math.sqrt(2)
-
-    path: ->
-        w2 = @width() / 2
-        h2 = @height() / 2
-
-        "M #{-w2} 0
-         A #{w2} #{h2} 0 1 1 #{w2} 0
-         A #{w2} #{h2} 0 1 1 #{-w2} 0
-        "
+class Case extends Ellipsis
 
 class Actor extends Element
     stick: 10
@@ -42,10 +28,9 @@ class Actor extends Element
 
 
 class Association extends Link
-    marker: 'arrow'
 
 class Inheritance extends Link
-    marker: 'lozenge'
+    @marker: 'lozenge'
 
 class UseCase extends Diagram
     label: 'UML Use case'

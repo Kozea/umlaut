@@ -112,6 +112,7 @@ class Svg
                 return if d3.event.sourceEvent.which is 3 or d3.event.sourceEvent.ctrlKey
                 diagram.dragging = true
             ).on('dragend', (elt) =>
+                return if not diagram.dragging
                 if not $(d3.event.sourceEvent.target).closest('#diagram').size()
                     diagram.elements.splice(diagram.elements.indexOf(elt), 1)
                     if elt in diagram.selection
@@ -276,7 +277,7 @@ class Svg
 
         link_g
             .append("path")
-            .attr("marker-end", (lnk) -> "url(##{lnk.marker})")
+            .attr("marker-end", (lnk) -> "url(##{lnk.constructor.marker})")
 
         link_g
             .append("text")
@@ -362,6 +363,8 @@ class Svg
             .each((elt) -> elt.set_txt_bbox(@getBBox()))
             .attr('x', (elt) -> elt.txt_x())
             .attr('y', (elt) -> elt.txt_y())
+            .selectAll('tspan')
+                .attr('x', (elt) -> elt.txt_x())
 
         @link
             .select('path')

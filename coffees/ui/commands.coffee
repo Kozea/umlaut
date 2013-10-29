@@ -2,7 +2,7 @@ element_add = (type) =>
     x = diagram.mouse.x
     y = diagram.mouse.y
     nth = diagram.elements.filter((elt) -> elt instanceof type).length + 1
-    new_elt = new type(x, y, "#{type.name} ##{nth}", true)
+    new_elt = new type(x, y, "#{type.name} ##{nth}", not diagram.freemode)
     diagram.elements.push(new_elt)
     if d3.event
         svg.svg.select('.selected').classed('selected', false)
@@ -65,7 +65,7 @@ commands =
         fun: ->
             edit((->
                 if diagram.selection.length == 1
-                    diagram.selection[0].txt
+                    diagram.selection[0].text
                 else
                     ''), ((txt) ->
                 for elt in diagram.selection
@@ -264,10 +264,9 @@ init_commands = ->
         path = svgicon
             .append('path')
                 .attr("class", "link")
-                .attr("marker-end", "url(##{icon.marker})")
+                .attr("marker-end", "url(##{icon.constructor.marker})")
                 .attr('d', icon.path())
 
-        margin = 3
         svgicon
             .attr('height', 10)
             .attr('viewBox', "0 -5 100 10")

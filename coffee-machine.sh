@@ -5,6 +5,7 @@ coffee -wcb -j umlaut.js -o javascripts/ \
     coffees/diagrams/elements.coffee     \
     coffees/diagrams/links.coffee        \
     coffees/diagrams/diagram.coffee      \
+    coffees/diagrams/commons.coffee      \
     coffees/diagrams/flowchart.coffee    \
     coffees/diagrams/usecase.coffee      \
     coffees/ui/*                         \

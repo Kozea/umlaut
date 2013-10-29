@@ -23,7 +23,6 @@ class Element
 
     width: ->
         @txt_width() + 2 * @margin.x
-
     height: ->
         @txt_height() + 2 * @margin.y
 
