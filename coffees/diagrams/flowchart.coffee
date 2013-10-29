@@ -83,6 +83,28 @@ class Document extends Element
          T #{-w2} #{h2}
          z"
 
+
+class Database extends Element
+    height: ->
+        super() + 2.5 * Math.min(@width() / 2,  super() / 2)
+
+    txt_y: ->
+        super() + Math.min(@width() / 2,  (@txt_height() + 2 * @margin.y) / 2) / 2
+
+    path: ->
+        w2 = @width() / 2
+        h2 = (@txt_height() + 2 * @margin.y) / 2
+        r = Math.min(w2, h2)
+        h2 += r / 2
+
+        "M #{-w2} #{-h2}
+         A #{w2} #{r} 0 1 1 #{w2} #{-h2}
+         A #{w2} #{r} 0 1 1 #{-w2} #{-h2}
+         M #{w2} #{-h2}
+         L #{w2} #{h2}
+         A #{w2} #{r} 0 1 1 #{-w2} #{h2}
+         L #{-w2} #{-h2}"
+
 class Flow extends Link
 
 class FlowChart extends Diagram
@@ -91,7 +113,7 @@ class FlowChart extends Diagram
     constructor: ->
         super()
         @types =
-            elements: [Process, IO, Terminator, Decision, Delay, SubProcess, Document]
+            elements: [Process, IO, Terminator, Decision, Delay, SubProcess, Document, Database]
             links: [Flow]
 
 Diagram.diagrams['FlowChart'] = FlowChart
