@@ -5,7 +5,7 @@ element_add = (type) =>
     new_elt = new type(x, y, "#{type.name} ##{nth}", true)
     diagram.elements.push(new_elt)
     if d3.event
-        d3.select('.selected').classed('selected', false)
+        svg.svg.select('.selected').classed('selected', false)
         diagram.selection = [new_elt]
 
     svg.sync()
@@ -24,6 +24,14 @@ element_add = (type) =>
             d3.event.ctrlKey, d3.event.altKey, d3.event.shiftKey, d3.event.metaKey,
             d3.event.button, d3.event.relatedTarget)
         node.dispatchEvent(mouse_evt)
+
+
+link_add = (type) ->
+    diagram.linking = []
+    for elt in diagram.selection
+        diagram.linking.push(new type(elt, diagram.mouse))
+    svg.sync()
+
 
 commands =
     undo:
@@ -75,7 +83,7 @@ commands =
                     if elt == lnk.source or elt == lnk.target
                         diagram.links.splice(diagram.links.indexOf(lnk), 1)
             diagram.selection = []
-            d3.selectAll('g.element').classed('selected', false)
+            svg.svg.selectAll('g.element').classed('selected', false)
             svg.sync()
         label: 'Remove elements'
         glyph: 'remove-sign'
@@ -84,7 +92,7 @@ commands =
     select_all:
         fun: (e) ->
             diagram.selection = diagram.elements.slice()
-            d3.selectAll('g.element').classed('selected', true)
+            svg.svg.selectAll('g.element').classed('selected', true)
             e?.preventDefault()
 
         label: 'Select all elements'
@@ -113,16 +121,6 @@ commands =
         label: 'Toggle free mode'
         glyph: 'send'
         hotkey: 'tab'
-
-    link:
-        fun: ->
-            diagram.linking = []
-            for elt in diagram.selection
-                diagram.linking.push(new Link(elt, diagram.mouse))
-            svg.sync()
-        label: 'Link elements'
-        glyph: 'arrow-right'
-        hotkey: 'l'
 
     linkstyle:
         fun: ->
@@ -173,10 +171,10 @@ init_commands = ->
     taken_hotkeys = []
     $('aside .icons .specific').each(-> Mousetrap.unbind $(@).attr('data-hotkey'))
     $('aside .icons svg').remove()
-    $('aside h3')
+    $('aside .sep')
         .attr('id', diagram.constructor.name)
         .addClass('specific')
-        .text(diagram.constructor.label)
+        .text(diagram.label)
 
     for e in diagram.types.elements
         i = 1
@@ -196,9 +194,13 @@ init_commands = ->
             .attr('data-hotkey', hotkey)
             .on('mousedown', fun)
 
-        path = svgicon.append('path')
+        g = svgicon.append('g')
+            .attr('class', 'element')
 
-        txt = svgicon
+        path = g.append('path')
+            .attr('class', 'shape')
+
+        txt = g
             .append('text')
             .text(e.name)
 
@@ -218,4 +220,56 @@ init_commands = ->
             .attr('width', icon.width())
             .attr('height', icon.height())
             .attr('preserveAspectRatio', 'xMidYMid Meet')
+        Mousetrap.bind hotkey, fun
+
+    taken_hotkeys = []
+    for l in diagram.types.links
+        i = 1
+        key = l.name[0].toLowerCase()
+        while i < l.length and key in taken_hotkeys
+            key = l[i++].toLowerCase()
+
+        taken_hotkeys.push(key)
+
+        fun = ((lnk) -> -> link_add(lnk))(l)
+        hotkey = "l #{key}"
+        icon = new l(e1 = new Element(0, 0), e2 = new Element(100, 0))
+        e1.set_txt_bbox(width: 10, height: 10)
+        e2.set_txt_bbox(width: 10, height: 10)
+
+        svgicon = d3.select('aside .icons')
+            .append('svg')
+            .attr('class', 'icon specific draggable btn btn-default')
+            .attr('title', "#{l.name} [#{hotkey}]")
+            .attr('data-hotkey', hotkey)
+            .on('mousedown', fun)
+
+        g = svgicon.append('g')
+            .attr('class', 'link')
+
+        g
+            .append('svg:defs')
+            .append('svg:marker')
+            .attr('id', 'arrow')
+            .attr('viewBox', '0 0 10 10')
+            .attr('refX', 10)
+            .attr('refY', 5)
+            .attr('markerUnits', 'userSpaceOnUse')
+            .attr('markerWidth', 10)
+            .attr('markerHeight', 10)
+            .attr('orient', 'auto')
+            .append('svg:path')
+            .attr('d', 'M 0 0 L 10 5 L 0 10')
+
+        path = svgicon
+            .append('path')
+                .attr("class", "link")
+                .attr("marker-end", "url(##{icon.marker})")
+                .attr('d', icon.path())
+
+        margin = 3
+        svgicon
+            .attr('height', 10)
+            .attr('viewBox', "0 -5 100 10")
+            .attr('preserveAspectRatio', 'none')
         Mousetrap.bind hotkey, fun

@@ -15,38 +15,40 @@ class Case extends Element
         "
 
 class Actor extends Element
-    @stick: 10
+    stick: 10
 
     height: ->
-        super() + 4 * Actor.stick
+        super() + 4 * @stick
 
     txt_y: ->
         @height() / 2 - @txt_height()
 
     path: ->
-        stick = Actor.stick
         bottom = @height() / 2 - @txt_height() - @margin.y
 
-        "M #{-stick} #{bottom}
-         L 0 #{bottom - stick}
-         M #{stick} #{bottom}
-         L 0 #{bottom - stick}
-         M 0 #{bottom - stick}
-         L 0 #{bottom - 2 * stick}
-         M #{-stick} #{bottom - 2 * stick}
-         L #{stick} #{bottom - 2 * stick}
-         M 0 #{bottom - 2 * stick}
-         L 0 #{bottom - 3 * stick}
-         A #{.5 * stick} #{.5 * stick} 0 1 1 0 #{bottom - 4 * stick}
-         A #{.5 * stick} #{.5 * stick} 0 1 1 0 #{bottom - 3 * stick}
+        "M #{-@stick} #{bottom}
+         L 0 #{bottom - @stick}
+         M #{@stick} #{bottom}
+         L 0 #{bottom - @stick}
+         M 0 #{bottom - @stick}
+         L 0 #{bottom - 2 * @stick}
+         M #{-@stick} #{bottom - 2 * @stick}
+         L #{@stick} #{bottom - 2 * @stick}
+         M 0 #{bottom - 2 * @stick}
+         L 0 #{bottom - 3 * @stick}
+         A #{.5 * @stick} #{.5 * @stick} 0 1 1 0 #{bottom - 4 * @stick}
+         A #{.5 * @stick} #{.5 * @stick} 0 1 1 0 #{bottom - 3 * @stick}
          "
 
 
 class Association extends Link
+    marker: 'arrow'
 
+class Inheritance extends Link
+    marker: 'lozenge'
 
 class UseCase extends Diagram
-    @label: 'UML Use case'
+    label: 'UML Use case'
 
     constructor: ->
         super()
@@ -54,6 +56,6 @@ class UseCase extends Diagram
         @linkstyle = 'diagonal'
         @types =
             elements: [Actor, Case]
-            links: [Arrow]
+            links: [Association, Inheritance]
 
 Diagram.diagrams['UseCase'] = UseCase

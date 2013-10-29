@@ -37,6 +37,8 @@ body > section
       margin: 0
 
   #main
+    -webkit-user-select: none
+    -moz-user-select: none
     -webkit-flex: 1
     flex: 1
     display: -webkit-flex
@@ -52,6 +54,11 @@ body > section
     aside
       margin: 1em .5em
       width: 100px
+
+      .sep
+        padding-top: 1em
+        text-align: center
+        font-size: 1.25em
 
       .btns
         text-align: center
@@ -81,6 +88,8 @@ footer
     padding: 0
 
     &:last-of-type
+      -webkit-flex: 2
+      flex: 2
       text-align: right
 
 #overlay
@@ -113,6 +122,7 @@ footer
 #diagram
   box-shadow: 0 0 15px #aaa inset
 
+svg
   #grid
     path
       fill: transparent
@@ -169,11 +179,6 @@ footer
       stroke-width: 2
 
 svg.icon
-  path
-    fill: $bg
-    stroke: $fg
-
   text
-    text-anchor: middle
     dominant-baseline: text-before-edge
-    font-family: "sans"
+

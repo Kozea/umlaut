@@ -50,6 +50,19 @@ class Svg
             .append('svg:path')
             .attr('d', 'M 0 0 L 10 5 L 0 10')
 
+        @defs
+            .append('svg:marker')
+            .attr('id', 'lozenge')
+            .attr('viewBox', '0 0 10 10')
+            .attr('refX', 10)
+            .attr('refY', 5)
+            .attr('markerUnits', 'userSpaceOnUse')
+            .attr('markerWidth', 10)
+            .attr('markerHeight', 10)
+            .attr('orient', 'auto')
+            .append('svg:path')
+            .attr('d', 'M 0 5 L 5 0 L 10 5 L 5 10 z')
+
         @pattern = @defs
             .append('svg:pattern')
             .attr('id', 'grid')
@@ -121,11 +134,11 @@ class Svg
             if d3.event.which is 3
                 diagram.linking = []
                 for elt in diagram.selection
-                     diagram.linking.push(new Arrow(elt, diagram.mouse))
+                     diagram.linking.push(new diagram.types.links[0](elt, diagram.mouse))
                 @sync()
             else
                 if not d3.event.shiftKey
-                    d3.selectAll('.selected').classed('selected', false)
+                    @svg.selectAll('.selected').classed('selected', false)
                     diagram.selection = []
 
                 mouse = mouse_xy(@svg.node())
@@ -178,7 +191,7 @@ class Svg
                 rect.height = Math.max(0, rect.height)
 
                 sel.attr rect
-                d3.selectAll('g.element').each((elt) ->
+                @svg.selectAll('g.element').each((elt) ->
                     g = d3.select @
                     selected = g.classed 'selected'
                     if elt.in(rect) and not selected
@@ -263,7 +276,7 @@ class Svg
 
         link_g
             .append("path")
-            .attr("marker-end", "url(#arrow)")
+            .attr("marker-end", (lnk) -> "url(##{lnk.marker})")
 
         link_g
             .append("text")
@@ -297,7 +310,7 @@ class Svg
                 return if d3.event.ctrlKey
                 selected = d3.select(@).classed 'selected'
                 if (selected and not diagram.dragging) or (not selected) and not d3.event.shiftKey
-                    d3.selectAll('.selected').classed('selected', false)
+                    svg.svg.selectAll('.selected').classed('selected', false)
                     diagram.selection = [elt]
                     d3.select(this).classed('selected', true)
 
@@ -317,7 +330,7 @@ class Svg
                 if diagram.linking.length
                     for lnk in diagram.linking
                         if lnk.source != elt
-                            diagram.links.push(new Arrow(lnk.source, elt))
+                            diagram.links.push(new lnk.constructor(lnk.source, elt))
                     diagram.linking = []
                     @sync()
                     d3.event.preventDefault())
@@ -456,4 +469,3 @@ class Svg
         @underlay
             .attr("width", @width)
             .attr("height", @height)
-

@@ -13,8 +13,9 @@ list_diagrams = ->
 
     $ul = $('#diagrams ul')
     $ul.children().remove()
-    for name, diagram of Diagram.diagrams
-        b64_diagram = (new diagram()).hash()
+    for name, type of Diagram.diagrams
+        diagram = new type()
+        b64_diagram = diagram.hash()
         $ul.append(
             $('<li>').append(
                 $('<a>').attr('href', "##{b64_diagram}").text("New #{diagram.label}")))

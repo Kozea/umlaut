@@ -2,7 +2,7 @@ class Diagram
     @diagrams: {}
 
     constructor: ->
-        @title = 'Untitled ' + @constructor.label
+        @title = 'Untitled ' + @label
         @linkstyle = 'rectangular'
         @zoom =
             scale: 1
