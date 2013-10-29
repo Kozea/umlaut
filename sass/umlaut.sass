@@ -23,55 +23,65 @@ body, html
   -webkit-flex-direction: column
   flex-direction: column
 
-  section
+body > section
+  -webkit-flex: 1
+  flex: 1
+  display: -webkit-flex
+  display: flex
+  -webkit-flex-direction: column
+  flex-direction: column
+
+  header
+    h2
+      text-align: center
+      margin: 0
+
+  #main
     -webkit-flex: 1
     flex: 1
     display: -webkit-flex
     display: flex
-    -webkit-flex-direction: column
-    flex-direction: column
+    -webkit-flex-direction: row
+    flex-direction: row
 
-    header
-      h2
-        text-align: center
-        margin: 0
-
-    section
+    article
       -webkit-flex: 1
       flex: 1
-      display: -webkit-flex
-      display: flex
-      -webkit-flex-direction: row
-      flex-direction: row
+      margin: 1em 0 .5em
 
-      article
-        -webkit-flex: 1
-        flex: 1
-        margin: 1em 0 .5em
+    aside
+      margin: 1em .5em
+      width: 100px
 
-      aside
-        margin: 1em .5em
-        width: 100px
+      .btns
         text-align: center
 
         .btn
           margin: 0 3px 6px 3px
 
-          .glyphicon
-            font-size: 20px
+        .glyphicon
+          font-size: 20px
 
-  footer
-    display: -webkit-flex
-    display: flex
 
-    h4
-      -webkit-flex: 1
-      flex: 1
-      margin: 0
-      padding: 0
+      .icons
+        .icon
+          min-width: 100%
+          max-width: 100%
+          height: 100%
+          margin: 0 0 6px
 
-      &:last-of-type
-        text-align: right
+footer
+  display: -webkit-flex
+  display: flex
+
+  h4
+    -webkit-flex: 1
+    flex: 1
+    margin: 0
+    padding: 0
+
+    &:last-of-type
+      text-align: right
 
 #overlay
   visibility: hidden
@@ -100,7 +110,7 @@ body, html
     width: 100%
     height: 75px
 
-svg
+#diagram
   box-shadow: 0 0 15px #aaa inset
 
   #grid
@@ -157,3 +167,13 @@ svg
       fill: rgba(0, 0, 255, .05)
       stroke: rgba(0, 0, 255, .3)
       stroke-width: 2
+
+svg.icon
+  path
+    fill: $bg
+    stroke: $fg
+
+  text
+    text-anchor: middle
+    dominant-baseline: text-before-edge
+    font-family: "sans"

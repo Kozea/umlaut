@@ -6,11 +6,26 @@ class Element
         x: @x
         y: @y
 
+    set_txt_bbox: (bbox) ->
+        @_txt_bbox = bbox
+
+    txt_width: ->
+        @_txt_bbox.width
+
+    txt_height: ->
+        @_txt_bbox.height
+
+    txt_x: ->
+        0
+
+    txt_y: ->
+        - @txt_height() / 2
+
     width: ->
-        @_txt_bbox.width + 2 * @margin.x
+        @txt_width() + 2 * @margin.x
 
     height: ->
-        @_txt_bbox.height + 2 * @margin.y
+        @txt_height() + 2 * @margin.y
 
     direction: (x, y) ->
         delta = @height() / @width()

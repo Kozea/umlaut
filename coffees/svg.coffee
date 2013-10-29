@@ -18,6 +18,7 @@ class Svg
 
         @svg = @article
             .append("svg")
+            .attr('id', "diagram")
             .attr("width", @width)
             .attr("height", @height)
 
@@ -97,7 +98,15 @@ class Svg
             ).on('dragstart', ->
                 return if d3.event.sourceEvent.which is 3 or d3.event.sourceEvent.ctrlKey
                 diagram.dragging = true
-            ).on('dragend', (elt) ->
+            ).on('dragend', (elt) =>
+                if not $(d3.event.sourceEvent.target).closest('#diagram').size()
+                    diagram.elements.splice(diagram.elements.indexOf(elt), 1)
+                    if elt in diagram.selection
+                        diagram.selection.splice(diagram.selection.indexOf(elt), 1)
+                    for lnk in diagram.links.slice()
+                        if elt == lnk.source or elt == lnk.target
+                            diagram.links.splice(diagram.links.indexOf(lnk), 1)
+                    svg.sync()
                 diagram.dragging = false
                 if not diagram.freemode
                     elt.fixed = true
@@ -164,6 +173,10 @@ class Svg
                     rect.height -= move.y
                 else
                     rect.height = move.y
+
+                rect.width = Math.max(0, rect.width)
+                rect.height = Math.max(0, rect.height)
+
                 sel.attr rect
                 d3.selectAll('g.element').each((elt) ->
                     g = d3.select @
@@ -218,7 +231,8 @@ class Svg
                     @zoom.scale(diagram.zoom.scale)
                     @zoom.translate(diagram.zoom.translate)
             )
-
+        @root.attr("transform", "translate(" + diagram.zoom.translate + ")scale(" + diagram.zoom.scale + ")")
+        @pattern.attr("patternTransform", "translate(" + diagram.zoom.translate + ")scale(" + diagram.zoom.scale + ")")
         @underlay_g.call(@zoom)
 
         @force
@@ -330,8 +344,9 @@ class Svg
                     if i != 0
                         tspan
                             .attr('dy', '1.2em'))
-            .each((elt) -> elt._txt_bbox = @getBBox())
-            .attr('y', (elt) -> - elt._txt_bbox.height / 2)
+            .each((elt) -> elt.set_txt_bbox(@getBBox()))
+            .attr('x', (elt) -> elt.txt_x())
+            .attr('y', (elt) -> elt.txt_y())
 
         @link
             .select('path')

@@ -1,11 +1,9 @@
 class Case extends Element
     width: ->
-        ow = super()
-        2 * ow / Math.sqrt(2)
+        2 * super() / Math.sqrt(2)
 
     height: ->
-        oh = super()
-        2 * oh / Math.sqrt(2)
+        2 * super() / Math.sqrt(2)
 
     path: ->
         w2 = @width() / 2
@@ -17,22 +15,30 @@ class Case extends Element
         "
 
 class Actor extends Element
+    @stick: 10
+
+    height: ->
+        super() + 4 * Actor.stick
+
+    txt_y: ->
+        @height() / 2 - @txt_height()
+
     path: ->
-        h2 = @height() / 2
+        stick = Actor.stick
+        bottom = @height() / 2 - @txt_height() - @margin.y
 
-        stick = 10
-
-        "M #{-stick} #{-h2}
-         L 0 #{-h2 - stick}
-         L #{stick} #{-h2}
-         M 0 #{-h2 - stick}
-         L 0 #{-h2 - 2 * stick}
-         M #{-stick} #{-h2 - 2 * stick}
-         L #{stick} #{-h2 - 2 * stick}
-         M 0 #{-h2 - 2 * stick}
-         L 0 #{-h2 - 3 * stick}
-         A #{.5 * stick} #{.5 * stick} 0 1 1 0 #{-h2 - 4 * stick}
-         A #{.5 * stick} #{.5 * stick} 0 1 1 0 #{-h2 - 3 * stick}
+        "M #{-stick} #{bottom}
+         L 0 #{bottom - stick}
+         M #{stick} #{bottom}
+         L 0 #{bottom - stick}
+         M 0 #{bottom - stick}
+         L 0 #{bottom - 2 * stick}
+         M #{-stick} #{bottom - 2 * stick}
+         L #{stick} #{bottom - 2 * stick}
+         M 0 #{bottom - 2 * stick}
+         L 0 #{bottom - 3 * stick}
+         A #{.5 * stick} #{.5 * stick} 0 1 1 0 #{bottom - 4 * stick}
+         A #{.5 * stick} #{.5 * stick} 0 1 1 0 #{bottom - 3 * stick}
          "
 
 

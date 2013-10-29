@@ -29,12 +29,32 @@ Element = (function() {
     };
   };
 
+  Element.prototype.set_txt_bbox = function(bbox) {
+    return this._txt_bbox = bbox;
+  };
+
+  Element.prototype.txt_width = function() {
+    return this._txt_bbox.width;
+  };
+
+  Element.prototype.txt_height = function() {
+    return this._txt_bbox.height;
+  };
+
+  Element.prototype.txt_x = function() {
+    return 0;
+  };
+
+  Element.prototype.txt_y = function() {
+    return -this.txt_height() / 2;
+  };
+
   Element.prototype.width = function() {
-    return this._txt_bbox.width + 2 * this.margin.x;
+    return this.txt_width() + 2 * this.margin.x;
   };
 
   Element.prototype.height = function() {
-    return this._txt_bbox.height + 2 * this.margin.y;
+    return this.txt_height() + 2 * this.margin.y;
   };
 
   Element.prototype.direction = function(x, y) {
@@ -344,11 +364,13 @@ DataIO = (function(_super) {
     return _ref2;
   }
 
+  DataIO.shift = 5;
+
   DataIO.prototype.path = function() {
     var h2, shift, w2;
+    shift = DataIO.shift;
     w2 = this.width() / 2;
     h2 = this.height() / 2;
-    shift = 5;
     return "M " + (-w2 - shift) + " " + (-h2) + "         L " + (w2 - shift) + " " + (-h2) + "         L " + (w2 + shift) + " " + h2 + "         L " + (-w2 + shift) + " " + h2 + "         z";
   };
 
@@ -364,11 +386,13 @@ Terminator = (function(_super) {
     return _ref3;
   }
 
+  Terminator.shift = 10;
+
   Terminator.prototype.path = function() {
     var h2, shift, w2;
     w2 = this.width() / 2;
     h2 = this.height() / 2;
-    shift = 10;
+    shift = Terminator.shift;
     return "M " + (-w2 + shift) + " " + (-h2) + "         L " + (w2 - shift) + " " + (-h2) + "         Q " + w2 + " " + (-h2) + " " + w2 + " " + (-h2 + shift) + "         L " + w2 + " " + (h2 - shift) + "         Q " + w2 + " " + h2 + " " + (w2 - shift) + " " + h2 + "         L " + (-w2 + shift) + " " + h2 + "         Q " + (-w2) + " " + h2 + " " + (-w2) + " " + (h2 - shift) + "         L " + (-w2) + " " + (-h2 + shift) + "         Q " + (-w2) + " " + (-h2) + " " + (-w2 + shift) + " " + (-h2);
   };
 
@@ -415,11 +439,13 @@ Delay = (function(_super) {
     return _ref4;
   }
 
+  Delay.shift = 10;
+
   Delay.prototype.path = function() {
     var h2, shift, w2;
+    shift = Delay.shift;
     w2 = this.width() / 2;
     h2 = this.height() / 2;
-    shift = 10;
     return "M " + (-w2) + " " + (-h2) + "         L " + (w2 - shift) + " " + (-h2) + "         Q " + w2 + " " + (-h2) + " " + w2 + " " + (-h2 + shift) + "         L " + w2 + " " + (h2 - shift) + "         Q " + w2 + " " + h2 + " " + (w2 - shift) + " " + h2 + "         L " + (-w2) + " " + h2 + "         z";
   };
 
@@ -467,15 +493,11 @@ Case = (function(_super) {
   }
 
   Case.prototype.width = function() {
-    var ow;
-    ow = Case.__super__.width.call(this);
-    return 2 * ow / Math.sqrt(2);
+    return 2 * Case.__super__.width.call(this) / Math.sqrt(2);
   };
 
   Case.prototype.height = function() {
-    var oh;
-    oh = Case.__super__.height.call(this);
-    return 2 * oh / Math.sqrt(2);
+    return 2 * Case.__super__.height.call(this) / Math.sqrt(2);
   };
 
   Case.prototype.path = function() {
@@ -497,11 +519,21 @@ Actor = (function(_super) {
     return _ref7;
   }
 
+  Actor.stick = 10;
+
+  Actor.prototype.height = function() {
+    return Actor.__super__.height.call(this) + 4 * Actor.stick;
+  };
+
+  Actor.prototype.txt_y = function() {
+    return this.height() / 2 - this.txt_height();
+  };
+
   Actor.prototype.path = function() {
-    var h2, stick;
-    h2 = this.height() / 2;
-    stick = 10;
-    return "M " + (-stick) + " " + (-h2) + "         L 0 " + (-h2 - stick) + "         L " + stick + " " + (-h2) + "         M 0 " + (-h2 - stick) + "         L 0 " + (-h2 - 2 * stick) + "         M " + (-stick) + " " + (-h2 - 2 * stick) + "         L " + stick + " " + (-h2 - 2 * stick) + "         M 0 " + (-h2 - 2 * stick) + "         L 0 " + (-h2 - 3 * stick) + "         A " + (.5 * stick) + " " + (.5 * stick) + " 0 1 1 0 " + (-h2 - 4 * stick) + "         A " + (.5 * stick) + " " + (.5 * stick) + " 0 1 1 0 " + (-h2 - 3 * stick) + "         ";
+    var bottom, stick;
+    stick = Actor.stick;
+    bottom = this.height() / 2 - this.txt_height() - this.margin.y;
+    return "M " + (-stick) + " " + bottom + "         L 0 " + (bottom - stick) + "         M " + stick + " " + bottom + "         L 0 " + (bottom - stick) + "         M 0 " + (bottom - stick) + "         L 0 " + (bottom - 2 * stick) + "         M " + (-stick) + " " + (bottom - 2 * stick) + "         L " + stick + " " + (bottom - 2 * stick) + "         M 0 " + (bottom - 2 * stick) + "         L 0 " + (bottom - 3 * stick) + "         A " + (.5 * stick) + " " + (.5 * stick) + " 0 1 1 0 " + (bottom - 4 * stick) + "         A " + (.5 * stick) + " " + (.5 * stick) + " 0 1 1 0 " + (bottom - 3 * stick) + "         ";
   };
 
   return Actor;
@@ -751,7 +783,7 @@ $(function() {
   _results = [];
   for (name in commands) {
     command = commands[name];
-    button = d3.select('aside').append('button').attr('title', "" + command.label + " [" + command.hotkey + "]").attr('class', 'btn btn-default btn-sm').on('click', command.fun);
+    button = d3.select('aside .btns').append('button').attr('title', "" + command.label + " [" + command.hotkey + "]").attr('class', 'btn btn-default btn-sm').on('click', command.fun);
     if (command.glyph) {
       button.append('span').attr('class', "glyphicon glyphicon-" + command.glyph);
     }
@@ -761,13 +793,13 @@ $(function() {
 });
 
 init_commands = function() {
-  var e, fun, hotkey, i, key, taken_hotkeys, _i, _len, _ref9, _results;
+  var e, fun, hotkey, i, icon, key, margin, path, svgicon, taken_hotkeys, txt, _i, _len, _ref9, _results;
   taken_hotkeys = [];
-  $('aside button.specific').each(function() {
+  $('aside .icons .specific').each(function() {
     return Mousetrap.unbind($(this).attr('data-hotkey'));
   });
-  $('aside .specific').remove();
-  $('aside').append($('<h3>').attr('id', diagram.constructor.name).addClass('specific').text(diagram.constructor.label));
+  $('aside .icons svg').remove();
+  $('aside h3').attr('id', diagram.constructor.name).addClass('specific').text(diagram.constructor.label);
   _ref9 = diagram.types.elements;
   _results = [];
   for (_i = 0, _len = _ref9.length; _i < _len; _i++) {
@@ -779,12 +811,20 @@ init_commands = function() {
     }
     taken_hotkeys.push(key);
     fun = (function(elt) {
-      return function(evt) {
-        return element_add(elt, evt);
+      return function() {
+        return element_add(elt);
       };
     })(e);
     hotkey = "a " + key;
-    d3.select('aside').append('button').attr('class', 'btn btn-default btn-block btn-sm draggable specific').attr('title', "" + e.name + " [" + hotkey + "]").attr('data-hotkey', hotkey).text(e.name).on('mousedown', fun);
+    icon = new e(0, 0, e.name);
+    svgicon = d3.select('aside .icons').append('svg').attr('class', 'icon specific draggable btn btn-default').attr('title', "" + e.name + " [" + hotkey + "]").attr('data-hotkey', hotkey).on('mousedown', fun);
+    path = svgicon.append('path');
+    txt = svgicon.append('text').text(e.name);
+    icon.set_txt_bbox(txt.node().getBBox());
+    path.attr('d', icon.path());
+    txt.attr('x', icon.txt_x()).attr('y', icon.txt_y());
+    margin = 3;
+    svgicon.attr('viewBox', "                " + (-icon.width() / 2 - margin) + "                " + (-icon.height() / 2 - margin) + "                " + (icon.width() + 2 * margin) + "                " + (icon.height() + 2 * margin)).attr('width', icon.width()).attr('height', icon.height()).attr('preserveAspectRatio', 'xMidYMid Meet');
     _results.push(Mousetrap.bind(hotkey, fun));
   }
   return _results;
@@ -843,7 +883,7 @@ Svg = (function() {
         return diagram.title = txt;
       }));
     });
-    this.svg = this.article.append("svg").attr("width", this.width).attr("height", this.height);
+    this.svg = this.article.append("svg").attr('id', "diagram").attr("width", this.width).attr("height", this.height);
     this.underlay_g = this.svg.append('g');
     this.underlay = this.underlay_g.append('rect').attr('class', 'underlay').attr('width', this.width).attr('height', this.height).attr('fill', 'url(#grid)');
     d3.select(window).on('resize', function() {
@@ -887,6 +927,21 @@ Svg = (function() {
       }
       return diagram.dragging = true;
     }).on('dragend', function(elt) {
+      var lnk, _i, _len, _ref9;
+      if (!$(d3.event.sourceEvent.target).closest('#diagram').size()) {
+        diagram.elements.splice(diagram.elements.indexOf(elt), 1);
+        if (__indexOf.call(diagram.selection, elt) >= 0) {
+          diagram.selection.splice(diagram.selection.indexOf(elt), 1);
+        }
+        _ref9 = diagram.links.slice();
+        for (_i = 0, _len = _ref9.length; _i < _len; _i++) {
+          lnk = _ref9[_i];
+          if (elt === lnk.source || elt === lnk.target) {
+            diagram.links.splice(diagram.links.indexOf(lnk), 1);
+          }
+        }
+        svg.sync();
+      }
       diagram.dragging = false;
       if (!diagram.freemode) {
         return elt.fixed = true;
@@ -963,6 +1018,8 @@ Svg = (function() {
         } else {
           rect.height = move.y;
         }
+        rect.width = Math.max(0, rect.width);
+        rect.height = Math.max(0, rect.height);
         sel.attr(rect);
         d3.selectAll('g.element').each(function(elt) {
           var g, selected;
@@ -1010,6 +1067,8 @@ Svg = (function() {
         return _this.zoom.translate(diagram.zoom.translate);
       }
     });
+    this.root.attr("transform", "translate(" + diagram.zoom.translate + ")scale(" + diagram.zoom.scale + ")");
+    this.pattern.attr("patternTransform", "translate(" + diagram.zoom.translate + ")scale(" + diagram.zoom.scale + ")");
     this.underlay_g.call(this.zoom);
     this.force.on('tick', this.tick).on('end', function() {
       var elt, _i, _len, _ref9;
@@ -1144,9 +1203,11 @@ Svg = (function() {
       }
       return _results;
     }).each(function(elt) {
-      return elt._txt_bbox = this.getBBox();
+      return elt.set_txt_bbox(this.getBBox());
+    }).attr('x', function(elt) {
+      return elt.txt_x();
     }).attr('y', function(elt) {
-      return -elt._txt_bbox.height / 2;
+      return elt.txt_y();
     });
     this.link.select('path').attr('d', function(lnk) {
       return lnk.path();

@@ -156,7 +156,7 @@ commands =
 
 $ ->
    for name, command of commands
-        button = d3.select('aside')
+        button = d3.select('aside .btns')
             .append('button')
             .attr('title', "#{command.label} [#{command.hotkey}]")
             .attr('class', 'btn btn-default btn-sm')
@@ -171,13 +171,12 @@ $ ->
 
 init_commands = ->
     taken_hotkeys = []
-    $('aside button.specific').each(-> Mousetrap.unbind $(@).attr('data-hotkey'))
-    $('aside .specific').remove()
-    $('aside').append(
-        $('<h3>')
-            .attr('id', diagram.constructor.name)
-            .addClass('specific')
-            .text(diagram.constructor.label))
+    $('aside .icons .specific').each(-> Mousetrap.unbind $(@).attr('data-hotkey'))
+    $('aside .icons svg').remove()
+    $('aside h3')
+        .attr('id', diagram.constructor.name)
+        .addClass('specific')
+        .text(diagram.constructor.label)
 
     for e in diagram.types.elements
         i = 1
@@ -187,13 +186,36 @@ init_commands = ->
 
         taken_hotkeys.push(key)
 
-        fun = ((elt) -> (evt) -> element_add(elt, evt))(e)
+        fun = ((elt) -> -> element_add(elt))(e)
         hotkey = "a #{key}"
-        d3.select('aside')
-            .append('button')
-            .attr('class', 'btn btn-default btn-block btn-sm draggable specific')
+        icon = new e(0, 0, e.name)
+        svgicon = d3.select('aside .icons')
+            .append('svg')
+            .attr('class', 'icon specific draggable btn btn-default')
             .attr('title', "#{e.name} [#{hotkey}]")
             .attr('data-hotkey', hotkey)
-            .text(e.name)
             .on('mousedown', fun)
+
+        path = svgicon.append('path')
+
+        txt = svgicon
+            .append('text')
+            .text(e.name)
+
+        icon.set_txt_bbox(txt.node().getBBox())
+        path.attr('d', icon.path())
+        txt
+            .attr('x', icon.txt_x())
+            .attr('y', icon.txt_y())
+
+        margin = 3
+        svgicon
+            .attr('viewBox', "
+                #{-icon.width() / 2 - margin}
+                #{-icon.height() / 2 - margin}
+                #{icon.width() + 2 * margin}
+                #{icon.height() + 2 * margin}")
+            .attr('width', icon.width())
+            .attr('height', icon.height())
+            .attr('preserveAspectRatio', 'xMidYMid Meet')
         Mousetrap.bind hotkey, fun

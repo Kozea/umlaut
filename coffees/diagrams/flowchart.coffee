@@ -10,10 +10,13 @@ class Process extends Element
          z"
 
 class DataIO extends Element
+    @shift: 5
+
     path: ->
+        shift = DataIO.shift
+
         w2 = @width() / 2
         h2 = @height() / 2
-        shift = 5
 
         "M #{-w2 - shift} #{-h2}
          L #{w2 - shift} #{-h2}
@@ -22,10 +25,12 @@ class DataIO extends Element
          z"
 
 class Terminator extends Element
+    @shift: 10
+
     path: ->
         w2 = @width() / 2
         h2 = @height() / 2
-        shift = 10
+        shift = Terminator.shift
 
         "M #{-w2 + shift} #{-h2}
          L #{w2 - shift} #{-h2}
@@ -60,10 +65,12 @@ class Decision extends Element
          z"
 
 class Delay extends Element
+    @shift: 10
+
     path: ->
+        shift = Delay.shift
         w2 = @width() / 2
         h2 = @height() / 2
-        shift = 10
 
         "M #{-w2} #{-h2}
          L #{w2 - shift} #{-h2}
