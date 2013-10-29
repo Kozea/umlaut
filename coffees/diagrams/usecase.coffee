@@ -49,7 +49,7 @@ class UseCase extends Diagram
     @label: 'UML Use case'
 
     constructor: ->
-        super
+        super()
 
         @linkstyle = 'diagonal'
         @types =

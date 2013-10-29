@@ -87,7 +87,7 @@ class FlowChart extends Diagram
     @label: 'Flow Chart'
 
     constructor: ->
-        super
+        super()
         @types =
             elements: [Process, DataIO, Terminator, Decision, Delay]
             links: [Arrow]

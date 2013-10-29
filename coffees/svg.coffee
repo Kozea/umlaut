@@ -231,8 +231,6 @@ class Svg
                     @zoom.scale(diagram.zoom.scale)
                     @zoom.translate(diagram.zoom.translate)
             )
-        @root.attr("transform", "translate(" + diagram.zoom.translate + ")scale(" + diagram.zoom.scale + ")")
-        @pattern.attr("patternTransform", "translate(" + diagram.zoom.translate + ")scale(" + diagram.zoom.scale + ")")
         @underlay_g.call(@zoom)
 
         @force
@@ -247,13 +245,17 @@ class Svg
             )
 
     sync: ->
+        @zoom.scale(diagram.zoom.scale)
+        @zoom.translate(diagram.zoom.translate)
+        @zoom.event(@underlay_g)
+        @title.text(diagram.title)
+
         @force.nodes(diagram.elements)
             .links(diagram.links)
 
         @link = @svg.select('g.links').selectAll('g.link')
             .data(diagram.links.concat(diagram.linking))
 
-        @title.text(diagram.title)
 
         link_g = @link.enter()
             .append('g')

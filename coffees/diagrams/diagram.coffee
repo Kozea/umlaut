@@ -37,7 +37,6 @@ class Diagram
         linkstyle: @linkstyle
         zoom: @zoom
         freemode: @freemode
-
         elements: @elements.map (elt) -> elt.objectify()
         links: @links.map (lnk) -> lnk.objectify()
 

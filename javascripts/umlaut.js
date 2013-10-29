@@ -471,7 +471,7 @@ FlowChart = (function(_super) {
   FlowChart.label = 'Flow Chart';
 
   function FlowChart() {
-    FlowChart.__super__.constructor.apply(this, arguments);
+    FlowChart.__super__.constructor.call(this);
     this.types = {
       elements: [Process, DataIO, Terminator, Decision, Delay],
       links: [Arrow]
@@ -558,7 +558,7 @@ UseCase = (function(_super) {
   UseCase.label = 'UML Use case';
 
   function UseCase() {
-    UseCase.__super__.constructor.apply(this, arguments);
+    UseCase.__super__.constructor.call(this);
     this.linkstyle = 'diagonal';
     this.types = {
       elements: [Actor, Case],
@@ -1067,8 +1067,6 @@ Svg = (function() {
         return _this.zoom.translate(diagram.zoom.translate);
       }
     });
-    this.root.attr("transform", "translate(" + diagram.zoom.translate + ")scale(" + diagram.zoom.scale + ")");
-    this.pattern.attr("patternTransform", "translate(" + diagram.zoom.translate + ")scale(" + diagram.zoom.scale + ")");
     this.underlay_g.call(this.zoom);
     this.force.on('tick', this.tick).on('end', function() {
       var elt, _i, _len, _ref9;
@@ -1087,9 +1085,12 @@ Svg = (function() {
   Svg.prototype.sync = function() {
     var element_g, link_g,
       _this = this;
+    this.zoom.scale(diagram.zoom.scale);
+    this.zoom.translate(diagram.zoom.translate);
+    this.zoom.event(this.underlay_g);
+    this.title.text(diagram.title);
     this.force.nodes(diagram.elements).links(diagram.links);
     this.link = this.svg.select('g.links').selectAll('g.link').data(diagram.links.concat(diagram.linking));
-    this.title.text(diagram.title);
     link_g = this.link.enter().append('g').attr("class", "link");
     link_g.append("path").attr("marker-end", "url(#arrow)");
     link_g.append("text").attr('class', "start");
