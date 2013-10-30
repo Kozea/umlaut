@@ -154,7 +154,7 @@ commands =
 
 $ ->
    for name, command of commands
-        button = d3.select('aside .btns')
+        button = d3.select('.btns')
             .append('button')
             .attr('title', "#{command.label} [#{command.hotkey}]")
             .attr('class', 'btn btn-default btn-sm')
@@ -171,7 +171,7 @@ init_commands = ->
     taken_hotkeys = []
     $('aside .icons .specific').each(-> Mousetrap.unbind $(@).attr('data-hotkey'))
     $('aside .icons svg').remove()
-    $('aside .sep')
+    $('aside h3')
         .attr('id', diagram.constructor.name)
         .addClass('specific')
         .text(diagram.label)
@@ -219,7 +219,7 @@ init_commands = ->
                 #{icon.height() + 2 * margin}")
             .attr('width', icon.width())
             .attr('height', icon.height())
-            .attr('preserveAspectRatio', 'xMidYMid Meet')
+            .attr('preserveAspectRatio', 'xMidYMid meet')
         Mousetrap.bind hotkey, fun
 
     taken_hotkeys = []

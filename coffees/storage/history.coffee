@@ -16,7 +16,7 @@ history_pop = () ->
     if not svg?
         window.svg = new Svg()
 
-    if diagram.constructor.name != $('aside .sep').attr('id')
+    if diagram.constructor.name != $('aside h3').attr('id')
         init_commands()
         svg.resize()
 

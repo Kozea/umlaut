@@ -1,6 +1,6 @@
 class Link
     @marker: 'arrow'
-    
+
     text_margin: 10
 
     constructor: (@source, @target, text) ->
@@ -26,12 +26,12 @@ class Link
         @d1 = @source.direction(c2.x, c2.y)
         @d2 = @target.direction(c1.x, c1.y)
 
-        @a1 = @source.anchor(@d1)
-        @a2 = @target.anchor(@d2)
+        @a1 = @source.anchors[@d1]()
+        @a2 = @target.anchors[@d2]()
 
         path = "M #{@a1.x} #{@a1.y}"
         vert = ['N', 'S']
-        horz = ['E', 'O']
+        horz = ['E', 'W']
 
         if diagram.linkstyle == 'curve'
             path = "#{path} C"

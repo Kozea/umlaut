@@ -1,6 +1,19 @@
 class Element
     constructor: (@x, @y, @text, @fixed=true) ->
         @margin = x: 10, y: 5
+        @anchors =
+            N: =>
+                x: @x
+                y: @y - @height() / 2
+            S: =>
+                x: @x
+                y: @y + @height() / 2
+            E: =>
+                x: @x + @width() / 2
+                y: @y
+            W: =>
+                x: @x - @width() / 2
+                y: @y
 
     pos: ->
         x: @x
@@ -10,21 +23,22 @@ class Element
         @_txt_bbox = bbox
 
     txt_width: ->
-        @_txt_bbox.width
+        @_txt_bbox.width + 2 * @margin.x
 
     txt_height: ->
-        @_txt_bbox.height
+        @_txt_bbox.height + 2 * @margin.y
 
     txt_x: ->
         0
 
     txt_y: ->
-        - @txt_height() / 2
+        - @_txt_bbox.height / 2
 
     width: ->
-        @txt_width() + 2 * @margin.x
+        @txt_width()
+
     height: ->
-        @txt_height() + 2 * @margin.y
+        @txt_height()
 
     direction: (x, y) ->
         delta = @height() / @width()
@@ -38,7 +52,7 @@ class Element
             if y > delta * (@x - x) + @y
                 return 'S'
             else
-                return 'O'
+                return 'W'
         if @x <= x and @y >= y
             if y > delta * (@x - x) + @y
                 return 'E'
@@ -46,24 +60,9 @@ class Element
                 return 'N'
         if @x >= x and @y >= y
             if y > delta * (x - @x) + @y
-                return 'O'
+                return 'W'
             else
                 return 'N'
-
-    anchor: (direction) ->
-        switch direction
-            when 'N'
-                x: @x
-                y: @y - @height() / 2
-            when 'S'
-                x: @x
-                y: @y + @height() / 2
-            when 'E'
-                x: @x + @width() / 2
-                y: @y
-            when 'O'
-                x: @x - @width() / 2
-                y: @y
 
     in: (rect) ->
         rect.x < @x < rect.x + rect.width and rect.y < @y < rect.y + rect.height

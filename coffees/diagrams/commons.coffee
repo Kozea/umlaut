@@ -28,11 +28,11 @@ class Ellipsis extends Element
 class Lozenge extends Element
     width: ->
         ow = super()
-        ow + Math.sqrt(ow * @txt_height() + 2 * @margin.y)
+        ow + Math.sqrt(ow * @txt_height())
 
     height: ->
         oh = super()
-        oh + Math.sqrt(oh * @txt_width() + 2 * @margin.x)
+        oh + Math.sqrt(oh * @txt_width())
 
     path: ->
         w2 = @width() / 2

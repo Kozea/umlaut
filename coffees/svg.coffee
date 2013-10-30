@@ -113,7 +113,7 @@ class Svg
                 diagram.dragging = true
             ).on('dragend', (elt) =>
                 return if not diagram.dragging
-                if not $(d3.event.sourceEvent.target).closest('#diagram').size()
+                if not $(d3.event.sourceEvent.target).closest('.inside').size()
                     diagram.elements.splice(diagram.elements.indexOf(elt), 1)
                     if elt in diagram.selection
                         diagram.selection.splice(diagram.selection.indexOf(elt), 1)
