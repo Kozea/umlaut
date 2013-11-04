@@ -159,7 +159,7 @@ svg #grid path {
   stroke: rgba(0, 0, 255, 0.12);
 }
 /* line 141, ../sass/umlaut.sass */
-svg .underlay.move {
+svg .background.move {
   cursor: move;
 }
 /* line 144, ../sass/umlaut.sass */
@@ -195,35 +195,41 @@ svg .link:hover {
   stroke-width: 3;
 }
 /* line 167, ../sass/umlaut.sass */
-svg .element {
+svg .element, svg .group {
   cursor: move;
 }
 /* line 170, ../sass/umlaut.sass */
-svg .element .shape {
+svg .element .shape, svg .group .shape {
   stroke: black;
   fill: white;
   stroke-width: 1.3;
 }
 /* line 176, ../sass/umlaut.sass */
-svg .element.moving .shape {
+svg .element.moving .shape, svg .group.moving .shape {
   stroke: red;
 }
 /* line 180, ../sass/umlaut.sass */
-svg .element.selected .shape {
+svg .element.selected .shape, svg .group.selected .shape {
   stroke: blue;
 }
 /* line 184, ../sass/umlaut.sass */
-svg .element.selected.moving .shape {
+svg .element.selected.moving .shape, svg .group.selected.moving .shape {
   stroke: magenta;
 }
 /* line 188, ../sass/umlaut.sass */
+svg .underlay .selection {
+  fill: rgba(0, 255, 0, 0.05);
+  stroke: rgba(0, 255, 0, 0.3);
+}
+/* line 193, ../sass/umlaut.sass */
 svg .overlay .selection {
   fill: rgba(0, 0, 255, 0.05);
   stroke: rgba(0, 0, 255, 0.3);
   stroke-width: 2;
+  stroke-width: 2;
 }
 
-/* line 194, ../sass/umlaut.sass */
+/* line 200, ../sass/umlaut.sass */
 svg.icon text {
   dominant-baseline: text-before-edge;
 }

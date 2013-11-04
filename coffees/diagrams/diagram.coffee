@@ -10,6 +10,7 @@ class Diagram
 
         @elements = []
         @links = []
+        @groups = []
 
         @snap = 25
         @freemode = false
@@ -19,7 +20,13 @@ class Diagram
         @linking = []
         @mouse = new Mouse(0, 0, '')
         @dragging = false
+        @groupping = false
         @no_save = false
+
+    group: (name) ->
+        for grp in @types.groups
+            if grp.name == name
+                return grp
 
     element: (name) ->
         for elt in @types.elements
@@ -31,6 +38,9 @@ class Diagram
             if lnk.name == name
                 return lnk
 
+    nodes: ->
+        @elements.concat(@groups)
+
     objectify: ->
         name: @constructor.name
         title: @title
@@ -38,6 +48,7 @@ class Diagram
         zoom: @zoom
         freemode: @freemode
         elements: @elements.map (elt) -> elt.objectify()
+        groups: @groups.map (grp) -> grp.objectify()
         links: @links.map (lnk) -> lnk.objectify()
 
     hash: ->
@@ -53,10 +64,17 @@ class Diagram
         if obj.freemode
             @freemode = obj.freemode
 
+        for grp in obj.groups
+            group_type = @group(grp.name)
+            group = new group_type(grp.x, grp.y, grp.text, grp.fixed)
+            group._width = grp.width
+            group._height = grp.height
+            @groups.push(group)
+
         for elt in obj.elements
-            element = diagram.element(elt.name)
-            diagram.elements.push(new element(elt.x, elt.y, elt.text, elt.fixed))
+            element = @element(elt.name)
+            @elements.push(new element(elt.x, elt.y, elt.text, elt.fixed))
 
         for lnk in obj.links
-            link = diagram.link(lnk.name)
-            diagram.links.push(new link(diagram.elements[lnk.source], diagram.elements[lnk.target], lnk.text))
+            link = @link(lnk.name)
+            @links.push(new link(@nodes()[lnk.source], @nodes()[lnk.target], lnk.text))

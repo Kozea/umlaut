@@ -174,55 +174,59 @@ class ManualInput extends Element
           L #{-w2} #{h2}
           z"
 
- class Preparation extends Element
-     width: ->
-         super() + @height()
+class Preparation extends Element
+    width: ->
+        super() + @height()
 
-     path: ->
-         w2 = @txt_width() / 2
-         h2 = @height() / 2
+    path: ->
+        w2 = @txt_width() / 2
+        h2 = @height() / 2
 
-         "M #{-w2 - h2} 0
-          L #{-w2} #{-h2}
-          L #{w2} #{-h2}
-          L #{w2 + h2} 0
-          L #{w2} #{h2}
-          L #{-w2} #{h2}
-          z"
+        "M #{-w2 - h2} 0
+         L #{-w2} #{-h2}
+         L #{w2} #{-h2}
+         L #{w2 + h2} 0
+         L #{w2} #{h2}
+         L #{-w2} #{h2}
+         z"
 
- class InternalStorage extends Process
-     shift: 10
+class InternalStorage extends Process
+    shift: 10
 
-     width: ->
-         super() + @shift
+    width: ->
+        super() + @shift
 
-     height: ->
-         super() + @shift
+    height: ->
+        super() + @shift
 
-     txt_x: ->
-         super() + @shift / 2
+    txt_x: ->
+        super() + @shift / 2
 
-     txt_y: ->
-         super() + @shift / 2
+    txt_y: ->
+        super() + @shift / 2
 
-     path: ->
-         w2 = @width() / 2
-         h2 = @height() / 2
-         "#{super()}
-          M #{-w2 + @shift} #{-h2}
-          L #{-w2 + @shift} #{h2}
-          M #{-w2} #{-h2 + @shift}
-          L #{w2} #{-h2 + @shift}
-         "
- class Flow extends Link
+    path: ->
+        w2 = @width() / 2
+        h2 = @height() / 2
+        "#{super()}
+         M #{-w2 + @shift} #{-h2}
+         L #{-w2 + @shift} #{h2}
+         M #{-w2} #{-h2 + @shift}
+         L #{w2} #{-h2 + @shift}
+        "
 
- class FlowChart extends Diagram
-     label: 'Flow Chart'
+class Flow extends Link
 
-     constructor: ->
-        super()
-        @types =
-            elements: [Process, IO, Terminator, Decision, Delay, SubProcess, Document, Database, HardDisk, ManualInput, Preparation, InternalStorage]
-            links: [Flow]
+class Container extends Group
+
+class FlowChart extends Diagram
+    label: 'Flow Chart'
+
+    constructor: ->
+       super()
+       @types =
+           elements: [Process, IO, Terminator, Decision, Delay, SubProcess, Document, Database, HardDisk, ManualInput, Preparation, InternalStorage]
+           groups: [Container]
+           links: [Flow]
 
 Diagram.diagrams['FlowChart'] = FlowChart

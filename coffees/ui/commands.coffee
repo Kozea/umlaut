@@ -1,9 +1,13 @@
 element_add = (type) =>
     x = diagram.mouse.x
     y = diagram.mouse.y
-    nth = diagram.elements.filter((elt) -> elt instanceof type).length + 1
+    set = if type instanceof Group.constructor then diagram.groups else diagram.elements
+    nth = set.filter((elt) -> elt instanceof type).length + 1
     new_elt = new type(x, y, "#{type.name} ##{nth}", not diagram.freemode)
-    diagram.elements.push(new_elt)
+    if new_elt instanceof Group
+        new_elt._width = 120
+        new_elt._height = 90
+    set.push(new_elt)
     if d3.event
         svg.svg.select('.selected').classed('selected', false)
         diagram.selection = [new_elt]
@@ -13,7 +17,7 @@ element_add = (type) =>
     if d3.event
         # Hack to trigger d3 drag event on newly created element
         node = null
-        d3.selectAll('g.element').each((elt) ->
+        d3.selectAll('g.element,g.group').each((elt) ->
             if elt == new_elt
                 node = @
                 d3.select(node).classed('selected', true))
@@ -26,70 +30,73 @@ element_add = (type) =>
         node.dispatchEvent(mouse_evt)
 
 
-link_add = (type) ->
-    diagram.linking = []
-    for elt in diagram.selection
-        diagram.linking.push(new type(elt, diagram.mouse))
-    svg.sync()
+ link_add = (type) ->
+     diagram.linking = []
+     for elt in diagram.selection
+         diagram.linking.push(new type(elt, diagram.mouse))
+     svg.sync()
 
 
-commands =
-    undo:
-        fun: (e) ->
-            history.go(-1)
-            e?.preventDefault()
+ commands =
+     undo:
+         fun: (e) ->
+             history.go(-1)
+             e?.preventDefault()
 
-        label: 'Undo'
-        glyph: 'chevron-left'
-        hotkey: 'ctrl+z'
+         label: 'Undo'
+         glyph: 'chevron-left'
+         hotkey: 'ctrl+z'
 
-    redo:
-        fun: (e) ->
-            history.go(1)
-            e?.preventDefault()
+     redo:
+         fun: (e) ->
+             history.go(1)
+             e?.preventDefault()
 
-        label: 'Redo'
-        glyph: 'chevron-right'
-        hotkey: 'ctrl+y'
+         label: 'Redo'
+         glyph: 'chevron-right'
+         hotkey: 'ctrl+y'
 
-    save:
-        fun: (e) ->
-            save()
-            e?.preventDefault()
+     save:
+         fun: (e) ->
+             save()
+             e?.preventDefault()
 
-        label: 'Save locally'
-        glyph: 'save'
-        hotkey: 'ctrl+s'
+         label: 'Save locally'
+         glyph: 'save'
+         hotkey: 'ctrl+s'
 
-    edit:
-        fun: ->
-            edit((->
-                if diagram.selection.length == 1
-                    diagram.selection[0].text
-                else
-                    ''), ((txt) ->
-                for elt in diagram.selection
-                    elt.text = txt))
-            svg.sync()
-        label: 'Edit elements text'
-        glyph: 'edit'
-        hotkey: 'e'
+     edit:
+         fun: ->
+             edit((->
+                 if diagram.selection.length == 1
+                     diagram.selection[0].text
+                 else
+                     ''), ((txt) ->
+                 for elt in diagram.selection
+                     elt.text = txt))
+             svg.sync()
+         label: 'Edit elements text'
+         glyph: 'edit'
+         hotkey: 'e'
 
-    remove:
-        fun: ->
-            for elt in diagram.selection
-                diagram.elements.splice(diagram.elements.indexOf(elt), 1)
-                for lnk in diagram.links.slice()
-                    if elt == lnk.source or elt == lnk.target
-                        diagram.links.splice(diagram.links.indexOf(lnk), 1)
-            diagram.selection = []
-            svg.svg.selectAll('g.element').classed('selected', false)
-            svg.sync()
-        label: 'Remove elements'
-        glyph: 'remove-sign'
-        hotkey: 'del'
+     remove:
+         fun: ->
+             for elt in diagram.selection
+                 if elt instanceof Group
+                     diagram.groups.splice(diagram.groups.indexOf(elt), 1)
+                 else
+                     diagram.elements.splice(diagram.elements.indexOf(elt), 1)
+                 for lnk in diagram.links.slice()
+                     if elt == lnk.source or elt == lnk.target
+                         diagram.links.splice(diagram.links.indexOf(lnk), 1)
+             diagram.selection = []
+             svg.svg.selectAll('g.element').classed('selected', false)
+             svg.sync()
+         label: 'Remove elements'
+         glyph: 'remove-sign'
+         hotkey: 'del'
 
-    select_all:
+     select_all:
         fun: (e) ->
             diagram.selection = diagram.elements.slice()
             svg.svg.selectAll('g.element').classed('selected', true)
@@ -111,7 +118,7 @@ commands =
 
     freemode:
         fun: ->
-            for elt in diagram.elements
+            for elt in diagram.nodes()
                 elt.fixed = diagram.freemode
             if diagram.freemode
                 svg.force.stop()
@@ -137,14 +144,14 @@ commands =
         fun: ->
             svg.zoom.scale(1)
             svg.zoom.translate([0, 0])
-            svg.zoom.event(svg.underlay_g)
+            svg.zoom.event(svg.background_g)
         label: 'Reset view'
         glyph: 'screenshot'
         hotkey: 'ctrl+backspace'
 
     snaptogrid:
         fun: ->
-            for elt in diagram.elements
+            for elt in diagram.nodes()
                 elt.x = elt.px = diagram.snap * Math.floor(elt.x / diagram.snap)
                 elt.y = elt.py = diagram.snap * Math.floor(elt.y / diagram.snap)
             svg.tick()
@@ -176,7 +183,7 @@ init_commands = ->
         .addClass('specific')
         .text(diagram.label)
 
-    for e in diagram.types.elements
+    for e in diagram.types.elements.concat(diagram.types.groups)
         i = 1
         key = e.name[0].toLowerCase()
         while i < e.length and key in taken_hotkeys
@@ -187,6 +194,9 @@ init_commands = ->
         fun = ((elt) -> -> element_add(elt))(e)
         hotkey = "a #{key}"
         icon = new e(0, 0, e.name)
+        if icon instanceof Group
+            icon._height = 70
+            icon._width = 90
         svgicon = d3.select('aside .icons')
             .append('svg')
             .attr('class', 'icon specific draggable btn btn-default')

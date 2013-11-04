@@ -11,8 +11,8 @@ class Link
 
     objectify: ->
         name: @constructor.name
-        source: diagram.elements.indexOf(@source)
-        target: diagram.elements.indexOf(@target)
+        source: diagram.nodes().indexOf(@source)
+        target: diagram.nodes().indexOf(@target)
         text: @text
 
     nearest: (pos) ->

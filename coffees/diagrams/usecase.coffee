@@ -32,6 +32,8 @@ class Association extends Link
 class Inheritance extends Link
     @marker: 'lozenge'
 
+class System extends Group
+
 class UseCase extends Diagram
     label: 'UML Use case'
 
@@ -41,6 +43,7 @@ class UseCase extends Diagram
         @linkstyle = 'diagonal'
         @types =
             elements: [Actor, Case]
+            groups: [System]
             links: [Association, Inheritance]
 
 Diagram.diagrams['UseCase'] = UseCase
