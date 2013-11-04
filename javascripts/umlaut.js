@@ -341,10 +341,13 @@ Diagram = (function() {
     if (obj.freemode) {
       this.freemode = obj.freemode;
     }
-    _ref1 = obj.groups;
+    _ref1 = obj.groups || [];
     for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
       grp = _ref1[_i];
       group_type = this.group(grp.name);
+      if (!group_type) {
+        continue;
+      }
       group = new group_type(grp.x, grp.y, grp.text, grp.fixed);
       group._width = grp.width;
       group._height = grp.height;
@@ -354,14 +357,14 @@ Diagram = (function() {
     for (_j = 0, _len1 = _ref2.length; _j < _len1; _j++) {
       elt = _ref2[_j];
       element = this.element(elt.name);
-      this.elements.push(new element(elt.x, elt.y, elt.text, elt.fixed));
+      element && this.elements.push(new element(elt.x, elt.y, elt.text, elt.fixed));
     }
     _ref3 = obj.links;
     _results = [];
     for (_k = 0, _len2 = _ref3.length; _k < _len2; _k++) {
       lnk = _ref3[_k];
       link = this.link(lnk.name);
-      _results.push(this.links.push(new link(this.nodes()[lnk.source], this.nodes()[lnk.target], lnk.text)));
+      _results.push(link && this.links.push(new link(this.nodes()[lnk.source], this.nodes()[lnk.target], lnk.text)));
     }
     return _results;
   };

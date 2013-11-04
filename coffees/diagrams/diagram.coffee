@@ -64,8 +64,10 @@ class Diagram
         if obj.freemode
             @freemode = obj.freemode
 
-        for grp in obj.groups
+        for grp in (obj.groups or [])
             group_type = @group(grp.name)
+            if not group_type
+                continue
             group = new group_type(grp.x, grp.y, grp.text, grp.fixed)
             group._width = grp.width
             group._height = grp.height
@@ -73,8 +75,8 @@ class Diagram
 
         for elt in obj.elements
             element = @element(elt.name)
-            @elements.push(new element(elt.x, elt.y, elt.text, elt.fixed))
+            element and @elements.push(new element(elt.x, elt.y, elt.text, elt.fixed))
 
         for lnk in obj.links
             link = @link(lnk.name)
-            @links.push(new link(@nodes()[lnk.source], @nodes()[lnk.target], lnk.text))
+            link and @links.push(new link(@nodes()[lnk.source], @nodes()[lnk.target], lnk.text))
