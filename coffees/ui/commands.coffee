@@ -1,12 +1,15 @@
 element_add = (type) =>
     x = diagram.mouse.x
     y = diagram.mouse.y
-    set = if type instanceof Group.constructor then diagram.groups else diagram.elements
-    nth = set.filter((elt) -> elt instanceof type).length + 1
-    new_elt = new type(x, y, "#{type.name} ##{nth}", not diagram.freemode)
+
+    new_elt = new type(x, y, '', not diagram.freemode)
+    set = diagram.elements
     if new_elt instanceof Group
+        set = diagram.groups
         new_elt._width = 120
         new_elt._height = 90
+    nth = set.filter((elt) -> elt instanceof type).length + 1
+    new_elt.text = "#{type.name} ##{nth}"
     set.push(new_elt)
     if d3.event
         svg.svg.select('.selected').classed('selected', false)
@@ -82,10 +85,12 @@ element_add = (type) =>
      remove:
          fun: ->
              for elt in diagram.selection
-                 if elt instanceof Group
+                 if elt in diagram.groups
                      diagram.groups.splice(diagram.groups.indexOf(elt), 1)
-                 else
+                 else if elt in diagram.elements
                      diagram.elements.splice(diagram.elements.indexOf(elt), 1)
+                 else if elt in diagram.links
+                     diagram.links.splice(diagram.links.indexOf(elt), 1)
                  for lnk in diagram.links.slice()
                      if elt == lnk.source or elt == lnk.target
                          diagram.links.splice(diagram.links.indexOf(lnk), 1)

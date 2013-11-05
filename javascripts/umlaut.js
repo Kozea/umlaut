@@ -967,15 +967,17 @@ element_add = function(type) {
   var mouse_evt, new_elt, node, nth, set, x, y;
   x = diagram.mouse.x;
   y = diagram.mouse.y;
-  set = type instanceof Group.constructor ? diagram.groups : diagram.elements;
-  nth = set.filter(function(elt) {
-    return elt instanceof type;
-  }).length + 1;
-  new_elt = new type(x, y, "" + type.name + " #" + nth, !diagram.freemode);
+  new_elt = new type(x, y, '', !diagram.freemode);
+  set = diagram.elements;
   if (new_elt instanceof Group) {
+    set = diagram.groups;
     new_elt._width = 120;
     new_elt._height = 90;
   }
+  nth = set.filter(function(elt) {
+    return elt instanceof type;
+  }).length + 1;
+  new_elt.text = "" + type.name + " #" + nth;
   set.push(new_elt);
   if (d3.event) {
     svg.svg.select('.selected').classed('selected', false);
@@ -1065,10 +1067,12 @@ commands = {
       _ref21 = diagram.selection;
       for (_i = 0, _len = _ref21.length; _i < _len; _i++) {
         elt = _ref21[_i];
-        if (elt instanceof Group) {
+        if (__indexOf.call(diagram.groups, elt) >= 0) {
           diagram.groups.splice(diagram.groups.indexOf(elt), 1);
-        } else {
+        } else if (__indexOf.call(diagram.elements, elt) >= 0) {
           diagram.elements.splice(diagram.elements.indexOf(elt), 1);
+        } else if (__indexOf.call(diagram.links, elt) >= 0) {
+          diagram.links.splice(diagram.links.indexOf(elt), 1);
         }
         _ref22 = diagram.links.slice();
         for (_j = 0, _len1 = _ref22.length; _j < _len1; _j++) {
