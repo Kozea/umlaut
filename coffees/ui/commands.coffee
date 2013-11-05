@@ -12,7 +12,6 @@ element_add = (type) =>
     new_elt.text = "#{type.name} ##{nth}"
     set.push(new_elt)
     if d3.event
-        svg.svg.select('.selected').classed('selected', false)
         diagram.selection = [new_elt]
 
     svg.sync()
@@ -20,10 +19,9 @@ element_add = (type) =>
     if d3.event
         # Hack to trigger d3 drag event on newly created element
         node = null
-        d3.selectAll('g.element,g.group').each((elt) ->
+        svg.svg.selectAll('g.element,g.group').each((elt) ->
             if elt == new_elt
-                node = @
-                d3.select(node).classed('selected', true))
+                node = @)
         mouse_evt = document.createEvent('MouseEvent')
         mouse_evt.initMouseEvent(
             d3.event.type, d3.event.canBubble, d3.event.cancelable, d3.event.view,
@@ -33,78 +31,78 @@ element_add = (type) =>
         node.dispatchEvent(mouse_evt)
 
 
- link_add = (type) ->
-     diagram.linking = []
-     for elt in diagram.selection
-         diagram.linking.push(new type(elt, diagram.mouse))
-     svg.sync()
+link_add = (type) ->
+    diagram.linking = []
+    for elt in diagram.selection
+        diagram.linking.push(new type(elt, diagram.mouse))
+    svg.sync()
+    d3.event.preventDefault()
 
 
- commands =
-     undo:
-         fun: (e) ->
-             history.go(-1)
-             e?.preventDefault()
-
-         label: 'Undo'
-         glyph: 'chevron-left'
-         hotkey: 'ctrl+z'
-
-     redo:
-         fun: (e) ->
-             history.go(1)
-             e?.preventDefault()
-
-         label: 'Redo'
-         glyph: 'chevron-right'
-         hotkey: 'ctrl+y'
-
-     save:
-         fun: (e) ->
-             save()
-             e?.preventDefault()
-
-         label: 'Save locally'
-         glyph: 'save'
-         hotkey: 'ctrl+s'
-
-     edit:
-         fun: ->
-             edit((->
-                 if diagram.selection.length == 1
-                     diagram.selection[0].text
-                 else
-                     ''), ((txt) ->
-                 for elt in diagram.selection
-                     elt.text = txt))
-             svg.sync()
-         label: 'Edit elements text'
-         glyph: 'edit'
-         hotkey: 'e'
-
-     remove:
-         fun: ->
-             for elt in diagram.selection
-                 if elt in diagram.groups
-                     diagram.groups.splice(diagram.groups.indexOf(elt), 1)
-                 else if elt in diagram.elements
-                     diagram.elements.splice(diagram.elements.indexOf(elt), 1)
-                 else if elt in diagram.links
-                     diagram.links.splice(diagram.links.indexOf(elt), 1)
-                 for lnk in diagram.links.slice()
-                     if elt == lnk.source or elt == lnk.target
-                         diagram.links.splice(diagram.links.indexOf(lnk), 1)
-             diagram.selection = []
-             svg.svg.selectAll('g.element').classed('selected', false)
-             svg.sync()
-         label: 'Remove elements'
-         glyph: 'remove-sign'
-         hotkey: 'del'
-
-     select_all:
+commands =
+    undo:
         fun: (e) ->
-            diagram.selection = diagram.elements.slice()
-            svg.svg.selectAll('g.element').classed('selected', true)
+            history.go(-1)
+            e?.preventDefault()
+
+        label: 'Undo'
+        glyph: 'chevron-left'
+        hotkey: 'ctrl+z'
+
+    redo:
+        fun: (e) ->
+            history.go(1)
+            e?.preventDefault()
+
+        label: 'Redo'
+        glyph: 'chevron-right'
+        hotkey: 'ctrl+y'
+
+    save:
+        fun: (e) ->
+            save()
+            e?.preventDefault()
+
+        label: 'Save locally'
+        glyph: 'save'
+        hotkey: 'ctrl+s'
+
+    edit:
+        fun: ->
+            edit((->
+                if diagram.selection.length == 1
+                    diagram.selection[0].text
+                else
+                    ''), ((txt) ->
+                for elt in diagram.selection
+                    elt.text = txt))
+            svg.sync()
+        label: 'Edit elements text'
+        glyph: 'edit'
+        hotkey: 'e'
+
+    remove:
+        fun: ->
+            for elt in diagram.selection
+                if elt in diagram.groups
+                    diagram.groups.splice(diagram.groups.indexOf(elt), 1)
+                else if elt in diagram.elements
+                    diagram.elements.splice(diagram.elements.indexOf(elt), 1)
+                else if elt in diagram.links
+                    diagram.links.splice(diagram.links.indexOf(elt), 1)
+                for lnk in diagram.links.slice()
+                    if elt == lnk.source or elt == lnk.target
+                        diagram.links.splice(diagram.links.indexOf(lnk), 1)
+            diagram.selection = []
+            svg.sync()
+        label: 'Remove elements'
+        glyph: 'remove-sign'
+        hotkey: 'del'
+
+    select_all:
+        fun: (e) ->
+            diagram.selection = diagram.nodes().concat(diagram.links)
+            svg.tick()
             e?.preventDefault()
 
         label: 'Select all elements'
@@ -149,7 +147,7 @@ element_add = (type) =>
         fun: ->
             svg.zoom.scale(1)
             svg.zoom.translate([0, 0])
-            svg.zoom.event(svg.background_g)
+            svg.zoom.event(d3.select('.background'))
         label: 'Reset view'
         glyph: 'screenshot'
         hotkey: 'ctrl+backspace'
@@ -163,6 +161,16 @@ element_add = (type) =>
         label: 'Snap to grid'
         glyph: 'magnet'
         hotkey: 'ctrl+space'
+
+    switch:
+        fun: ->
+            for node in diagram.selection
+                if node instanceof Link
+                    [node.source, node.target] = [node.target, node.source]
+            svg.tick()
+        label: 'Switch link direction'
+        glyph: 'transfer'
+        hotkey: 'w'
 
 $ ->
    for name, command of commands
@@ -262,28 +270,14 @@ init_commands = ->
         g = svgicon.append('g')
             .attr('class', 'link')
 
-        g
-            .append('svg:defs')
-            .append('svg:marker')
-            .attr('id', 'arrow')
-            .attr('viewBox', '0 0 10 10')
-            .attr('refX', 10)
-            .attr('refY', 5)
-            .attr('markerUnits', 'userSpaceOnUse')
-            .attr('markerWidth', 10)
-            .attr('markerHeight', 10)
-            .attr('orient', 'auto')
-            .append('svg:path')
-            .attr('d', 'M 0 0 L 10 5 L 0 10')
-
         path = svgicon
             .append('path')
-                .attr("class", "link")
-                .attr("marker-end", "url(##{icon.constructor.marker})")
+                .attr("class", "shape")
+                .attr("marker-end", "url(##{icon.constructor.marker.id})")
                 .attr('d', icon.path())
 
         svgicon
-            .attr('height', 10)
-            .attr('viewBox', "0 -5 100 10")
+            .attr('height', 20)
+            .attr('viewBox', "0 -10 100 20")
             .attr('preserveAspectRatio', 'none')
         Mousetrap.bind hotkey, fun

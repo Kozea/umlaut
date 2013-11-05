@@ -16,118 +16,59 @@ class Svg
                 edit((-> diagram.title), ((txt) -> diagram.title = txt))
         )
 
-        @svg = @article
-            .append("svg")
-            .attr('id', "diagram")
-            .attr("width", @width)
-            .attr("height", @height)
+        @zoom = d3.behavior.zoom()
+            .scale(diagram.zoom.scale)
+            .translate(diagram.zoom.translate)
+            .scaleExtent([.15, 5])
+            .on("zoom", =>
+                if not d3.event.sourceEvent or d3.event.sourceEvent.type in ['wheel', 'click'] or d3.event.sourceEvent.ctrlKey or d3.event.sourceEvent.which is 2
+                    diagram.zoom.translate = d3.event.translate
+                    diagram.zoom.scale = d3.event.scale
+                    d3.select('.root').attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")")
+                    d3.select('#grid').attr("patternTransform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")")
+                else
+                    @zoom.scale(diagram.zoom.scale)
+                    @zoom.translate(diagram.zoom.translate)
+            )
 
-        @background_g = @svg
-            .append('g')
+        @article
+            .selectAll('svg')
+            .data([diagram])
+            .enter()
+                .append("svg")
+                .attr('id', "diagram")
+                .attr("width", @width)
+                .attr("height", @height)
+                .call(@create)
 
-        @background = @background_g
-            .append('rect')
-            .attr('class', 'background')
-            .attr('width', @width)
-            .attr('height', @height)
-            .attr('fill', 'url(#grid)')
+        @svg = d3.select('#diagram')
 
-        d3.select(window).on('resize', => @resize())
+        markers = @svg.select('defs')
+            .selectAll('marker')
+            .data(diagram.markers())
 
-        @defs = @svg
-            .append('svg:defs')
-
-        @defs
-            .append('svg:marker')
-            .attr('id', 'arrow')
-            .attr('viewBox', '0 0 10 10')
-            .attr('refX', 10)
-            .attr('refY', 5)
-            .attr('markerUnits', 'userSpaceOnUse')
-            .attr('markerWidth', 10)
-            .attr('markerHeight', 10)
-            .attr('orient', 'auto')
-            .append('svg:path')
-            .attr('d', 'M 0 0 L 10 5 L 0 10')
-
-        @defs
-            .append('svg:marker')
-            .attr('id', 'lozenge')
-            .attr('viewBox', '0 0 10 10')
-            .attr('refX', 10)
-            .attr('refY', 5)
-            .attr('markerUnits', 'userSpaceOnUse')
-            .attr('markerWidth', 10)
-            .attr('markerHeight', 10)
-            .attr('orient', 'auto')
-            .append('svg:path')
-            .attr('d', 'M 0 5 L 5 0 L 10 5 L 5 10 z')
-
-        @pattern = @defs
-            .append('svg:pattern')
-            .attr('id', 'grid')
-            .attr('viewBox', '0 0 10 10')
-            .attr('x', 0)
-            .attr('y', 0)
-            .attr('width', diagram.snap)
-            .attr('height', diagram.snap)
-            .attr('patternUnits', 'userSpaceOnUse')
-
-        @pattern
-            .append('svg:path')
-            .attr('d', 'M 10 0 L 0 0 L 0 10')
-
-        @root = @background_g
-            .append('g')
-            .attr('class', 'root')
+        markers
+            .enter()
+                .append('marker')
+                .attr('id', (m) -> m.id)
+                .attr('viewBox', '-10 -10 30 30')
+                .attr('refX', 20)
+                .attr('refY', 5)
+                .attr('markerUnits', 'userSpaceOnUse')
+                .attr('markerWidth', 40)
+                .attr('markerHeight', 40)
+                .attr('orient', 'auto')
+                .append('path')
+                    .attr('d', (m) -> m.path())
+        markers
+            .exit()
+            .remove()
 
         @force = d3.layout.force()
             .gravity(.2)
-            .linkDistance(300)
+            .linkDistance(100)
             .charge(-5000)
             .size([@width, @height])
-
-        @drag = @force.drag()
-            .on("drag.force", (elt) =>
-                return if not diagram.dragging or d3.event.sourceEvent.ctrlKey
-
-                if not elt in diagram.selection
-                    diagram.selection.push elt
-
-                if d3.event.sourceEvent.shiftKey
-                    delta =
-                        x: elt.px - d3.event.x
-                        y: elt.py - d3.event.y
-                else
-                    delta =
-                        x: elt.px - diagram.snap * Math.floor(d3.event.x / diagram.snap)
-                        y: elt.py - diagram.snap * Math.floor(d3.event.y / diagram.snap)
-
-                for elt in diagram.selection
-                    elt.px -= delta.x
-                    elt.py -= delta.y
-
-                @force.resume()
-            ).on('dragstart', ->
-                return if d3.event.sourceEvent.which is 3 or d3.event.sourceEvent.ctrlKey
-                diagram.dragging = true
-            ).on('dragend', (elt) =>
-                return if not diagram.dragging
-                diagram.dragging = false
-                if not $(d3.event.sourceEvent.target).closest('.inside').size()
-                    diagram.elements.splice(diagram.elements.indexOf(elt), 1)
-                    if elt in diagram.selection
-                        diagram.selection.splice(diagram.selection.indexOf(elt), 1)
-                    for lnk in diagram.links.slice()
-                        if elt == lnk.source or elt == lnk.target
-                            diagram.links.splice(diagram.links.indexOf(lnk), 1)
-                    svg.sync()
-                if not diagram.freemode
-                    elt.fixed = true
-            )
-
-        @element = null
-        @link = null
 
         @svg.on("mousedown", (event) =>
             return if diagram.dragging or d3.event.ctrlKey or d3.event.which is 2
@@ -140,8 +81,8 @@ class Svg
                 @sync()
             else
                 if not d3.event.shiftKey
-                    @svg.selectAll('.selected').classed('selected', false)
                     diagram.selection = []
+                    svg.tick()
 
                 mouse = mouse_xy(@svg.node())
                 @svg.select(if diagram.groupping then 'g.underlay' else 'g.overlay')
@@ -196,14 +137,13 @@ class Svg
 
                 @svg.selectAll('g.element,g.group').each((elt) ->
                     g = d3.select @
-                    selected = g.classed 'selected'
+                    selected = elt in diagram.selection
                     if elt.in(rect) and not selected
                         diagram.selection.push(elt)
-                        g.classed 'selected', true
                     else if not elt.in(rect) and selected and not d3.event.shiftKey
                         diagram.selection.splice(diagram.selection.indexOf(elt), 1)
-                        g.classed 'selected', false
                 )
+                svg.tick()
                 d3.event.preventDefault()
 
         ).on("mouseup", =>
@@ -230,49 +170,13 @@ class Svg
             d3.event.preventDefault()
         ).on("keydown", =>
             if d3.event.ctrlKey
-                @background.classed('move', true)
+                d3.select('.background').classed('move', true)
         ).on("keyup", =>
-            @background.classed('move', false)
+            d3.select('.background').classed('move', false)
         )
 
-        @root
-            .append('g')
-            .attr('class', 'underlay')
-
-        @root
-            .append('g')
-            .attr('class', 'groups')
-
-        @root
-            .append('g')
-            .attr('class', 'links')
-
-        @root
-            .append('g')
-            .attr('class', 'elements')
-
-        @root
-            .append('g')
-            .attr('class', 'overlay')
-
-        @zoom = d3.behavior.zoom()
-            .scale(diagram.zoom.scale)
-            .translate(diagram.zoom.translate)
-            .scaleExtent([.15, 5])
-            .on("zoom", =>
-                if not d3.event.sourceEvent or d3.event.sourceEvent.type in ['wheel', 'click'] or d3.event.sourceEvent.ctrlKey or d3.event.sourceEvent.which is 2
-                    diagram.zoom.translate = d3.event.translate
-                    diagram.zoom.scale = d3.event.scale
-                    @root.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")")
-                    @pattern.attr("patternTransform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")")
-                else
-                    @zoom.scale(diagram.zoom.scale)
-                    @zoom.translate(diagram.zoom.translate)
-            )
-        @background_g.call(@zoom)
-
         @force
-            .on('tick', @tick)
+            .on('tick', => @tick())
             .on('end', =>
                 if not diagram.freemode
                     for elt in diagram.nodes()
@@ -282,43 +186,183 @@ class Svg
                 generate_url()
             )
 
+    create: (svg) =>
+        defs = svg
+            .append('defs')
+
+        background_g = svg
+            .append('g')
+            .attr('id', 'bg')
+
+        background = background_g
+            .append('rect')
+            .attr('class', 'background')
+            .attr('width', @width)
+            .attr('height', @height)
+            .attr('fill', 'url(#grid)')
+            .call(@zoom)
+
+        d3.select(window).on('resize', => @resize())
+
+        pattern = defs
+            .append('pattern')
+            .attr('id', 'grid')
+            .attr('viewBox', '0 0 10 10')
+            .attr('x', 0)
+            .attr('y', 0)
+            .attr('width', diagram.snap)
+            .attr('height', diagram.snap)
+            .attr('patternUnits', 'userSpaceOnUse')
+
+        pattern
+            .append('path')
+            .attr('d', 'M 10 0 L 0 0 L 0 10')
+
+        root = background_g
+            .append('g')
+            .attr('class', 'root')
+
+        root
+            .append('g')
+            .attr('class', 'underlay')
+
+        root
+            .append('g')
+            .attr('class', 'groups')
+
+        root
+            .append('g')
+            .attr('class', 'links')
+
+        root
+            .append('g')
+            .attr('class', 'elements')
+
+        root
+            .append('g')
+            .attr('class', 'overlay')
+
+
     sync: ->
         @zoom.scale(diagram.zoom.scale)
         @zoom.translate(diagram.zoom.translate)
-        @zoom.event(@background_g)
+        @zoom.event(d3.select('#bg'))
         @title.text(diagram.title)
+        force_drag = @force.drag()
+            .on("drag.force", (elt) ->
+                return if not diagram.dragging or d3.event.sourceEvent.ctrlKey
+
+                if not elt in diagram.selection
+                    diagram.selection.push elt
+
+                if d3.event.sourceEvent.shiftKey
+                    delta =
+                        x: elt.px - d3.event.x
+                        y: elt.py - d3.event.y
+                else
+                    delta =
+                        x: elt.px - diagram.snap * Math.floor(d3.event.x / diagram.snap)
+                        y: elt.py - diagram.snap * Math.floor(d3.event.y / diagram.snap)
+
+                for elt in diagram.selection
+                    elt.px -= delta.x
+                    elt.py -= delta.y
+
+                svg.force.resume()
+            ).on('dragstart', ->
+                return if d3.event.sourceEvent.which is 3 or d3.event.sourceEvent.ctrlKey
+                diagram.dragging = true
+            ).on('dragend', (elt) =>
+                return if not diagram.dragging
+                diagram.dragging = false
+                if not $(d3.event.sourceEvent.target).closest('.inside').size()
+                    if elt in diagram.elements
+                        diagram.elements.splice(diagram.elements.indexOf(elt), 1)
+                    if elt in diagram.groups
+                        diagram.groups.splice(diagram.groups.indexOf(elt), 1)
+                    if elt in diagram.selection
+                        diagram.selection.splice(diagram.selection.indexOf(elt), 1)
+                    for lnk in diagram.links.slice()
+                        if elt == lnk.source or elt == lnk.target
+                            diagram.links.splice(diagram.links.indexOf(lnk), 1)
+                    svg.sync()
+                if not diagram.freemode
+                    elt.fixed = true
+            )
 
         @force.nodes(diagram.nodes())
             .links(diagram.links)
 
-        @group = @svg.select('g.groups').selectAll('g.group')
+        group = @svg.select('g.groups').selectAll('g.group')
             .data(diagram.groups)
 
-        group_g = @group.enter()
+        group_g = group.enter()
             .append('g')
             .attr("class", "group")
-            .call(@drag)
+            .call(force_drag)
             .on("mousedown", (grp) ->
                 return if d3.event.ctrlKey
 
-                selected = d3.select(@).classed 'selected'
+                selected = grp in diagram.selection
                 if (selected and not diagram.dragging) or (not selected) and not d3.event.shiftKey
-                    svg.svg.selectAll('.selected').classed('selected', false)
-                    d3.select(@).classed 'selected', true
                     diagram.selection = [grp]
                 if d3.event.shiftKey and not selected
-                    d3.select(@).classed 'selected', true
                     diagram.selection.push(grp)
                 if d3.event.which != 3
                     svg.svg.selectAll('g.element')
                         .each((elt) ->
                             if elt not in diagram.selection and grp.contains elt
-                                diagram.selection.push elt
-                                d3.select(@).classed('selected', true)))
-
-            .on('dblclick', (elt) ->
+                                diagram.selection.push elt)
+                svg.tick())
+            .on("mousemove", (grp) ->
                 return if d3.event.ctrlKey
-                edit((-> elt.text), ((txt) -> elt.text = txt)))
+                for lnk in diagram.linking
+                    lnk.target = grp)
+            .on("mouseout", (grp) ->
+                return if d3.event.ctrlKey
+                for lnk in diagram.linking
+                    lnk.target = diagram.mouse)
+            .on("mouseup", (grp) =>
+                return if d3.event.ctrlKey
+                if diagram.linking.length
+                    for lnk in diagram.linking
+                        if lnk.source != grp
+                            diagram.links.push(new lnk.constructor(lnk.source, grp))
+                    diagram.linking = []
+                    @sync()
+                    d3.event.preventDefault())
+            .on('dblclick', (grp) ->
+                return if d3.event.ctrlKey
+                edit((-> grp.text), ((txt) -> grp.text = txt)))
+
+        resize_drag = d3.behavior.drag()
+            .on("dragstart", (grp) ->
+                d3.event.sourceEvent.stopPropagation())
+            .on("drag", (grp) ->
+                grp._width += d3.event.dx * 2
+                grp._height += d3.event.dy * 2
+
+                group = d3.select(@parentNode)
+                group
+                    .selectAll('path')
+                    .attr('d', grp.path())
+                group
+                    .select('text')
+                    .attr('x', grp.txt_x())
+                    .attr('y', grp.txt_y())
+                    .selectAll('tspan')
+                    .attr('x', grp.txt_x())
+                svg.tick())
+
+            .on("dragend", (grp) ->
+                grp._width = grp.width()
+                grp._height = grp.height()
+                generate_url())
+
+        group_g
+            .append('path')
+            .attr('class', 'ghost')
+            .call(resize_drag)
 
         group_g
             .append('path')
@@ -327,7 +371,7 @@ class Svg
         group_g
             .append('text')
 
-        @group
+        group
             .select('text')
             .each((elt) ->
                 txt = d3.select @
@@ -346,20 +390,25 @@ class Svg
             .selectAll('tspan')
             .attr('x', (elt) -> elt.txt_x())
 
-        @group
-            .select('path.shape')
-            .attr('d', (grp) -> grp.path())
+        group
+            .each((grp) ->
+                $(@).find('path').attr('d', grp.path()))
 
-        @link = @svg.select('g.links').selectAll('g.link')
+        link = @svg.select('g.links').selectAll('g.link')
             .data(diagram.links.concat(diagram.linking))
 
-        link_g = @link.enter()
+        link_g = link.enter()
             .append('g')
             .attr("class", "link")
 
         link_g
             .append("path")
-            .attr("marker-end", (lnk) -> "url(##{lnk.constructor.marker})")
+            .attr('class', (lnk) -> "shape #{lnk.constructor.type}")
+            .attr("marker-end", (lnk) -> "url(##{lnk.constructor.marker.id})")
+
+        link_g
+            .append("path")
+            .attr('class', 'ghost')
 
         link_g
             .append("text")
@@ -370,6 +419,12 @@ class Svg
             .attr('class', "end")
 
         link_g
+            .on('mousedown', (lnk) ->
+                if not d3.event.shiftKey
+                    diagram.selection = []
+                diagram.selection.push(lnk)
+                svg.tick()
+                d3.event.stopPropagation())
             .on('dblclick', (lnk) ->
                 return if d3.event.ctrlKey
                 nearest = lnk.nearest diagram.mouse
@@ -378,28 +433,24 @@ class Svg
                 else
                     edit((-> lnk.text.target), ((txt) -> lnk.text.target = txt)))
 
-        @element = @svg.select('g.elements')
-            .selectAll('g.element')
+        element = @svg.select('g.elements').selectAll('g.element')
             .data(diagram.elements)
 
         # Update
 
         # Enter
-        element_g = @element.enter()
+        element_g = element.enter()
             .append('g')
             .attr('class', 'element')
-            .call(@drag)
+            .call(force_drag)
             .on("mousedown", (elt) ->
                 return if d3.event.ctrlKey
-                selected = d3.select(@).classed 'selected'
+                selected = elt in diagram.selection
                 if (selected and not diagram.dragging) or (not selected) and not d3.event.shiftKey
-                    svg.svg.selectAll('.selected').classed('selected', false)
                     diagram.selection = [elt]
-                    d3.select(this).classed('selected', true)
-
                 if d3.event.shiftKey and not selected
-                    d3.select(this).classed('selected', true)
-                    diagram.selection.push(elt))
+                    diagram.selection.push(elt)
+                svg.tick())
             .on("mousemove", (elt) ->
                 return if d3.event.ctrlKey
                 for lnk in diagram.linking
@@ -426,10 +477,14 @@ class Svg
             .attr('class', 'shape')
 
         element_g
+            .append('path')
+            .attr('class', 'ghost')
+
+        element_g
             .append('text')
 
         # Update + Enter
-        @element
+        element
             .select('text')
             .each((elt) ->
                 txt = d3.select @
@@ -448,11 +503,11 @@ class Svg
             .selectAll('tspan')
                 .attr('x', (elt) -> elt.txt_x())
 
-        @link
-            .select('path')
-            .attr('d', (lnk) -> lnk.path())
+        link
+            .each((lnk) ->
+                $(@).find('path').attr('d', lnk.path()))
 
-        @link
+        link
             .select('text.start')
             .each((lnk) ->
                 txt = d3.select @
@@ -466,7 +521,7 @@ class Svg
                         tspan
                             .attr('dy', '1.2em'))
 
-        @link
+        link
             .select('text.end')
             .each((lnk) ->
                 txt = d3.select @
@@ -480,25 +535,26 @@ class Svg
                         tspan
                             .attr('dy', '1.2em'))
 
-        @element
-            .select('path.shape')
-            .attr('d', (elt) -> elt.path())
+        element
+            .each((elt) ->
+                $(@).find('path').attr('d', elt.path()))
 
         # Exit
-        @element.exit()
+        group.exit()
             .remove()
 
-        @link.exit()
+        element.exit()
+            .remove()
+
+        link.exit()
             .remove()
 
         @tick()
 
         @force.start()
 
-
-    tick: =>
+    tick: ->
         need_force = false
-
         for elt in diagram.nodes()
             if not elt.fixed
                 need_force = true
@@ -509,18 +565,24 @@ class Svg
         if not need_force and not diagram.dragging
             @force.stop()
 
-        @group
+        @svg.select('g.groups').selectAll('g.group')
             .attr("transform", ((grp) -> "translate(" + grp.x + "," + grp.y + ")"))
+            .classed('moving', (grp) -> not grp.fixed)
+            .classed('selected', (grp) -> grp in diagram.selection)
 
-        @element
+        @svg.select('g.elements').selectAll('g.element')
             .attr("transform", ((elt) -> "translate(" + elt.x + "," + elt.y + ")"))
-            .each((elt) -> d3.select(this).classed('moving', not elt.fixed))
+            .classed('moving', (elt) -> not elt.fixed)
+            .classed('selected', (elt) -> elt in diagram.selection)
 
-        @link
-            .select('path')
-            .attr("d", (lnk) -> lnk.path())
+        link = @svg.select('g.links').selectAll('g.link')
+            .classed('selected', (lnk) -> lnk in diagram.selection)
 
-        @link
+        link
+            .each((lnk) ->
+                $(@).find('path').attr('d', lnk.path()))
+
+        link
             .select('text.start')
             .attr('transform', (lnk) -> "translate(#{lnk.a1.x}, #{lnk.a1.y})")
             .attr('dx', (lnk) ->
@@ -534,7 +596,7 @@ class Svg
                 else
                     lnk.text_margin)
 
-        @link
+        link
             .select('text.end')
             .attr('transform', (lnk) -> "translate(#{lnk.a2.x}, #{lnk.a2.y})")
             .attr('dx', (lnk) ->
@@ -554,6 +616,6 @@ class Svg
         @svg
             .attr("width", @width)
             .attr("height", @height)
-        @background
+        d3.select('.background')
             .attr("width", @width)
             .attr("height", @height)

@@ -1,5 +1,22 @@
+class Marker
+    constructor: ->
+        @id = @constructor.name
+
+class Void extends Marker
+    path: ->
+        'M 0 0'
+
+class Arrow extends Marker
+    path: ->
+        'M 10 0 L 20 5 L 10 10'
+
+class BlackArrow extends Arrow
+    path: ->
+        "#{super()} z"
+
 class Link
-    @marker: 'arrow'
+    @marker: new Void()
+    @type: 'full'
 
     text_margin: 10
 

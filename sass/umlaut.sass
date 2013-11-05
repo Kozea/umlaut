@@ -133,6 +133,18 @@ footer
   box-shadow: 0 0 15px #aaa inset
 
 svg
+  #Arrow
+    fill: transparent
+    stroke: $fg
+
+  #BlackArrow
+    fill: $fg
+    stroke: $fg
+
+  #WhiteArrow, #WhiteDiamond
+    fill: $bg
+    stroke: $fg
+
   #grid
     path
       fill: transparent
@@ -148,41 +160,57 @@ svg
     tspan
       dominant-baseline: text-before-edge
 
-  .link
-    +transition(stroke-width 500ms)
+  .ghost
     fill: none
+    stroke: transparent
+    stroke-width: 10
+
+  .link
+    .dashed
+      stroke-dasharray: 5 5
+
+    .ghost
+      stroke-width: 30
+
+  .group
+    .ghost
+      cursor: crosshair
+
+  .link, .element, .group
+    &:hover .shape
+      stroke-width: 2
+
+  .shape
+    +transition(stroke-width 500ms)
     stroke: $fg
     stroke-width: 1.3
+
+  .selected
+    .shape
+      stroke: $sel
+
+    &.moving
+      .shape
+        stroke: $selmoving
+
+  .moving
+    .shape
+      stroke: $moving
+
+  .link
+    .shape
+      fill: none
+
 
     text
       fill: $fg
       stroke: none
 
-    &.selected
-      stroke: $sel
-
-    &:hover
-      stroke-width: 3
-
   .element, .group
     cursor: move
 
     .shape
-      stroke: $fg
       fill: $bg
-      stroke-width: 1.3
-
-    &.moving
-      .shape
-        stroke: $moving
-
-    &.selected
-      .shape
-        stroke: $sel
-
-    &.selected.moving
-      .shape
-        stroke: $selmoving
 
   .underlay
     .selection

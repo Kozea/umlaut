@@ -216,6 +216,7 @@ class InternalStorage extends Process
         "
 
 class Flow extends Link
+    @marker: new Arrow()
 
 class Container extends Group
 

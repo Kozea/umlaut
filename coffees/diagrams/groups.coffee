@@ -1,9 +1,9 @@
 class Group extends Element
     height: ->
-        @_height
+        Math.max(@_height, super())
 
     width: ->
-        @_width
+        Math.max(@_width, super())
 
     contains: (elt) ->
         w2 = @width() / 2

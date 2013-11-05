@@ -21,7 +21,12 @@ class Diagram
         @mouse = new Mouse(0, 0, '')
         @dragging = false
         @groupping = false
-        @no_save = false
+
+    markers: ->
+        markers = {}
+        for type in @types.links
+            markers[type.marker.id] = type.marker
+        val for key, val of markers
 
     group: (name) ->
         for grp in @types.groups
@@ -66,8 +71,6 @@ class Diagram
 
         for grp in (obj.groups or [])
             group_type = @group(grp.name)
-            if not group_type
-                continue
             group = new group_type(grp.x, grp.y, grp.text, grp.fixed)
             group._width = grp.width
             group._height = grp.height
@@ -75,8 +78,8 @@ class Diagram
 
         for elt in obj.elements
             element = @element(elt.name)
-            element and @elements.push(new element(elt.x, elt.y, elt.text, elt.fixed))
+            @elements.push(new element(elt.x, elt.y, elt.text, elt.fixed))
 
         for lnk in obj.links
             link = @link(lnk.name)
-            link and @links.push(new link(@nodes()[lnk.source], @nodes()[lnk.target], lnk.text))
+            @links.push(new link(@nodes()[lnk.source], @nodes()[lnk.target], lnk.text))

@@ -27,15 +27,10 @@ class Actor extends Element
          "
 
 
-class Association extends Link
-
-class Inheritance extends Link
-    @marker: 'lozenge'
-
 class System extends Group
 
 class UseCase extends Diagram
-    label: 'UML Use case'
+    label: 'UML Use Case Diagram'
 
     constructor: ->
         super()
@@ -44,6 +39,7 @@ class UseCase extends Diagram
         @types =
             elements: [Actor, Case]
             groups: [System]
-            links: [Association, Inheritance]
+            links: uml_links
+
 
 Diagram.diagrams['UseCase'] = UseCase

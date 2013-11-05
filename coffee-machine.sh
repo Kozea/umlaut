@@ -9,6 +9,7 @@ coffee -wcb -j umlaut.js -o javascripts/ \
     coffees/diagrams/groups.coffee       \
     coffees/diagrams/flowchart.coffee    \
     coffees/diagrams/usecase.coffee      \
+    coffees/diagrams/class.coffee        \
     coffees/ui/*                         \
     coffees/svg.coffee                   \
     coffees/storage/*                    \
