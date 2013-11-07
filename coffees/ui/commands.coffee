@@ -2,18 +2,15 @@ element_add = (type) =>
     x = diagram.mouse.x
     y = diagram.mouse.y
 
-    new_elt = new type(x, y, '', not diagram.freemode)
-    if new_elt instanceof Group
+    if new type() instanceof Group
         set = diagram.groups
-        new_elt._width = 120
-        new_elt._height = 90
         diagram.last_types.group = type
     else
         set = diagram.elements
         diagram.last_types.element = type
 
     nth = set.filter((elt) -> elt instanceof type).length + 1
-    new_elt.text = "#{type.name} ##{nth}"
+    new_elt = new type(x, y, "#{type.name} ##{nth}", not diagram.freemode)
     set.push(new_elt)
     if d3.event
         diagram.selection = [new_elt]

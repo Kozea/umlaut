@@ -77,7 +77,9 @@ class Svg
             if d3.event.which is 3
                 diagram.linking = []
                 for elt in diagram.selection
-                     diagram.linking.push(new diagram.last_types.link(elt, diagram.mouse))
+                    type = diagram.last_types.link or diagram.types.links[0]
+                    continue unless type
+                    diagram.linking.push(new type(elt, diagram.mouse))
                 @sync()
             else
                 if not d3.event.shiftKey
@@ -157,12 +159,13 @@ class Svg
                 y = + sel.attr("y")
                 width = + sel.attr("width")
                 height = + sel.attr("height")
-                type = diagram.last_types.group
-                nth = diagram.groups.filter((grp) -> grp instanceof type).length + 1
-                grp = new type(x + width / 2, y + height / 2, "#{type.name} ##{nth}", not diagram.freemode)
-                grp._width = width
-                grp._height = height
-                diagram.groups.push grp
+                type = diagram.last_types.group or diagram.types.groups[0]
+                if type
+                    nth = diagram.groups.filter((grp) -> grp instanceof type).length + 1
+                    grp = new type(x + width / 2, y + height / 2, "#{type.name} ##{nth}", not diagram.freemode)
+                    grp._width = width
+                    grp._height = height
+                    diagram.groups.push grp
                 diagram.groupping = false
                 @sync()
 
@@ -336,25 +339,38 @@ class Svg
                 edit((-> grp.text), ((txt) -> grp.text = txt)))
 
         resize_drag = d3.behavior.drag()
-            .on("dragstart", (grp) ->
+            .on("dragstart", (node) ->
+                return if d3.event.sourceEvent.which is 3
                 d3.event.sourceEvent.stopPropagation())
-            .on("drag", (grp) ->
-                grp.width(grp.width() + d3.event.dx * 2)
-                grp.height(grp.height() + d3.event.dy * 2)
-
+            .on("drag", (node) ->
                 group = d3.select(@parentNode)
-                group
-                    .selectAll('path')
-                    .attr('d', grp.path())
-                group
-                    .select('text')
-                    .attr('x', grp.txt_x())
-                    .attr('y', grp.txt_y())
-                    .selectAll('tspan')
-                    .attr('x', grp.txt_x())
+
+                if d3.event.sourceEvent.which is 2 and node instanceof Electric
+                    rotations =
+                        E: 0
+                        S: 90
+                        W: 180
+                        N: 270
+
+                    mouse = mouse_xy d3.select('#diagram').node()
+                    direction = Electric.__super__.direction.apply(node, [mouse.x, mouse.y])
+                    node._rotation = rotations[direction]
+                else
+                    node.width(node.width() + d3.event.dx * 2)
+                    node.height(node.height() + d3.event.dy * 2)
+
+                    group
+                        .selectAll('path')
+                        .attr('d', node.path())
+                    group
+                        .select('text')
+                        .attr('x', node.txt_x())
+                        .attr('y', node.txt_y())
+                        .selectAll('tspan')
+                        .attr('x', node.txt_x())
                 svg.tick())
 
-            .on("dragend", (grp) ->
+            .on("dragend", (node) ->
                 generate_url())
 
         group_g
@@ -565,12 +581,12 @@ class Svg
             @force.stop()
 
         @svg.select('g.groups').selectAll('g.group')
-            .attr("transform", ((grp) -> "translate(" + grp.x + "," + grp.y + ")"))
+            .attr("transform", ((grp) -> "translate(#{grp.x},#{grp.y})rotate(#{grp._rotation})"))
             .classed('moving', (grp) -> not grp.fixed)
             .classed('selected', (grp) -> grp in diagram.selection)
 
         @svg.select('g.elements').selectAll('g.element')
-            .attr("transform", ((elt) -> "translate(" + elt.x + "," + elt.y + ")"))
+            .attr("transform", ((elt) -> "translate(#{elt.x},#{elt.y})rotate(#{elt._rotation})"))
             .classed('moving', (elt) -> not elt.fixed)
             .classed('selected', (elt) -> elt in diagram.selection)
 

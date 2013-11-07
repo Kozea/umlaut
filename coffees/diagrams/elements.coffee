@@ -3,6 +3,7 @@ class Element
         @margin = x: 10, y: 5
         @_width = null
         @_height = null
+        @_rotation = 0
         @anchors =
             N: =>
                 x: @x

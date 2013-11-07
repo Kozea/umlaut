@@ -24,7 +24,7 @@ class Actor extends Element
     path: ->
         wstick = (@width() - Actor.__super__.txt_width.apply(@)) / 2
         hstick = (@height() - Actor.__super__.txt_height.apply(@)) / 4
-        bottom = @height() / 2 - Actor.__super__.txt_height.apply(@) + @margin.y
+        bottom = @txt_y() -  @margin.y
 
         "M #{-wstick} #{bottom}
          L 0 #{bottom - hstick}
