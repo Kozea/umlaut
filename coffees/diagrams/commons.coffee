@@ -10,10 +10,10 @@ class Rect extends Element
          z"
 
 class Ellipsis extends Element
-    width: ->
+    txt_width: ->
         2 * super() / Math.sqrt(2)
 
-    height: ->
+    txt_height: ->
         2 * super() / Math.sqrt(2)
 
     path: ->
@@ -28,11 +28,8 @@ class Ellipsis extends Element
 class Note extends Element
     shift: 15
 
-    width: ->
+    txt_width: ->
         super() + @shift
-
-    height: ->
-        super()
 
     txt_x: ->
         super() - @shift / 2
@@ -57,13 +54,13 @@ class Note extends Element
         "
 
 class Lozenge extends Element
-    width: ->
+    txt_width: ->
         ow = super()
-        ow + Math.sqrt(ow * @txt_height())
+        ow + Math.sqrt(ow * Lozenge.__super__.txt_height.apply(@))
 
-    height: ->
+    txt_height: ->
         oh = super()
-        oh + Math.sqrt(oh * @txt_width())
+        oh + Math.sqrt(oh * Lozenge.__super__.txt_width.apply(@))
 
     path: ->
         w2 = @width() / 2
@@ -74,7 +71,7 @@ class Lozenge extends Element
          L 0 #{h2}
          z"
 
-class WhiteArrow extends Arrow
+class WhiteArrow extends BlackArrow
 
 class Diamond extends Marker
     path: ->

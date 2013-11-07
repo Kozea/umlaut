@@ -1,6 +1,8 @@
 class Element
     constructor: (@x, @y, @text, @fixed=true) ->
         @margin = x: 10, y: 5
+        @_width = null
+        @_height = null
         @anchors =
             N: =>
                 x: @x
@@ -34,11 +36,15 @@ class Element
     txt_y: ->
         - @_txt_bbox.height / 2
 
-    width: ->
-        @txt_width()
+    width: (w=null) ->
+        if w != null
+            @_width = w
+        Math.max(@_width or 0, @txt_width())
 
-    height: ->
-        @txt_height()
+    height: (h=null) ->
+        if h != null
+            @_height = h
+        Math.max(@_height or 0, @txt_height())
 
     direction: (x, y) ->
         delta = @height() / @width()
@@ -71,6 +77,8 @@ class Element
         name: @constructor.name
         x: @x
         y: @y
+        width: @_width
+        height: @_height
         text: @text
         fixed: @fixed
 

@@ -3,11 +3,15 @@ element_add = (type) =>
     y = diagram.mouse.y
 
     new_elt = new type(x, y, '', not diagram.freemode)
-    set = diagram.elements
     if new_elt instanceof Group
         set = diagram.groups
         new_elt._width = 120
         new_elt._height = 90
+        diagram.last_types.group = type
+    else
+        set = diagram.elements
+        diagram.last_types.element = type
+
     nth = set.filter((elt) -> elt instanceof type).length + 1
     new_elt.text = "#{type.name} ##{nth}"
     set.push(new_elt)
@@ -35,6 +39,7 @@ link_add = (type) ->
     diagram.linking = []
     for elt in diagram.selection
         diagram.linking.push(new type(elt, diagram.mouse))
+    diagram.last_types.link = type
     svg.sync()
     d3.event.preventDefault()
 
@@ -167,6 +172,9 @@ commands =
             for node in diagram.selection
                 if node instanceof Link
                     [node.source, node.target] = [node.target, node.source]
+                if node instanceof Element
+                    for link in diagram.links
+                        [link.source, link.target] = [link.target, link.source]
             svg.tick()
         label: 'Switch link direction'
         glyph: 'transfer'
@@ -270,9 +278,9 @@ init_commands = ->
         g = svgicon.append('g')
             .attr('class', 'link')
 
-        path = svgicon
+        path = g
             .append('path')
-                .attr("class", "shape")
+                .attr("class", "shape #{icon.constructor.type}")
                 .attr("marker-end", "url(##{icon.constructor.marker.id})")
                 .attr('d', icon.path())
 

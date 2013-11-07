@@ -77,7 +77,7 @@ class Svg
             if d3.event.which is 3
                 diagram.linking = []
                 for elt in diagram.selection
-                     diagram.linking.push(new diagram.types.links[0](elt, diagram.mouse))
+                     diagram.linking.push(new diagram.last_types.link(elt, diagram.mouse))
                 @sync()
             else
                 if not d3.event.shiftKey
@@ -157,7 +157,7 @@ class Svg
                 y = + sel.attr("y")
                 width = + sel.attr("width")
                 height = + sel.attr("height")
-                type = diagram.types.groups[0]
+                type = diagram.last_types.group
                 nth = diagram.groups.filter((grp) -> grp instanceof type).length + 1
                 grp = new type(x + width / 2, y + height / 2, "#{type.name} ##{nth}", not diagram.freemode)
                 grp._width = width
@@ -339,8 +339,8 @@ class Svg
             .on("dragstart", (grp) ->
                 d3.event.sourceEvent.stopPropagation())
             .on("drag", (grp) ->
-                grp._width += d3.event.dx * 2
-                grp._height += d3.event.dy * 2
+                grp.width(grp.width() + d3.event.dx * 2)
+                grp.height(grp.height() + d3.event.dy * 2)
 
                 group = d3.select(@parentNode)
                 group
@@ -355,8 +355,6 @@ class Svg
                 svg.tick())
 
             .on("dragend", (grp) ->
-                grp._width = grp.width()
-                grp._height = grp.height()
                 generate_url())
 
         group_g
@@ -403,12 +401,12 @@ class Svg
 
         link_g
             .append("path")
-            .attr('class', (lnk) -> "shape #{lnk.constructor.type}")
-            .attr("marker-end", (lnk) -> "url(##{lnk.constructor.marker.id})")
+            .attr('class', 'ghost')
 
         link_g
             .append("path")
-            .attr('class', 'ghost')
+            .attr('class', (lnk) -> "shape #{lnk.constructor.type}")
+            .attr("marker-end", (lnk) -> "url(##{lnk.constructor.marker.id})")
 
         link_g
             .append("text")
@@ -474,11 +472,12 @@ class Svg
 
         element_g
             .append('path')
-            .attr('class', 'shape')
+            .attr('class', 'ghost')
+            .call(resize_drag)
 
         element_g
             .append('path')
-            .attr('class', 'ghost')
+            .attr('class', 'shape')
 
         element_g
             .append('text')

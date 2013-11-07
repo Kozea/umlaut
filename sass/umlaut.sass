@@ -161,9 +161,16 @@ svg
       dominant-baseline: text-before-edge
 
   .ghost
+    +transition(stroke 500ms)
     fill: none
-    stroke: transparent
-    stroke-width: 10
+    stroke: rgba(0, 0, 255, 0)
+    stroke-width: 20
+
+    &:hover
+      stroke: rgba(0, 0, 255, .1)
+
+    &:active
+      stroke: rgba(0, 0, 255, .2)
 
   .link
     .dashed

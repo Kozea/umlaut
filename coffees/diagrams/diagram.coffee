@@ -18,6 +18,11 @@ class Diagram
         @types = {}
         @selection = []
         @linking = []
+        @last_types =
+            link: null
+            element: null
+            group: null
+
         @mouse = new Mouse(0, 0, '')
         @dragging = false
         @groupping = false
@@ -77,8 +82,11 @@ class Diagram
             @groups.push(group)
 
         for elt in obj.elements
-            element = @element(elt.name)
-            @elements.push(new element(elt.x, elt.y, elt.text, elt.fixed))
+            element_type = @element(elt.name)
+            element = new element_type(elt.x, elt.y, elt.text, elt.fixed)
+            element._width = elt.width
+            element._height = elt.height
+            @elements.push(element)
 
         for lnk in obj.links
             link = @link(lnk.name)

@@ -1,29 +1,43 @@
 class Case extends Ellipsis
 
 class Actor extends Element
-    stick: 10
+    constructor: ->
+        super
 
-    height: ->
-        super() + 4 * @stick
+        @anchors.E = =>
+            x: @x + (@width() - Actor.__super__.txt_width.apply(@)) / 2
+            y: @y
+
+        @anchors.W = =>
+            x: @x - (@width() - Actor.__super__.txt_width.apply(@)) / 2
+            y: @y
 
     txt_y: ->
-        @height() / 2 - @txt_height() + 2 * @margin.y
+        @height() / 2 - Actor.__super__.txt_height.apply(@) + 2 + @margin.y
+
+    txt_height: ->
+        super() + 50
+
+    txt_width: ->
+        super() + 25
 
     path: ->
-        bottom = @height() / 2 - @txt_height() + @margin.y
+        wstick = (@width() - Actor.__super__.txt_width.apply(@)) / 2
+        hstick = (@height() - Actor.__super__.txt_height.apply(@)) / 4
+        bottom = @height() / 2 - Actor.__super__.txt_height.apply(@) + @margin.y
 
-        "M #{-@stick} #{bottom}
-         L 0 #{bottom - @stick}
-         M #{@stick} #{bottom}
-         L 0 #{bottom - @stick}
-         M 0 #{bottom - @stick}
-         L 0 #{bottom - 2 * @stick}
-         M #{-@stick} #{bottom - 1.75 * @stick}
-         L #{@stick} #{bottom - 2.25 * @stick}
-         M 0 #{bottom - 2 * @stick}
-         L 0 #{bottom - 3 * @stick}
-         A #{.5 * @stick} #{.5 * @stick} 0 1 1 0 #{bottom - 4 * @stick}
-         A #{.5 * @stick} #{.5 * @stick} 0 1 1 0 #{bottom - 3 * @stick}
+        "M #{-wstick} #{bottom}
+         L 0 #{bottom - hstick}
+         M #{wstick} #{bottom}
+         L 0 #{bottom - hstick}
+         M 0 #{bottom - hstick}
+         L 0 #{bottom - 2 * hstick}
+         M #{-wstick} #{bottom - 1.75 * hstick}
+         L #{wstick} #{bottom - 2.25 * hstick}
+         M 0 #{bottom - 2 * hstick}
+         L 0 #{bottom - 3 * hstick}
+         A #{.5 * wstick} #{.5 * hstick} 0 1 1 0 #{bottom - 4 * hstick}
+         A #{.5 * wstick} #{.5 * hstick} 0 1 1 0 #{bottom - 3 * hstick}
          "
 
 
