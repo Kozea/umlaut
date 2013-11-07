@@ -31,6 +31,12 @@ class Electric extends Element
         d
 
 class Node extends Electric
+    base_width: ->
+        super() / 4
+
+    base_height: ->
+        super() / 4
+
     constructor: ->
         super
         @margin.x = 0
@@ -59,12 +65,6 @@ class Resistor extends Electric
 
 
 class Diode extends Electric
-    base_width: ->
-        super() / 4
-
-    base_height: ->
-        super() / 4
-
     path: ->
         w2 = @width() / 2
         h2 = @height() / 2
