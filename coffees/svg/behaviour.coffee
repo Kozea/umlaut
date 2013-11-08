@@ -106,7 +106,7 @@ mouse_node = (node) ->
                     if lnk.source != node
                         diagram.links.push(new lnk.cls(lnk.source, node))
                 diagram.linking = []
-                @sync()
+                svg.sync()
                 d3.event.preventDefault())
         .on('dblclick', (node) ->
             return if d3.event.ctrlKey

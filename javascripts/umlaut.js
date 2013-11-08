@@ -2045,7 +2045,7 @@ mouse_node = function(node) {
         }
       }
       diagram.linking = [];
-      _this.sync();
+      svg.sync();
       return d3.event.preventDefault();
     }
   }).on('dblclick', function(node) {
