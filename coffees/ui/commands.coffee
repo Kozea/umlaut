@@ -1,4 +1,4 @@
-element_add = (type) =>
+node_add = (type) =>
     x = diagram.mouse.x
     y = diagram.mouse.y
 
@@ -9,33 +9,33 @@ element_add = (type) =>
         set = diagram.elements
         diagram.last_types.element = type
 
-    nth = set.filter((elt) -> elt instanceof type).length + 1
-    new_elt = new type(x, y, "#{type.name} ##{nth}", not diagram.freemode)
-    set.push(new_elt)
+    nth = set.filter((node) -> node instanceof type).length + 1
+    new_node = new type(x, y, "#{type.name} ##{nth}", not diagram.freemode)
+    set.push(new_node)
     if d3.event
-        diagram.selection = [new_elt]
+        diagram.selection = [new_node]
 
     svg.sync()
 
     if d3.event
         # Hack to trigger d3 drag event on newly created element
-        node = null
-        svg.svg.selectAll('g.element,g.group').each((elt) ->
-            if elt == new_elt
-                node = @)
+        dom_node = null
+        svg.svg.selectAll('g.element,g.group').each((node) ->
+            if node == new_node
+                dom_node = @)
         mouse_evt = document.createEvent('MouseEvent')
         mouse_evt.initMouseEvent(
             d3.event.type, d3.event.canBubble, d3.event.cancelable, d3.event.view,
             d3.event.detail, d3.event.screenX, d3.event.screenY, d3.event.clientX, d3.event.clientY,
             d3.event.ctrlKey, d3.event.altKey, d3.event.shiftKey, d3.event.metaKey,
             d3.event.button, d3.event.relatedTarget)
-        node.dispatchEvent(mouse_evt)
+        dom_node.dispatchEvent(mouse_evt)
 
 
 link_add = (type) ->
     diagram.linking = []
-    for elt in diagram.selection
-        diagram.linking.push(new type(elt, diagram.mouse))
+    for node in diagram.selection
+        diagram.linking.push(new type(node, diagram.mouse))
     diagram.last_types.link = type
     svg.sync()
     d3.event.preventDefault()
@@ -76,8 +76,8 @@ commands =
                     diagram.selection[0].text
                 else
                     ''), ((txt) ->
-                for elt in diagram.selection
-                    elt.text = txt))
+                for node in diagram.selection
+                    node.text = txt))
             svg.sync()
         label: 'Edit elements text'
         glyph: 'edit'
@@ -85,15 +85,15 @@ commands =
 
     remove:
         fun: ->
-            for elt in diagram.selection
-                if elt in diagram.groups
-                    diagram.groups.splice(diagram.groups.indexOf(elt), 1)
-                else if elt in diagram.elements
-                    diagram.elements.splice(diagram.elements.indexOf(elt), 1)
-                else if elt in diagram.links
-                    diagram.links.splice(diagram.links.indexOf(elt), 1)
+            for node in diagram.selection
+                if node in diagram.groups
+                    diagram.groups.splice(diagram.groups.indexOf(node), 1)
+                else if node in diagram.elements
+                    diagram.elements.splice(diagram.elements.indexOf(node), 1)
+                else if node in diagram.links
+                    diagram.links.splice(diagram.links.indexOf(node), 1)
                 for lnk in diagram.links.slice()
-                    if elt == lnk.source or elt == lnk.target
+                    if node == lnk.source or node == lnk.target
                         diagram.links.splice(diagram.links.indexOf(lnk), 1)
             diagram.selection = []
             svg.sync()
@@ -114,8 +114,8 @@ commands =
     reorganize:
         fun: ->
             sel = if diagram.selection.length > 0 then diagram.selection else diagram.elements
-            for elt in sel
-                elt.fixed = false
+            for node in sel
+                node.fixed = false
             svg.sync()
         label: 'Reorganize'
         glyph: 'th'
@@ -123,8 +123,8 @@ commands =
 
     freemode:
         fun: ->
-            for elt in diagram.nodes()
-                elt.fixed = diagram.freemode
+            for node in diagram.nodes()
+                node.fixed = diagram.freemode
             if diagram.freemode
                 svg.force.stop()
             else
@@ -156,9 +156,9 @@ commands =
 
     snaptogrid:
         fun: ->
-            for elt in diagram.nodes()
-                elt.x = elt.px = diagram.snap * Math.floor(elt.x / diagram.snap)
-                elt.y = elt.py = diagram.snap * Math.floor(elt.y / diagram.snap)
+            for node in diagram.nodes()
+                node.x = node.px = diagram.snap * Math.floor(node.x / diagram.snap)
+                node.y = node.py = diagram.snap * Math.floor(node.y / diagram.snap)
             svg.tick()
         label: 'Snap to grid'
         glyph: 'magnet'
@@ -209,7 +209,7 @@ init_commands = ->
 
         taken_hotkeys.push(key)
 
-        fun = ((elt) -> -> element_add(elt))(e)
+        fun = ((node) -> -> node_add(node))(e)
         hotkey = "a #{key}"
         icon = new e(0, 0, e.name)
         if icon instanceof Group
