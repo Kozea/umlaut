@@ -2,6 +2,7 @@
 
 coffee -wcb -j umlaut.js -o javascripts/ \
     coffees/utils.coffee                 \
+    coffees/diagrams/base.coffee         \
     coffees/diagrams/elements.coffee     \
     coffees/diagrams/links.coffee        \
     coffees/diagrams/diagram.coffee      \

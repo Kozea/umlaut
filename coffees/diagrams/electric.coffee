@@ -76,6 +76,26 @@ class Diode extends Electric
          L #{-w2} #{h2}
         z"
 
+class Battery extends Electric
+    base_width: ->
+        super() / 2
+
+    base_height: ->
+        super() * 2
+
+    path: ->
+        w2 = @width() / 2
+        h2 = @height() / 2
+        h4 = h2 / 2
+        "M #{-w2} #{-h4}
+         L 0 #{-h4}
+         L 0 #{h4}
+         L #{-w2} #{h4}
+         z
+         M #{w2} #{-h2}
+         L #{w2} #{h2}
+        "
+
 
 class Wire extends Link
 
@@ -85,7 +105,7 @@ class ElectricDiagram extends Diagram
     constructor: ->
        super()
        @types =
-           elements: [Diode, Resistor, Node]
+           elements: [Diode, Resistor, Node, Battery]
            groups: []
            links: [Wire]
 

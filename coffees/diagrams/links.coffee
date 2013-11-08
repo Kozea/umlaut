@@ -1,4 +1,4 @@
-class Marker
+class Marker extends Base
     constructor: ->
         @id = @constructor.name
 
@@ -14,7 +14,7 @@ class BlackArrow extends Arrow
     path: ->
         "#{super()} z"
 
-class Link
+class Link extends Base
     @marker: new Void()
     @type: 'full'
 

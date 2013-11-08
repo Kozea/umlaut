@@ -1,4 +1,4 @@
-class Diagram
+class Diagram extends Base
     @diagrams: {}
 
     constructor: ->
@@ -77,15 +77,17 @@ class Diagram
         for grp in (obj.groups or [])
             group_type = @group(grp.name)
             group = new group_type(grp.x, grp.y, grp.text, grp.fixed)
-            group._width = grp.width
-            group._height = grp.height
+            group._width = grp.width or null
+            group._height = grp.height or null
+            group._rotation = grp.rotation or 0
             @groups.push(group)
 
         for elt in obj.elements
             element_type = @element(elt.name)
             element = new element_type(elt.x, elt.y, elt.text, elt.fixed)
-            element._width = elt.width
-            element._height = elt.height
+            element._width = elt.width or null
+            element._height = elt.height or null
+            element._rotation = elt.rotation or 0
             @elements.push(element)
 
         for lnk in obj.links

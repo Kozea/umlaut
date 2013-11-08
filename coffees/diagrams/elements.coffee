@@ -1,4 +1,4 @@
-class Element
+class Element extends Base
     constructor: (@x, @y, @text, @fixed=true) ->
         @margin = x: 10, y: 5
         @_width = null
@@ -80,6 +80,7 @@ class Element
         y: @y
         width: @_width
         height: @_height
+        rotation: @_rotation
         text: @text
         fixed: @fixed
 
