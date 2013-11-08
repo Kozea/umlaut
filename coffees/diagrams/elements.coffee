@@ -1,4 +1,6 @@
 class Element extends Base
+    @resizeable: true
+    @rotationable: false
     @fill: 'bg'
     @stroke: 'fg'
 

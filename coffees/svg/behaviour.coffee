@@ -1,7 +1,7 @@
 force_drag = (force) ->
     force
         .on("drag.force", (node) ->
-            return if not diagram.dragging or d3.event.sourceEvent.ctrlKey
+            return if not diagram.dragging or d3.event.sourceEvent.ctrlKey or (d3.event.sourceEvent.which is 2 and node.cls.rotationable)
 
             if not node in diagram.selection
                 diagram.selection.push node
@@ -20,11 +20,12 @@ force_drag = (force) ->
                 node.py -= delta.y
 
             svg.force.resume()
-        ).on('dragstart', ->
-            return if d3.event.sourceEvent.which is 3 or d3.event.sourceEvent.ctrlKey
+        ).on('dragstart', (node) ->
+            return if d3.event.sourceEvent.which is 3 or d3.event.sourceEvent.ctrlKey or (d3.event.sourceEvent.which is 2 and node.cls.rotationable) or (d3.event.sourceEvent.which is 1 and node.cls.resizeable and d3.select(d3.event.sourceEvent.target).classed('ghost'))
+
             diagram.dragging = true
-        ).on('dragend', (node) =>
-            return if not diagram.dragging
+        ).on('dragend', (node) ->
+            return if not diagram.dragging or (d3.event.sourceEvent.which is 2 and node.cls.rotationable)
             diagram.dragging = false
             if not $(d3.event.sourceEvent.target).closest('.inside').size()
                 if node in diagram.elements
@@ -40,24 +41,17 @@ force_drag = (force) ->
             if not diagram.freemode
                 node.fixed = true)
 
-resize_drag = d3.behavior.drag()
+ghost_drag = d3.behavior.drag()
     .on("dragstart", (node) ->
-        return if d3.event.sourceEvent.which is 3
-        d3.event.sourceEvent.stopPropagation())
-    .on("drag", (node) ->
-        group = d3.select(@parentNode)
-
-        if d3.event.sourceEvent.which is 2 and node instanceof Electric
-            rotations =
-                E: 0
-                S: 90
-                W: 180
-                N: 270
-
-            mouse = mouse_xy d3.select('#diagram').node()
-            direction = node.super('direction', Electric, [mouse.x, mouse.y])
-            node._rotation = rotations[direction]
-        else
+        if node.cls.resizeable and d3.event.sourceEvent.which is 1
+            ghost_drag.resize = true
+            d3.event.sourceEvent.stopPropagation()
+        if node.cls.rotationable and d3.event.sourceEvent.which is 2
+            ghost_drag.rotate = true
+            d3.event.sourceEvent.stopPropagation()
+    ).on("drag", (node) ->
+        if ghost_drag.resize
+            group = d3.select(@parentNode)
             node.width(node.width() + d3.event.dx * 2)
             node.height(node.height() + d3.event.dy * 2)
 
@@ -70,9 +64,22 @@ resize_drag = d3.behavior.drag()
                 .attr('y', node.txt_y())
                 .selectAll('tspan')
                 .attr('x', node.txt_x())
-        svg.tick())
+            svg.tick()
+        if ghost_drag.rotate
+            group = d3.select(@parentNode)
+            rotations =
+                E: 0
+                S: 90
+                W: 180
+                N: 270
 
+            mouse = mouse_xy d3.select('#diagram').node()
+            direction = node.super('direction', Electric, [mouse.x, mouse.y])
+            node._rotation = rotations[direction]
+            svg.tick())
     .on("dragend", (node) ->
+        return if not ghost_drag.resize and not ghost_drag.rotate
+        ghost_drag.resize = ghost_drag.rotate = false
         generate_url())
 
 

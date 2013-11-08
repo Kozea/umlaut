@@ -1,4 +1,7 @@
 class Electric extends Element
+    @resizeable: false
+    @rotationable: true
+
     base_height: ->
         20
 

@@ -72,7 +72,8 @@ class Svg extends Base
             .size([@width, @height])
 
         @svg.on("mousedown", (event) =>
-            return if diagram.dragging or d3.event.ctrlKey or d3.event.which is 2
+            return if not d3.select(d3.event.target).classed('background') or d3.event.ctrlKey or d3.event.which is 2
+            # return if diagram.dragging or d3.event.ctrlKey or d3.event.which is 2
             if d3.event.altKey and d3.event.shiftKey
                 diagram.groupping = true
             if d3.event.which is 3
