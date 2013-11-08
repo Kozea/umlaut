@@ -197,7 +197,7 @@ init_commands = ->
     $('aside .icons .specific').each(-> Mousetrap.unbind $(@).attr('data-hotkey'))
     $('aside .icons svg').remove()
     $('aside h3')
-        .attr('id', diagram.constructor.name)
+        .attr('id', diagram.cls.name)
         .addClass('specific')
         .text(diagram.label)
 
@@ -222,21 +222,15 @@ init_commands = ->
             .attr('data-hotkey', hotkey)
             .on('mousedown', fun)
 
-        g = svgicon.append('g')
-            .attr('class', 'element')
+        element = svgicon
+            .selectAll(if icon instanceof Group then 'g.group' else 'g.element')
+            .data([icon])
 
-        path = g.append('path')
-            .attr('class', 'shape')
-
-        txt = g
-            .append('text')
-            .text(e.name)
-
-        icon.set_txt_bbox(txt.node().getBBox())
-        path.attr('d', icon.path())
-        txt
-            .attr('x', icon.txt_x())
-            .attr('y', icon.txt_y())
+        element.enter()
+            .call(enter_node)
+        element
+            .call(update_node)
+            .call(update_node)
 
         margin = 3
         svgicon
@@ -272,14 +266,12 @@ init_commands = ->
             .attr('data-hotkey', hotkey)
             .on('mousedown', fun)
 
-        g = svgicon.append('g')
-            .attr('class', 'link')
+        link = svgicon
+            .selectAll('g.link')
+            .data([icon])
 
-        path = g
-            .append('path')
-                .attr("class", "shape #{icon.constructor.type}")
-                .attr("marker-end", "url(##{icon.constructor.marker.id})")
-                .attr('d', icon.path())
+        link.enter().call(enter_link)
+        link.call(update_link)
 
         svgicon
             .attr('height', 20)

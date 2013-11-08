@@ -5,15 +5,15 @@ class Actor extends Element
         super
 
         @anchors.E = =>
-            x: @x + (@width() - Actor.__super__.txt_width.apply(@)) / 2
+            x: @x + (@width() - @super('txt_width')) / 2
             y: @y
 
         @anchors.W = =>
-            x: @x - (@width() - Actor.__super__.txt_width.apply(@)) / 2
+            x: @x - (@width() - @super('txt_width')) / 2
             y: @y
 
     txt_y: ->
-        @height() / 2 - Actor.__super__.txt_height.apply(@) + 2 + @margin.y
+        @height() / 2 - @super('txt_height') + 2 + @margin.y
 
     txt_height: ->
         super() + 50
@@ -22,8 +22,8 @@ class Actor extends Element
         super() + 25
 
     path: ->
-        wstick = (@width() - Actor.__super__.txt_width.apply(@)) / 2
-        hstick = (@height() - Actor.__super__.txt_height.apply(@)) / 4
+        wstick = (@width() - @super('txt_width')) / 2
+        hstick = (@height() - @super('txt_height')) / 4
         bottom = @txt_y() -  @margin.y
 
         "M #{-wstick} #{bottom}
@@ -47,7 +47,7 @@ class UseCase extends Diagram
     label: 'UML Use Case Diagram'
 
     constructor: ->
-        super()
+        super
 
         @linkstyle = 'diagonal'
         @types =

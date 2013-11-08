@@ -8,7 +8,7 @@ load = (data) =>
     window.svg = new Svg()
 
 save = =>
-    localStorage.setItem("#{diagram.constructor.name}|#{diagram.title}", diagram.hash())
+    localStorage.setItem("#{diagram.cls.name}|#{diagram.title}", diagram.hash())
 
 
 generate_url = ->

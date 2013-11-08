@@ -217,7 +217,14 @@ svg
     cursor: move
 
     .shape
-      fill: $bg
+      &.fill-bg
+        fill: $bg
+
+      &.fill-fg
+        fill: $fg
+
+      &.fill-none
+        fill: transparent
 
   .underlay
     .selection

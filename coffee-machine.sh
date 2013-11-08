@@ -12,7 +12,8 @@ coffee -wcb -j umlaut.js -o javascripts/ \
     coffees/diagrams/usecase.coffee      \
     coffees/diagrams/electric.coffee     \
     coffees/diagrams/class.coffee        \
-    coffees/ui/*                         \
+    coffees/ui/*.coffee                  \
+    coffees/svg/*.coffee                 \
     coffees/svg.coffee                   \
-    coffees/storage/*                    \
+    coffees/storage/*.coffee             \
     coffees/init.coffee                  \

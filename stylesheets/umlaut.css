@@ -254,16 +254,24 @@ svg .link text {
 svg .element, svg .group {
   cursor: move;
 }
-/* line 219, ../sass/umlaut.sass */
-svg .element .shape, svg .group .shape {
+/* line 220, ../sass/umlaut.sass */
+svg .element .shape.fill-bg, svg .group .shape.fill-bg {
   fill: white;
 }
 /* line 223, ../sass/umlaut.sass */
+svg .element .shape.fill-fg, svg .group .shape.fill-fg {
+  fill: black;
+}
+/* line 226, ../sass/umlaut.sass */
+svg .element .shape.fill-none, svg .group .shape.fill-none {
+  fill: transparent;
+}
+/* line 230, ../sass/umlaut.sass */
 svg .underlay .selection {
   fill: rgba(0, 255, 0, 0.05);
   stroke: rgba(0, 255, 0, 0.3);
 }
-/* line 228, ../sass/umlaut.sass */
+/* line 235, ../sass/umlaut.sass */
 svg .overlay .selection {
   fill: rgba(0, 0, 255, 0.05);
   stroke: rgba(0, 0, 255, 0.3);
@@ -271,7 +279,7 @@ svg .overlay .selection {
   stroke-width: 2;
 }
 
-/* line 235, ../sass/umlaut.sass */
+/* line 242, ../sass/umlaut.sass */
 svg.icon text {
   dominant-baseline: text-before-edge;
 }

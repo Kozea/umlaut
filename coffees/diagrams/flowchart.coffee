@@ -92,7 +92,7 @@ class SubProcess extends Process
         super() * @shift
 
     shift_width: ->
-        (@width() * (@shift - 1) / @shift)
+        @width() * (@shift - 1) / @shift
 
     path: ->
         w2 = @width() / 2
@@ -133,7 +133,7 @@ class Database extends Element
         super() + 20
 
     radius: ->
-        Math.min((@height() - Database.__super__.txt_height.apply(@)) / 4, @width() / 3)
+        Math.min((@height() - @super('txt_height')) / 4, @width() / 3)
 
     path: ->
         w2 = @width() / 2
@@ -157,7 +157,7 @@ class HardDisk extends Element
         super() + 20
 
     radius: ->
-        Math.min((@width() - HardDisk.__super__.txt_width.apply(@)) / 4, @height() / 3)
+        Math.min((@width() - @super('txt_width')) / 4, @height() / 3)
 
     path: ->
         w2 = @width() / 2
@@ -187,7 +187,7 @@ class ManualInput extends Element
             y: @y + @shift_height() / 2
 
     shift_height: ->
-        (@height() * (@shift - 1) / @shift)
+        @height() * (@shift - 1) / @shift
 
     txt_height: ->
         super() * @shift
@@ -213,7 +213,7 @@ class Preparation extends Element
         super() * @shift
 
     shift_width: ->
-        (@width() * (@shift - 1) / @shift)
+        @width() * (@shift - 1) / @shift
 
     path: ->
         w2 = @width() / 2
@@ -245,10 +245,10 @@ class InternalStorage extends Process
         super() * @hshift
 
     shift_width: ->
-        (@width() * (@wshift - 1) / @wshift)
+        @width() * (@wshift - 1) / @wshift
 
     shift_height: ->
-        (@height() * (@hshift - 1) / @hshift)
+        @height() * (@hshift - 1) / @hshift
 
     path: ->
         w2 = @width() / 2

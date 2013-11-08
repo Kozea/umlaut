@@ -22,7 +22,7 @@ class ClassDiagram extends Diagram
     label: 'UML Class Diagram'
 
     constructor: ->
-        super()
+        super
 
         @linkstyle = 'diagonal'
         @types =

@@ -5,8 +5,9 @@ mouse_xy = (e) ->
     y: (m[1] - diagram.zoom.translate[1]) / diagram.zoom.scale
 
 
-class Svg
+class Svg extends Base
     constructor: ->
+        super
         @aside = d3.select('aside')
         @article = d3.select("article")
         @width = @article.node().clientWidth
@@ -251,318 +252,25 @@ class Svg
         @zoom.translate(diagram.zoom.translate)
         @zoom.event(d3.select('#bg'))
         @title.text(diagram.title)
-        force_drag = @force.drag()
-            .on("drag.force", (elt) ->
-                return if not diagram.dragging or d3.event.sourceEvent.ctrlKey
-
-                if not elt in diagram.selection
-                    diagram.selection.push elt
-
-                if d3.event.sourceEvent.shiftKey
-                    delta =
-                        x: elt.px - d3.event.x
-                        y: elt.py - d3.event.y
-                else
-                    delta =
-                        x: elt.px - diagram.snap * Math.floor(d3.event.x / diagram.snap)
-                        y: elt.py - diagram.snap * Math.floor(d3.event.y / diagram.snap)
-
-                for elt in diagram.selection
-                    elt.px -= delta.x
-                    elt.py -= delta.y
-
-                svg.force.resume()
-            ).on('dragstart', ->
-                return if d3.event.sourceEvent.which is 3 or d3.event.sourceEvent.ctrlKey
-                diagram.dragging = true
-            ).on('dragend', (elt) =>
-                return if not diagram.dragging
-                diagram.dragging = false
-                if not $(d3.event.sourceEvent.target).closest('.inside').size()
-                    if elt in diagram.elements
-                        diagram.elements.splice(diagram.elements.indexOf(elt), 1)
-                    if elt in diagram.groups
-                        diagram.groups.splice(diagram.groups.indexOf(elt), 1)
-                    if elt in diagram.selection
-                        diagram.selection.splice(diagram.selection.indexOf(elt), 1)
-                    for lnk in diagram.links.slice()
-                        if elt == lnk.source or elt == lnk.target
-                            diagram.links.splice(diagram.links.indexOf(lnk), 1)
-                    svg.sync()
-                if not diagram.freemode
-                    elt.fixed = true
-            )
 
         @force.nodes(diagram.nodes())
             .links(diagram.links)
 
-        group = @svg.select('g.groups').selectAll('g.group')
-            .data(diagram.groups)
+        group = @svg.select('g.groups').selectAll('g.group').data(diagram.groups)
+        element = @svg.select('g.elements').selectAll('g.element').data(diagram.elements)
+        link = @svg.select('g.links').selectAll('g.link').data(diagram.links.concat(diagram.linking))
 
-        group_g = group.enter()
-            .append('g')
-            .attr("class", "group")
-            .call(force_drag)
-            .on("mousedown", (grp) ->
-                return if d3.event.ctrlKey
+        group.enter().call(enter_node)
+        element.enter().call(enter_node)
+        link.enter().call(enter_link)
 
-                selected = grp in diagram.selection
-                if (selected and not diagram.dragging) or (not selected) and not d3.event.shiftKey
-                    diagram.selection = [grp]
-                if d3.event.shiftKey and not selected
-                    diagram.selection.push(grp)
-                if d3.event.which != 3
-                    svg.svg.selectAll('g.element')
-                        .each((elt) ->
-                            if elt not in diagram.selection and grp.contains elt
-                                diagram.selection.push elt)
-                svg.tick())
-            .on("mousemove", (grp) ->
-                return if d3.event.ctrlKey
-                for lnk in diagram.linking
-                    lnk.target = grp)
-            .on("mouseout", (grp) ->
-                return if d3.event.ctrlKey
-                for lnk in diagram.linking
-                    lnk.target = diagram.mouse)
-            .on("mouseup", (grp) =>
-                return if d3.event.ctrlKey
-                if diagram.linking.length
-                    for lnk in diagram.linking
-                        if lnk.source != grp
-                            diagram.links.push(new lnk.constructor(lnk.source, grp))
-                    diagram.linking = []
-                    @sync()
-                    d3.event.preventDefault())
-            .on('dblclick', (grp) ->
-                return if d3.event.ctrlKey
-                edit((-> grp.text), ((txt) -> grp.text = txt)))
+        group.call(update_node)
+        element.call(update_node)
+        link.call(update_link)
 
-        resize_drag = d3.behavior.drag()
-            .on("dragstart", (node) ->
-                return if d3.event.sourceEvent.which is 3
-                d3.event.sourceEvent.stopPropagation())
-            .on("drag", (node) ->
-                group = d3.select(@parentNode)
-
-                if d3.event.sourceEvent.which is 2 and node instanceof Electric
-                    rotations =
-                        E: 0
-                        S: 90
-                        W: 180
-                        N: 270
-
-                    mouse = mouse_xy d3.select('#diagram').node()
-                    direction = Electric.__super__.direction.apply(node, [mouse.x, mouse.y])
-                    node._rotation = rotations[direction]
-                else
-                    node.width(node.width() + d3.event.dx * 2)
-                    node.height(node.height() + d3.event.dy * 2)
-
-                    group
-                        .selectAll('path')
-                        .attr('d', node.path())
-                    group
-                        .select('text')
-                        .attr('x', node.txt_x())
-                        .attr('y', node.txt_y())
-                        .selectAll('tspan')
-                        .attr('x', node.txt_x())
-                svg.tick())
-
-            .on("dragend", (node) ->
-                generate_url())
-
-        group_g
-            .append('path')
-            .attr('class', 'ghost')
-            .call(resize_drag)
-
-        group_g
-            .append('path')
-            .attr('class', 'shape')
-
-        group_g
-            .append('text')
-
-        group
-            .select('text')
-            .each((elt) ->
-                txt = d3.select @
-                return if elt.text == txt.text
-                txt.selectAll('tspan').remove()
-                for line, i in elt.text.split('\n')
-                    tspan = txt.append('tspan')
-                        .text(line)
-                        .attr('x', 0)
-                    if i != 0
-                        tspan
-                            .attr('dy', '1.2em'))
-            .each((elt) -> elt.set_txt_bbox(@getBBox()))
-            .attr('x', (elt) -> elt.txt_x())
-            .attr('y', (elt) -> elt.txt_y())
-            .selectAll('tspan')
-            .attr('x', (elt) -> elt.txt_x())
-
-        group
-            .each((grp) ->
-                $(@).find('path').attr('d', grp.path()))
-
-        link = @svg.select('g.links').selectAll('g.link')
-            .data(diagram.links.concat(diagram.linking))
-
-        link_g = link.enter()
-            .append('g')
-            .attr("class", "link")
-
-        link_g
-            .append("path")
-            .attr('class', 'ghost')
-
-        link_g
-            .append("path")
-            .attr('class', (lnk) -> "shape #{lnk.constructor.type}")
-            .attr("marker-end", (lnk) -> "url(##{lnk.constructor.marker.id})")
-
-        link_g
-            .append("text")
-            .attr('class', "start")
-
-        link_g
-            .append("text")
-            .attr('class', "end")
-
-        link_g
-            .on('mousedown', (lnk) ->
-                if not d3.event.shiftKey
-                    diagram.selection = []
-                diagram.selection.push(lnk)
-                svg.tick()
-                d3.event.stopPropagation())
-            .on('dblclick', (lnk) ->
-                return if d3.event.ctrlKey
-                nearest = lnk.nearest diagram.mouse
-                if nearest is lnk.source
-                    edit((-> lnk.text.source), ((txt) -> lnk.text.source = txt))
-                else
-                    edit((-> lnk.text.target), ((txt) -> lnk.text.target = txt)))
-
-        element = @svg.select('g.elements').selectAll('g.element')
-            .data(diagram.elements)
-
-        # Update
-
-        # Enter
-        element_g = element.enter()
-            .append('g')
-            .attr('class', 'element')
-            .call(force_drag)
-            .on("mousedown", (elt) ->
-                return if d3.event.ctrlKey
-                selected = elt in diagram.selection
-                if (selected and not diagram.dragging) or (not selected) and not d3.event.shiftKey
-                    diagram.selection = [elt]
-                if d3.event.shiftKey and not selected
-                    diagram.selection.push(elt)
-                svg.tick())
-            .on("mousemove", (elt) ->
-                return if d3.event.ctrlKey
-                for lnk in diagram.linking
-                    lnk.target = elt)
-            .on("mouseout", (elt) ->
-                return if d3.event.ctrlKey
-                for lnk in diagram.linking
-                    lnk.target = diagram.mouse)
-            .on("mouseup", (elt) =>
-                return if d3.event.ctrlKey
-                if diagram.linking.length
-                    for lnk in diagram.linking
-                        if lnk.source != elt
-                            diagram.links.push(new lnk.constructor(lnk.source, elt))
-                    diagram.linking = []
-                    @sync()
-                    d3.event.preventDefault())
-            .on('dblclick', (elt) ->
-                return if d3.event.ctrlKey
-                edit((-> elt.text), ((txt) -> elt.text = txt)))
-
-        element_g
-            .append('path')
-            .attr('class', 'ghost')
-            .call(resize_drag)
-
-        element_g
-            .append('path')
-            .attr('class', 'shape')
-
-        element_g
-            .append('text')
-
-        # Update + Enter
-        element
-            .select('text')
-            .each((elt) ->
-                txt = d3.select @
-                return if elt.text == txt.text
-                txt.selectAll('tspan').remove()
-                for line, i in elt.text.split('\n')
-                    tspan = txt.append('tspan')
-                        .text(line)
-                        .attr('x', 0)
-                    if i != 0
-                        tspan
-                            .attr('dy', '1.2em'))
-            .each((elt) -> elt.set_txt_bbox(@getBBox()))
-            .attr('x', (elt) -> elt.txt_x())
-            .attr('y', (elt) -> elt.txt_y())
-            .selectAll('tspan')
-                .attr('x', (elt) -> elt.txt_x())
-
-        link
-            .each((lnk) ->
-                $(@).find('path').attr('d', lnk.path()))
-
-        link
-            .select('text.start')
-            .each((lnk) ->
-                txt = d3.select @
-                return if lnk.text.source == txt.text
-                txt.selectAll('tspan').remove()
-                for line, i in lnk.text.source.split('\n')
-                    tspan = txt.append('tspan')
-                        .text(line)
-                        .attr('x', 0)
-                    if i != 0
-                        tspan
-                            .attr('dy', '1.2em'))
-
-        link
-            .select('text.end')
-            .each((lnk) ->
-                txt = d3.select @
-                return if not lnk.text.target == txt.text
-                txt.selectAll('tspan').remove()
-                for line, i in lnk.text.target.split('\n')
-                    tspan = txt.append('tspan')
-                        .text(line)
-                        .attr('x', 0)
-                    if i != 0
-                        tspan
-                            .attr('dy', '1.2em'))
-
-        element
-            .each((elt) ->
-                $(@).find('path').attr('d', elt.path()))
-
-        # Exit
-        group.exit()
-            .remove()
-
-        element.exit()
-            .remove()
-
-        link.exit()
-            .remove()
+        group.exit().remove()
+        element.exit().remove()
+        link.exit().remove()
 
         @tick()
 
@@ -580,50 +288,9 @@ class Svg
         if not need_force and not diagram.dragging
             @force.stop()
 
-        @svg.select('g.groups').selectAll('g.group')
-            .attr("transform", ((grp) -> "translate(#{grp.x},#{grp.y})rotate(#{grp._rotation})"))
-            .classed('moving', (grp) -> not grp.fixed)
-            .classed('selected', (grp) -> grp in diagram.selection)
-
-        @svg.select('g.elements').selectAll('g.element')
-            .attr("transform", ((elt) -> "translate(#{elt.x},#{elt.y})rotate(#{elt._rotation})"))
-            .classed('moving', (elt) -> not elt.fixed)
-            .classed('selected', (elt) -> elt in diagram.selection)
-
-        link = @svg.select('g.links').selectAll('g.link')
-            .classed('selected', (lnk) -> lnk in diagram.selection)
-
-        link
-            .each((lnk) ->
-                $(@).find('path').attr('d', lnk.path()))
-
-        link
-            .select('text.start')
-            .attr('transform', (lnk) -> "translate(#{lnk.a1.x}, #{lnk.a1.y})")
-            .attr('dx', (lnk) ->
-                if lnk.d1 in ['N', 'E']
-                    lnk.text_margin + @getBBox().width / 2
-                else
-                    - (lnk.text_margin + @getBBox().width / 2))
-            .attr('dy', (lnk) ->
-                if lnk.d1 in ['N', 'E']
-                     - (@getBBox().height + lnk.text_margin)
-                else
-                    lnk.text_margin)
-
-        link
-            .select('text.end')
-            .attr('transform', (lnk) -> "translate(#{lnk.a2.x}, #{lnk.a2.y})")
-            .attr('dx', (lnk) ->
-                if lnk.d2 in ['N', 'E']
-                    lnk.text_margin + @getBBox().width / 2
-                else
-                    - (lnk.text_margin + @getBBox().width / 2))
-            .attr('dy', (lnk) ->
-                if lnk.d2 in ['N', 'E']
-                     - (@getBBox().height + lnk.text_margin)
-                else
-                    lnk.text_margin)
+        @svg.select('g.groups').selectAll('g.group').call(tick_node)
+        @svg.select('g.elements').selectAll('g.element').call(tick_node)
+        @svg.select('g.links').selectAll('g.link').call(tick_link)
 
     resize: ->
         @width = @article.node().clientWidth

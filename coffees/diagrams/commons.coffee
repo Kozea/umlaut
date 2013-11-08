@@ -56,11 +56,11 @@ class Note extends Element
 class Lozenge extends Element
     txt_width: ->
         ow = super()
-        ow + Math.sqrt(ow * Lozenge.__super__.txt_height.apply(@))
+        ow + Math.sqrt(ow * @super('txt_height', Lozenge))
 
     txt_height: ->
         oh = super()
-        oh + Math.sqrt(oh * Lozenge.__super__.txt_width.apply(@))
+        oh + Math.sqrt(oh * @super('txt_width', Lozenge))
 
     path: ->
         w2 = @width() / 2

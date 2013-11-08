@@ -15,20 +15,13 @@ class Electric extends Element
         @base_width()
 
     direction: (x, y) ->
-        d = super(x, y)
         if @_rotation % 180 == 0
-            if d == 'N'
-                d = 'W'
-            if d == 'S'
-                d = 'E'
-
-        if @_rotation % 180 == 90
-            if d == 'W'
-                d = 'N'
-            if d == 'E'
-                d = 'S'
-
-        d
+            if x > @x
+                return 'E'
+            return 'W'
+        if y > @y
+            return 'S'
+        return 'N'
 
 class Node extends Electric
     base_width: ->
@@ -43,6 +36,9 @@ class Node extends Electric
         @margin.y = 0
         @text = ''
 
+    direction: (x, y) ->
+        @super('direction', Electric, [x, y])
+
     path: ->
         w2 = @width() / 2
         h2 = @height() / 2
@@ -52,6 +48,8 @@ class Node extends Electric
         "
 
 class Resistor extends Electric
+    @fill: 'none'
+
     base_width: ->
         super() * 3
 
@@ -77,33 +75,55 @@ class Diode extends Electric
         z"
 
 class Battery extends Electric
+    @fill: 'fg'
+
     base_width: ->
-        super() / 2
+        super() / 3
 
     base_height: ->
         super() * 2
 
     path: ->
         w2 = @width() / 2
+        w4 = @width() / 4
         h2 = @height() / 2
         h4 = h2 / 2
         "M #{-w2} #{-h4}
-         L 0 #{-h4}
-         L 0 #{h4}
+         L #{-w4} #{-h4}
+         L #{-w4} #{h4}
          L #{-w2} #{h4}
          z
          M #{w2} #{-h2}
          L #{w2} #{h2}
         "
 
-
 class Wire extends Link
+
+    path: ->
+        c1 = @source.pos()
+        c2 = @target.pos()
+        if undefined in [c1.x, c1.y, c2.x, c2.y]
+            return 'M 0 0'
+        @d1 = @source.direction(c2.x, c2.y)
+        @d2 = @target.direction(c1.x, c1.y)
+
+        @a1 = @source.anchors[@d1]()
+        @a2 = @target.anchors[@d2]()
+
+        path = "M #{@a1.x} #{@a1.y} L"
+
+        if @d1 in ['N', 'S']
+            path = "#{path} #{@a1.x} #{@a2.y} L"
+        else
+            path = "#{path} #{@a2.x} #{@a1.y} L"
+
+        "#{path} #{@a2.x} #{@a2.y}"
 
 class ElectricDiagram extends Diagram
     label: 'Electric Diagram'
 
     constructor: ->
-       super()
+       super
        @types =
            elements: [Diode, Resistor, Node, Battery]
            groups: []

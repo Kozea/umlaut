@@ -2,6 +2,7 @@ class Diagram extends Base
     @diagrams: {}
 
     constructor: ->
+        super
         @title = 'Untitled ' + @label
         @linkstyle = 'rectangular'
         @zoom =
@@ -62,7 +63,7 @@ class Diagram extends Base
         links: @links.map (lnk) -> lnk.objectify()
 
     hash: ->
-        btoa(JSON.stringify(@objectify()))
+        btoa(unescape(encodeURIComponent(JSON.stringify(@objectify()))))
 
     loads: (obj) ->
         if obj.title

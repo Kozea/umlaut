@@ -1,5 +1,9 @@
 class Element extends Base
+    @fill: 'bg'
+    @stroke: 'fg'
+
     constructor: (@x, @y, @text, @fixed=true) ->
+        super
         @margin = x: 10, y: 5
         @_width = null
         @_height = null
@@ -73,6 +77,9 @@ class Element extends Base
 
     in: (rect) ->
         rect.x < @x < rect.x + rect.width and rect.y < @y < rect.y + rect.height
+
+    contains: ->
+        false
 
     objectify: ->
         name: @constructor.name

@@ -1,5 +1,6 @@
 class Marker extends Base
     constructor: ->
+        super
         @id = @constructor.name
 
 class Void extends Marker
@@ -21,6 +22,7 @@ class Link extends Base
     text_margin: 10
 
     constructor: (@source, @target, text) ->
+        super
         @a1 = @a2 = 0
         @text =
             source: text?.source or ''
