@@ -1,6 +1,12 @@
 force_drag = (force) ->
     force
-        .on("drag.force", (node) ->
+        .on('dragstart', (node) ->
+            svg.svg.classed('dragging', true)
+            svg.svg.classed('translating', true)
+            return if d3.event.sourceEvent.which is 3 or d3.event.sourceEvent.ctrlKey
+
+            diagram.dragging = true
+        ).on("drag.force", (node) ->
             return if not diagram.dragging or d3.event.sourceEvent.ctrlKey
 
             if not node in diagram.selection
@@ -20,11 +26,9 @@ force_drag = (force) ->
                 node.py -= delta.y
 
             svg.force.resume()
-        ).on('dragstart', (node) ->
-            return if d3.event.sourceEvent.which is 3 or d3.event.sourceEvent.ctrlKey
-
-            diagram.dragging = true
         ).on('dragend', (node) ->
+            svg.svg.classed('dragging', false)
+            svg.svg.classed('translating', false)
             return if not diagram.dragging
             diagram.dragging = false
             if not $(d3.event.sourceEvent.target).closest('.inside').size()
@@ -43,6 +47,9 @@ force_drag = (force) ->
 
 nsweo_resize_drag = d3.behavior.drag()
     .on("dragstart", (handle) ->
+        return if d3.event.ctrlKey
+        svg.svg.classed('dragging', true)
+        svg.svg.classed('resizing', true)
         node = d3.select($(@).closest('.element,.group').get(0)).data()[0]
         diagram._origin = mouse_xy svg.svg.node()
         node.px = node.x
@@ -51,6 +58,7 @@ nsweo_resize_drag = d3.behavior.drag()
         node.pheight = node.height()
         d3.event.sourceEvent.stopPropagation()
     ).on("drag", (handle) ->
+        return if d3.event.ctrlKey
         nodes = d3.select($(@).closest('.element,.group').get(0))
         node = nodes.data()[0]
         m = mouse_xy svg.svg.node()
@@ -106,11 +114,68 @@ nsweo_resize_drag = d3.behavior.drag()
                 .attr('x', node.txt_x())
         svg.tick()
     ).on("dragend", (handle) ->
+        return if d3.event.ctrlKey
+        svg.svg.classed('dragging', false)
+        svg.svg.classed('resizing', false)
         node = d3.select($(@).closest('.element,.group').get(0)).data()[0]
         node.px = node.x
         node.py = node.y
         node.pwidth = node.pheight = null
         generate_url())
+
+anchor_link_drag = d3.behavior.drag()
+    .on("dragstart", (anchor) ->
+        return if d3.event.ctrlKey
+        svg.svg.classed('dragging', true)
+        svg.svg.classed('linking', true)
+        node = d3.select($(@).closest('.element,.group').get(0)).data()[0]
+        type = diagram.last_types.link or diagram.types.links[0]
+        link = new type(node, diagram.mouse)
+        link.source_anchor = anchor
+        diagram.linking.push(link)
+        svg.sync()
+        d3.event.sourceEvent.stopPropagation()
+    ).on("drag", (anchor) ->
+        return if d3.event.ctrlKey
+        node = d3.select($(@).closest('.element,.group').get(0)).data()[0]
+        svg.tick()
+    ).on("dragend", (anchor) ->
+        return if d3.event.ctrlKey
+        svg.svg.classed('dragging', false)
+        svg.svg.classed('linking', false)
+        node = d3.select($(@).closest('.element,.group').get(0)).data()[0]
+        diagram.linking = []
+        svg.sync()
+        diagram.linking = [])
+
+mouse_anchor = (anchor) ->
+    anchor
+        .on("mousemove", (anchor) ->
+            return if d3.event.ctrlKey
+            d3.select(@).classed('active', true)
+            node = d3.select($(@).closest('.element,.group').get(0)).data()[0]
+            for lnk in diagram.linking
+                lnk.target_anchor = anchor
+                lnk.target = node)
+        .on("mouseout", (anchor) ->
+            return if d3.event.ctrlKey
+            d3.select(@).classed('active', false)
+            for lnk in diagram.linking
+                lnk.target_anchor = null
+                lnk.target = diagram.mouse)
+        .on("mouseup", (anchor) =>
+            return if d3.event.ctrlKey
+            node = d3.select($(@).closest('.element,.group').get(0)).data()[0]
+            if diagram.linking.length
+                for lnk in diagram.linking
+                    if lnk.source != node
+                        link = new lnk.cls(lnk.source, node)
+                        link.source_anchor = lnk.source_anchor
+                        link.target_anchor = lnk.target_anchor
+                        diagram.links.push(link)
+                diagram.linking = []
+                svg.sync()
+                d3.event.preventDefault())
 
 mouse_node = (node) ->
     node

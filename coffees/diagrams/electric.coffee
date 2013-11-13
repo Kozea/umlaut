@@ -2,6 +2,9 @@ class Electric extends Element
     @resizeable: false
     @rotationable: true
 
+    anchor_list: ->
+        ['W', 'E']
+
     base_height: ->
         20
 
@@ -18,7 +21,7 @@ class Electric extends Element
         @base_width()
 
     direction: (x, y) ->
-        if @_rotation % 180 == 0
+        if @_rotation < 45 or 135 < @_rotation < 225 or @_rotation > 315
             if x > @x
                 return 'E'
             return 'W'
@@ -38,9 +41,6 @@ class Node extends Electric
         @margin.x = 0
         @margin.y = 0
         @text = ''
-
-    direction: (x, y) ->
-        @super('direction', Electric, [x, y])
 
     path: ->
         w2 = @width() / 2
@@ -107,15 +107,16 @@ class Wire extends Link
         c2 = @target.pos()
         if undefined in [c1.x, c1.y, c2.x, c2.y]
             return 'M 0 0'
-        @d1 = @source.direction(c2.x, c2.y)
-        @d2 = @target.direction(c1.x, c1.y)
 
-        @a1 = @source.anchors[@d1]()
-        @a2 = @target.anchors[@d2]()
+        @d1 = @source_anchor or @source.direction(c2.x, c2.y)
+        @a1 = @source.rotate(@source.anchors[@d1]())
+
+        @d2 = @target_anchor or @target.direction(c1.x, c1.y)
+        @a2 = @target.rotate(@target.anchors[@d2]())
 
         path = "M #{@a1.x} #{@a1.y} L"
 
-        if @d1 in ['N', 'S']
+        if c2.x > c1.x or c2.y > c1.y and not (c2.x > c1.x and c2.y > c1.y)
             path = "#{path} #{@a1.x} #{@a2.y} L"
         else
             path = "#{path} #{@a2.x} #{@a1.y} L"

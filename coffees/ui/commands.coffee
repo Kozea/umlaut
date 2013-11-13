@@ -32,15 +32,6 @@ node_add = (type) =>
         dom_node.dispatchEvent(mouse_evt)
 
 
-link_add = (type) ->
-    diagram.linking = []
-    for node in diagram.selection
-        diagram.linking.push(new type(node, diagram.mouse))
-    diagram.last_types.link = type
-    svg.sync()
-    d3.event.preventDefault()
-
-
 commands =
     undo:
         fun: (e) ->
@@ -244,7 +235,7 @@ init_commands = ->
         Mousetrap.bind hotkey, fun
 
     taken_hotkeys = []
-    for l in diagram.types.links
+    for l, n in diagram.types.links
         i = 1
         key = l.name[0].toLowerCase()
         while i < l.length and key in taken_hotkeys
@@ -252,7 +243,6 @@ init_commands = ->
 
         taken_hotkeys.push(key)
 
-        fun = ((lnk) -> -> link_add(lnk))(l)
         hotkey = "l #{key}"
         icon = new l(e1 = new Element(0, 0), e2 = new Element(100, 0))
         e1.set_txt_bbox(width: 10, height: 10)
@@ -260,16 +250,22 @@ init_commands = ->
 
         svgicon = d3.select('aside .icons')
             .append('svg')
-            .attr('class', 'icon specific draggable btn btn-default')
+            .attr('class', "icon specific btn btn-default link #{l.name}")
             .attr('title', "#{l.name} [#{hotkey}]")
             .attr('data-hotkey', hotkey)
-            .on('mousedown', fun)
+            .classed('active', n == 0)
+            .on('mousedown', ((lnk) ->
+                ->
+                    diagram.last_types.link = lnk
+                    d3.selectAll('aside .icons .link').classed('active', false)
+                    d3.select(@).classed('active', true)
+                    )(l))
 
         link = svgicon
             .selectAll('g.link')
             .data([icon])
 
-        link.enter().call(enter_link)
+        link.enter().call(enter_link, false)
         link.call(update_link)
 
         svgicon

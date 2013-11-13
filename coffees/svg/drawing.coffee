@@ -1,22 +1,36 @@
-enter_node = (nodes) ->
+enter_node = (nodes, connect=true) ->
     g = nodes
         .append('g')
         .attr('class', (node) -> if node instanceof Group then 'group' else 'element')
     g.append('path').attr('class', 'ghost')
     g.append('path').attr('class', (node) -> "shape fill-#{node.cls.fill} stroke-#{node.cls.stroke}")
+    g.append('text')
+    if not connect
+        return
 
     g.append('g')
         .attr('class', 'handles')
         .each((node) ->
             d3.select(this)
-            .selectAll('.handles')
+            .selectAll('.handle')
             .data(node.handle_list())
             .enter()
                 .append('path')
                 .attr('class', (handle) -> "handle #{handle}")
                 .call(nsweo_resize_drag))
 
-    g.append('text')
+    g.append('g')
+        .attr('class', 'anchors')
+        .each((node) ->
+            d3.select(this)
+            .selectAll('.anchor')
+            .data(node.anchor_list())
+            .enter()
+                .append('path')
+                .attr('class', (anchor) -> "anchor #{anchor}")
+                .call(mouse_anchor)
+                .call(anchor_link_drag))
+
     g.call(force_drag(svg.force.drag()))
     g.call(mouse_node)
 
@@ -45,7 +59,7 @@ update_node = (nodes) ->
     nodes.select('.ghost').attr('d', (node) -> Rect::path.apply(node))
 
 
-enter_link = (links) ->
+enter_link = (links, connect=true) ->
     g = links
         .append('g')
         .attr("class", "link")
@@ -67,7 +81,8 @@ enter_link = (links) ->
         .append("text")
         .attr('class', "end")
 
-    g.call(mouse_link)
+    if connect
+        g.call(mouse_link)
 
 
 update_link = (links) ->
@@ -127,7 +142,19 @@ tick_node = (nodes) ->
                          L #{h.x} #{h.y - 2 * s}
                          A #{s} #{s} 0 1 1 #{h.x} #{h.y - 4 * s}
                          A #{s} #{s} 0 1 1 #{h.x} #{h.y - 2 * s}
-                        "))
+                        ")
+            # Anchors
+            s = 10
+            d3.select(@)
+                .selectAll('.anchor')
+                .data(node.anchor_list())
+                .attr('d', (anchor) ->
+                    a = node.anchors[anchor]()
+                    a.x -= node.x
+                    a.y -= node.y
+                    "M #{a.x} #{a.y + s}
+                     A #{s} #{s} 0 1 1 #{a.x} #{a.y - s}
+                     A #{s} #{s} 0 1 1 #{a.x} #{a.y + s}"))
 
 tick_link = (links) ->
     links

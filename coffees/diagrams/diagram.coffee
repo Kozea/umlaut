@@ -96,5 +96,8 @@ class Diagram extends Base
             @elements.push(element)
 
         for lnk in obj.links
-            link = @link(lnk.name)
-            @links.push(new link(@nodes()[lnk.source], @nodes()[lnk.target], lnk.text))
+            link_type = @link(lnk.name)
+            link = new link_type(@nodes()[lnk.source], @nodes()[lnk.target], lnk.text)
+            link.source_anchor = lnk.source_anchor
+            link.target_anchor = lnk.target_anchor
+            @links.push(link)

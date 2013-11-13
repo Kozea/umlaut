@@ -228,11 +228,12 @@ svg
       fill: transparent
       stroke: none
 
-    .handle
+    .handle, .anchor
       +transition(fill 500ms, stroke 500ms)
       fill: rgba(0, 0, 0, 0)
       stroke: rgba(0, 0, 0, 0)
 
+    .handle
       &.NW
         cursor: nw-resize
       &.NE
@@ -244,10 +245,26 @@ svg
       &.O
         cursor: crosshair
 
+    .anchor
+      cursor: pointer
+
     &:hover
       .handle
         fill: rgba(0, 0, 0, .05)
-        stroke: rgba(0, 0, 0, .25)
+        stroke: rgba(0, 0, 0, .3)
+
+      .anchor
+        fill: rgba(255, 0, 0, .05)
+        stroke: rgba(255, 0, 0, .5)
+
+  &.linking
+    .anchor
+      fill: rgba(0, 255, 0, .05)
+      stroke: rgba(0, 255, 0, .7)
+
+      &.active
+        fill: rgba(0, 255, 0, .5)
+        stroke: rgba(0, 255, 0, 1)
 
   .underlay
     .selection

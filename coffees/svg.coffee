@@ -76,26 +76,19 @@ class Svg extends Base
             # return if diagram.dragging or d3.event.ctrlKey or d3.event.which is 2
             if d3.event.altKey and d3.event.shiftKey
                 diagram.groupping = true
-            if d3.event.which is 3
-                diagram.linking = []
-                for elt in diagram.selection
-                    type = diagram.last_types.link or diagram.types.links[0]
-                    continue unless type
-                    diagram.linking.push(new type(elt, diagram.mouse))
-                @sync()
-            else
-                if not d3.event.shiftKey
-                    diagram.selection = []
-                    svg.tick()
 
-                mouse = mouse_xy(@svg.node())
-                @svg.select(if diagram.groupping then 'g.underlay' else 'g.overlay')
-                    .append("rect").attr
-                        class: "selection"
-                        x: mouse.x
-                        y: mouse.y
-                        width: 0
-                        height: 0
+            if not d3.event.shiftKey
+                diagram.selection = []
+                svg.tick()
+
+            mouse = mouse_xy(@svg.node())
+            @svg.select(if diagram.groupping then 'g.underlay' else 'g.overlay')
+                .append("rect").attr
+                    class: "selection"
+                    x: mouse.x
+                    y: mouse.y
+                    width: 0
+                    height: 0
             d3.event.preventDefault()
         ).on('contextmenu', ->
             if not d3.event.shiftKey
@@ -107,9 +100,6 @@ class Svg extends Base
             mouse = mouse_xy(@svg.node())
             diagram.mouse.x = mouse.x
             diagram.mouse.y = mouse.y
-            if diagram.linking.length
-                @tick()
-                return
 
             sel = @svg.select("rect.selection")
             unless sel.empty()
@@ -152,9 +142,7 @@ class Svg extends Base
 
         ).on("mouseup", =>
             return if d3.event.ctrlKey
-            if diagram.linking.length
-                diagram.linking = []
-                @sync()
+
             if diagram.groupping
                 sel = @svg.select("rect.selection")
                 x = + sel.attr("x")

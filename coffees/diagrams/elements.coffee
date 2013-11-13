@@ -42,6 +42,15 @@ class Element extends Base
                 x: 0
                 y: - @height() / 2
 
+    rotate: (pos) ->
+        rad = Math.PI * @_rotation / 180
+        x = pos.x - @x
+        y = pos.y - @y
+        x: x * Math.cos(rad) - y * Math.sin(rad) + @x
+        y: x * Math.sin(rad) + y * Math.cos(rad) + @y
+
+    anchor_list: ->
+        ['N', 'S', 'W', 'E']
 
     handle_list: ->
         l = []
@@ -52,8 +61,9 @@ class Element extends Base
         l
 
     pos: ->
-        x: @x
-        y: @y
+        @rotate(
+            x: @x
+            y: @y)
 
     set_txt_bbox: (bbox) ->
         @_txt_bbox = bbox
