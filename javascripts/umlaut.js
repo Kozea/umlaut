@@ -1953,7 +1953,7 @@ edit = function(getter, setter) {
 force_drag = function(force) {
   return force.on("drag.force", function(node) {
     var delta, _i, _len, _ref35, _ref36;
-    if (!diagram.dragging || d3.event.sourceEvent.ctrlKey || (d3.event.sourceEvent.which === 2 && node.cls.rotationable)) {
+    if (!diagram.dragging || d3.event.sourceEvent.ctrlKey) {
       return;
     }
     if (_ref35 = !node, __indexOf.call(diagram.selection, _ref35) >= 0) {
@@ -1978,13 +1978,13 @@ force_drag = function(force) {
     }
     return svg.force.resume();
   }).on('dragstart', function(node) {
-    if (d3.event.sourceEvent.which === 3 || d3.event.sourceEvent.ctrlKey || (d3.event.sourceEvent.which === 2 && node.cls.rotationable) || (d3.event.sourceEvent.which === 1 && node.cls.resizeable && d3.select(d3.event.sourceEvent.target).classed('ghost'))) {
+    if (d3.event.sourceEvent.which === 3 || d3.event.sourceEvent.ctrlKey) {
       return;
     }
     return diagram.dragging = true;
   }).on('dragend', function(node) {
     var lnk, _i, _len, _ref35;
-    if (!diagram.dragging || (d3.event.sourceEvent.which === 2 && node.cls.rotationable)) {
+    if (!diagram.dragging) {
       return;
     }
     diagram.dragging = false;
@@ -2095,7 +2095,7 @@ nsweo_resize_drag = d3.behavior.drag().on("dragstart", function(handle) {
 mouse_node = function(node) {
   var _this = this;
   return node.on("mousedown", function(node) {
-    var selected;
+    var i, selected;
     if (d3.event.ctrlKey) {
       return;
     }
@@ -2107,9 +2107,24 @@ mouse_node = function(node) {
       diagram.selection.push(node);
     }
     if (d3.event.which !== 3) {
-      svg.svg.selectAll('g.element').each(function(node) {
-        if (__indexOf.call(diagram.selection, node) < 0 && node.contains(node)) {
-          return diagram.selection.push(node);
+      if (node instanceof Group) {
+        i = diagram.groups.indexOf(node);
+        if (i >= 0 && i !== diagram.groups.length) {
+          diagram.groups.splice(i, 1);
+          diagram.groups.push(node);
+          svg.sync();
+        }
+      } else {
+        i = diagram.elements.indexOf(node);
+        if (i >= 0 && i !== diagram.elements.length) {
+          diagram.elements.splice(diagram.elements.indexOf(node), 1);
+          diagram.elements.push(node);
+          svg.sync();
+        }
+      }
+      svg.svg.selectAll('g.element').each(function(elt) {
+        if (__indexOf.call(diagram.selection, elt) < 0 && node.contains(elt)) {
+          return diagram.selection.push(elt);
         }
       });
     }

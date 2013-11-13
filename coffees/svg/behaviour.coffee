@@ -1,7 +1,7 @@
 force_drag = (force) ->
     force
         .on("drag.force", (node) ->
-            return if not diagram.dragging or d3.event.sourceEvent.ctrlKey or (d3.event.sourceEvent.which is 2 and node.cls.rotationable)
+            return if not diagram.dragging or d3.event.sourceEvent.ctrlKey
 
             if not node in diagram.selection
                 diagram.selection.push node
@@ -21,11 +21,11 @@ force_drag = (force) ->
 
             svg.force.resume()
         ).on('dragstart', (node) ->
-            return if d3.event.sourceEvent.which is 3 or d3.event.sourceEvent.ctrlKey or (d3.event.sourceEvent.which is 2 and node.cls.rotationable) or (d3.event.sourceEvent.which is 1 and node.cls.resizeable and d3.select(d3.event.sourceEvent.target).classed('ghost'))
+            return if d3.event.sourceEvent.which is 3 or d3.event.sourceEvent.ctrlKey
 
             diagram.dragging = true
         ).on('dragend', (node) ->
-            return if not diagram.dragging or (d3.event.sourceEvent.which is 2 and node.cls.rotationable)
+            return if not diagram.dragging
             diagram.dragging = false
             if not $(d3.event.sourceEvent.target).closest('.inside').size()
                 if node in diagram.elements
@@ -122,10 +122,22 @@ mouse_node = (node) ->
             if d3.event.shiftKey and not selected
                 diagram.selection.push(node)
             if d3.event.which != 3
-                    svg.svg.selectAll('g.element')
-                        .each((node) ->
-                            if node not in diagram.selection and node.contains node
-                                diagram.selection.push node)
+                if node instanceof Group
+                    i = diagram.groups.indexOf(node)
+                    if i >= 0 and i != diagram.groups.length
+                        diagram.groups.splice(i, 1)
+                        diagram.groups.push(node)
+                        svg.sync()
+                else
+                    i = diagram.elements.indexOf(node)
+                    if i >= 0 and i != diagram.elements.length
+                        diagram.elements.splice(diagram.elements.indexOf(node), 1)
+                        diagram.elements.push(node)
+                        svg.sync()
+                svg.svg.selectAll('g.element')
+                    .each((elt) ->
+                        if elt not in diagram.selection and node.contains elt
+                            diagram.selection.push elt)
             svg.tick())
         .on("mousemove", (node) ->
             return if d3.event.ctrlKey
