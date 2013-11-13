@@ -215,8 +215,8 @@ class Svg extends Base
             .attr('viewBox', '0 0 10 10')
             .attr('x', 0)
             .attr('y', 0)
-            .attr('width', diagram.snap)
-            .attr('height', diagram.snap)
+            .attr('width', diagram.snap.x)
+            .attr('height', diagram.snap.y)
             .attr('patternUnits', 'userSpaceOnUse')
 
         pattern

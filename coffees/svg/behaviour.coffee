@@ -12,8 +12,8 @@ force_drag = (force) ->
                     y: node.py - d3.event.y
             else
                 delta =
-                    x: node.px - diagram.snap * Math.floor(d3.event.x / diagram.snap)
-                    y: node.py - diagram.snap * Math.floor(d3.event.y / diagram.snap)
+                    x: node.px - diagram.snap.x * Math.floor(d3.event.x / diagram.snap.x)
+                    y: node.py - diagram.snap.y * Math.floor(d3.event.y / diagram.snap.y)
 
             for node in diagram.selection
                 node.px -= delta.x
@@ -41,47 +41,76 @@ force_drag = (force) ->
             if not diagram.freemode
                 node.fixed = true)
 
-ghost_drag = d3.behavior.drag()
-    .on("dragstart", (node) ->
-        if node.cls.resizeable and d3.event.sourceEvent.which is 1
-            ghost_drag.resize = true
-            d3.event.sourceEvent.stopPropagation()
-        if node.cls.rotationable and d3.event.sourceEvent.which is 2
-            ghost_drag.rotate = true
-            d3.event.sourceEvent.stopPropagation()
-    ).on("drag", (node) ->
-        if ghost_drag.resize
-            group = d3.select(@parentNode)
-            node.width(node.width() + d3.event.dx * 2)
-            node.height(node.height() + d3.event.dy * 2)
+nsweo_resize_drag = d3.behavior.drag()
+    .on("dragstart", (handle) ->
+        node = d3.select($(@).closest('.element,.group').get(0)).data()[0]
+        diagram._origin = mouse_xy svg.svg.node()
+        node.px = node.x
+        node.py = node.y
+        node.pwidth = node.width()
+        node.pheight = node.height()
+        d3.event.sourceEvent.stopPropagation()
+    ).on("drag", (handle) ->
+        nodes = d3.select($(@).closest('.element,.group').get(0))
+        node = nodes.data()[0]
+        m = mouse_xy svg.svg.node()
+        if handle is 'O'
+            delta =
+                x: m.x - node.x
+                y: m.y - node.y
 
-            group
-                .selectAll('path')
-                .attr('d', node.path())
-            group
+            if delta.x != 0
+                angle = 90 + 180 * (Math.atan(delta.y / delta.x)) / Math.PI
+            else
+                angle = 0
+            if delta.x < 0
+                angle += 180
+            if not d3.event.sourceEvent.shiftKey
+                angle = diagram.snap.a * Math.floor(angle / diagram.snap.a)
+
+            node._rotation = angle
+        else
+            delta =
+                x: m.x - diagram._origin.x
+                y: m.y - diagram._origin.y
+            switch handle
+                when 'SE'
+                    signs =
+                        x: 1
+                        y: 1
+                when 'SW'
+                    signs =
+                        x: -1
+                        y: 1
+                when 'NW'
+                    signs =
+                        x: -1
+                        y: -1
+                when 'NE'
+                    signs =
+                        x: 1
+                        y: -1
+
+            node.width(node.pwidth + signs.x * delta.x)
+            node.height(node.pheight + signs.y * delta.y)
+            node.x = node.px + signs.x * (node.width() - node.pwidth) / 2
+            node.y = node.py + signs.y * (node.height() - node.pheight) / 2
+
+            nodes.select('.shape').attr('d', node.path())
+            nodes.select('.ghost').attr('d', Rect::path.apply(node))
+            nodes
                 .select('text')
                 .attr('x', node.txt_x())
                 .attr('y', node.txt_y())
                 .selectAll('tspan')
                 .attr('x', node.txt_x())
-            svg.tick()
-        if ghost_drag.rotate
-            group = d3.select(@parentNode)
-            rotations =
-                E: 0
-                S: 90
-                W: 180
-                N: 270
-
-            mouse = mouse_xy d3.select('#diagram').node()
-            direction = node.super('direction', Electric, [mouse.x, mouse.y])
-            node._rotation = rotations[direction]
-            svg.tick())
-    .on("dragend", (node) ->
-        return if not ghost_drag.resize and not ghost_drag.rotate
-        ghost_drag.resize = ghost_drag.rotate = false
+        svg.tick()
+    ).on("dragend", (handle) ->
+        node = d3.select($(@).closest('.element,.group').get(0)).data()[0]
+        node.px = node.x
+        node.py = node.y
+        node.pwidth = node.pheight = null
         generate_url())
-
 
 mouse_node = (node) ->
     node

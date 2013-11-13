@@ -1,16 +1,28 @@
-enter_node = (node) ->
-    g = node
+enter_node = (nodes) ->
+    g = nodes
         .append('g')
         .attr('class', (node) -> if node instanceof Group then 'group' else 'element')
-    g.append('path').attr('class', 'ghost').call(ghost_drag)
+    g.append('path').attr('class', 'ghost')
     g.append('path').attr('class', (node) -> "shape fill-#{node.cls.fill} stroke-#{node.cls.stroke}")
+
+    g.append('g')
+        .attr('class', 'handles')
+        .each((node) ->
+            d3.select(this)
+            .selectAll('.handles')
+            .data(node.handle_list())
+            .enter()
+                .append('path')
+                .attr('class', (handle) -> "handle #{handle}")
+                .call(nsweo_resize_drag))
+
     g.append('text')
     g.call(force_drag(svg.force.drag()))
     g.call(mouse_node)
 
 
-update_node = (node) ->
-    node
+update_node = (nodes) ->
+    nodes
         .select('text')
         .each((node) ->
             txt = d3.select @
@@ -29,13 +41,12 @@ update_node = (node) ->
         .selectAll('tspan')
             .attr('x', (node) -> node.txt_x())
 
-    node
-        .each((node) ->
-            $(@).find('path').attr('d', node.path()))
+    nodes.select('.shape').attr('d', (node) -> node.path())
+    nodes.select('.ghost').attr('d', (node) -> Rect::path.apply(node))
 
 
-enter_link = (link) ->
-    g = link
+enter_link = (links) ->
+    g = links
         .append('g')
         .attr("class", "link")
 
@@ -45,8 +56,8 @@ enter_link = (link) ->
 
     g
         .append("path")
-        .attr('class', (lnk) -> "shape #{lnk.cls.type}")
-        .attr("marker-end", (lnk) -> "url(##{lnk.cls.marker.id})")
+        .attr('class', (link) -> "shape #{link.cls.type}")
+        .attr("marker-end", (link) -> "url(##{link.cls.marker.id})")
 
     g
         .append("text")
@@ -59,18 +70,18 @@ enter_link = (link) ->
     g.call(mouse_link)
 
 
-update_link = (link) ->
-    link
-        .each((lnk) ->
-            $(@).find('path').attr('d', lnk.path()))
+update_link = (links) ->
+    links
+        .each((link) ->
+            $(@).find('path').attr('d', link.path()))
 
-    link
+    links
         .select('text.start')
-        .each((lnk) ->
+        .each((link) ->
             txt = d3.select @
-            return if lnk.text.source == txt.text
+            return if link.text.source == txt.text
             txt.selectAll('tspan').remove()
-            for line, i in lnk.text.source.split('\n')
+            for line, i in link.text.source.split('\n')
                 tspan = txt.append('tspan')
                     .text(line)
                     .attr('x', 0)
@@ -78,13 +89,13 @@ update_link = (link) ->
                     tspan
                         .attr('dy', '1.2em'))
 
-    link
+    links
         .select('text.end')
-        .each((lnk) ->
+        .each((link) ->
             txt = d3.select @
-            return if not lnk.text.target == txt.text
+            return if not link.text.target == txt.text
             txt.selectAll('tspan').remove()
-            for line, i in lnk.text.target.split('\n')
+            for line, i in link.text.target.split('\n')
                 tspan = txt.append('tspan')
                     .text(line)
                     .attr('x', 0)
@@ -92,44 +103,64 @@ update_link = (link) ->
                     tspan
                         .attr('dy', '1.2em'))
 
-tick_node = (node) ->
-    node
+tick_node = (nodes) ->
+    nodes
         .attr("transform", ((node) -> "translate(#{node.x},#{node.y})rotate(#{node._rotation})"))
         .classed('moving', (node) -> not node.fixed)
         .classed('selected', (node) -> node in diagram.selection)
+        .each((node) ->
+            # Handles
+            s = node.cls.handle_size
+            d3.select(@)
+                .selectAll('.handle')
+                .data(node.handle_list())
+                .attr('d', (handle) ->
+                    h = node.handles[handle]()
+                    if handle != 'O'
+                        "M #{h.x - s} #{h.y - s}
+                         L #{h.x + s} #{h.y - s}
+                         L #{h.x + s} #{h.y + s}
+                         L #{h.x - s} #{h.y + s}
+                        z"
+                    else
+                        "M #{h.x} #{h.y}
+                         L #{h.x} #{h.y - 2 * s}
+                         A #{s} #{s} 0 1 1 #{h.x} #{h.y - 4 * s}
+                         A #{s} #{s} 0 1 1 #{h.x} #{h.y - 2 * s}
+                        "))
 
-tick_link = (link) ->
-    link
-        .classed('selected', (lnk) -> lnk in diagram.selection)
+tick_link = (links) ->
+    links
+        .classed('selected', (link) -> link in diagram.selection)
 
-    link
-        .each((lnk) ->
-            $(@).find('path').attr('d', lnk.path()))
+    links
+        .each((link) ->
+            $(@).find('path').attr('d', link.path()))
 
-    link
+    links
         .select('text.start')
-        .attr('transform', (lnk) -> "translate(#{lnk.a1.x}, #{lnk.a1.y})")
-        .attr('dx', (lnk) ->
-            if lnk.d1 in ['N', 'E']
-                lnk.text_margin + @getBBox().width / 2
+        .attr('transform', (link) -> "translate(#{link.a1.x}, #{link.a1.y})")
+        .attr('dx', (link) ->
+            if link.d1 in ['N', 'E']
+                link.text_margin + @getBBox().width / 2
             else
-                - (lnk.text_margin + @getBBox().width / 2))
-        .attr('dy', (lnk) ->
-            if lnk.d1 in ['N', 'E']
-                 - (@getBBox().height + lnk.text_margin)
+                - (link.text_margin + @getBBox().width / 2))
+        .attr('dy', (link) ->
+            if link.d1 in ['N', 'E']
+                 - (@getBBox().height + link.text_margin)
             else
-                lnk.text_margin)
+                link.text_margin)
 
-    link
+    links
         .select('text.end')
-        .attr('transform', (lnk) -> "translate(#{lnk.a2.x}, #{lnk.a2.y})")
-        .attr('dx', (lnk) ->
-            if lnk.d2 in ['N', 'E']
-                lnk.text_margin + @getBBox().width / 2
+        .attr('transform', (link) -> "translate(#{link.a2.x}, #{link.a2.y})")
+        .attr('dx', (link) ->
+            if link.d2 in ['N', 'E']
+                link.text_margin + @getBBox().width / 2
             else
-                - (lnk.text_margin + @getBBox().width / 2))
-        .attr('dy', (lnk) ->
-            if lnk.d2 in ['N', 'E']
-                 - (@getBBox().height + lnk.text_margin)
+                - (link.text_margin + @getBBox().width / 2))
+        .attr('dy', (link) ->
+            if link.d2 in ['N', 'E']
+                 - (@getBBox().height + link.text_margin)
             else
-                lnk.text_margin)
+                link.text_margin)

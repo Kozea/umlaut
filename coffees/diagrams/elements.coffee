@@ -1,4 +1,5 @@
 class Element extends Base
+    @handle_size: 10
     @resizeable: true
     @rotationable: false
     @fill: 'bg'
@@ -23,6 +24,32 @@ class Element extends Base
             W: =>
                 x: @x - @width() / 2
                 y: @y
+
+        @handles =
+            NE: =>
+                x: @width() / 2
+                y: - @height() / 2
+            NW: =>
+                x: - @width() / 2
+                y: - @height() / 2
+            SW: =>
+                x: - @width() / 2
+                y: @height() / 2
+            SE: =>
+                x: @width() / 2
+                y: @height() / 2
+            O: =>
+                x: 0
+                y: - @height() / 2
+
+
+    handle_list: ->
+        l = []
+        if @cls.resizeable
+            l = l.concat(['NW', 'NE', 'SW', 'SE'])
+        if @cls.rotationable
+            l.push('O')
+        l
 
     pos: ->
         x: @x

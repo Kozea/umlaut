@@ -192,35 +192,34 @@ svg .ghost {
   -moz-transition: stroke 500ms;
   -o-transition: stroke 500ms;
   transition: stroke 500ms;
-  fill: none;
-  stroke: rgba(0, 0, 255, 0);
-  stroke-width: 20;
 }
-/* line 169, ../sass/umlaut.sass */
+/* line 166, ../sass/umlaut.sass */
 svg .ghost:hover {
   stroke: rgba(0, 0, 255, 0.1);
 }
-/* line 172, ../sass/umlaut.sass */
+/* line 169, ../sass/umlaut.sass */
 svg .ghost:active {
   stroke: rgba(0, 0, 255, 0.2);
 }
-/* line 176, ../sass/umlaut.sass */
+/* line 173, ../sass/umlaut.sass */
 svg .link .dashed {
   stroke-dasharray: 5 5;
 }
-/* line 179, ../sass/umlaut.sass */
+/* line 176, ../sass/umlaut.sass */
 svg .link .ghost {
+  fill: none;
   stroke-width: 30;
+  stroke: rgba(0, 0, 255, 0);
 }
-/* line 183, ../sass/umlaut.sass */
+/* line 182, ../sass/umlaut.sass */
 svg .group .ghost {
   cursor: crosshair;
 }
-/* line 187, ../sass/umlaut.sass */
+/* line 186, ../sass/umlaut.sass */
 svg .link:hover .shape, svg .element:hover .shape, svg .group:hover .shape {
   stroke-width: 2;
 }
-/* line 190, ../sass/umlaut.sass */
+/* line 189, ../sass/umlaut.sass */
 svg .shape {
   -webkit-transition: stroke-width 500ms;
   -moz-transition: stroke-width 500ms;
@@ -229,57 +228,95 @@ svg .shape {
   stroke: black;
   stroke-width: 1.3;
 }
-/* line 196, ../sass/umlaut.sass */
+/* line 195, ../sass/umlaut.sass */
 svg .selected .shape {
   stroke: blue;
 }
-/* line 200, ../sass/umlaut.sass */
+/* line 199, ../sass/umlaut.sass */
 svg .selected.moving .shape {
   stroke: magenta;
 }
-/* line 204, ../sass/umlaut.sass */
+/* line 203, ../sass/umlaut.sass */
 svg .moving .shape {
   stroke: red;
 }
-/* line 208, ../sass/umlaut.sass */
+/* line 207, ../sass/umlaut.sass */
 svg .link .shape {
   fill: none;
 }
-/* line 212, ../sass/umlaut.sass */
+/* line 210, ../sass/umlaut.sass */
 svg .link text {
   fill: black;
   stroke: none;
 }
-/* line 216, ../sass/umlaut.sass */
+/* line 214, ../sass/umlaut.sass */
 svg .element, svg .group {
   cursor: move;
 }
-/* line 220, ../sass/umlaut.sass */
+/* line 218, ../sass/umlaut.sass */
 svg .element .shape.fill-bg, svg .group .shape.fill-bg {
   fill: white;
 }
-/* line 223, ../sass/umlaut.sass */
+/* line 221, ../sass/umlaut.sass */
 svg .element .shape.fill-fg, svg .group .shape.fill-fg {
   fill: black;
 }
-/* line 226, ../sass/umlaut.sass */
+/* line 224, ../sass/umlaut.sass */
 svg .element .shape.fill-none, svg .group .shape.fill-none {
   fill: transparent;
 }
-/* line 230, ../sass/umlaut.sass */
+/* line 227, ../sass/umlaut.sass */
+svg .element .ghost, svg .group .ghost {
+  fill: transparent;
+  stroke: none;
+}
+/* line 231, ../sass/umlaut.sass */
+svg .element .handle, svg .group .handle {
+  -webkit-transition: fill 500ms, stroke 500ms;
+  -moz-transition: fill 500ms, stroke 500ms;
+  -o-transition: fill 500ms, stroke 500ms;
+  transition: fill 500ms, stroke 500ms;
+  fill: rgba(0, 0, 0, 0);
+  stroke: rgba(0, 0, 0, 0);
+}
+/* line 236, ../sass/umlaut.sass */
+svg .element .handle.NW, svg .group .handle.NW {
+  cursor: nw-resize;
+}
+/* line 238, ../sass/umlaut.sass */
+svg .element .handle.NE, svg .group .handle.NE {
+  cursor: ne-resize;
+}
+/* line 240, ../sass/umlaut.sass */
+svg .element .handle.SW, svg .group .handle.SW {
+  cursor: sw-resize;
+}
+/* line 242, ../sass/umlaut.sass */
+svg .element .handle.SE, svg .group .handle.SE {
+  cursor: se-resize;
+}
+/* line 244, ../sass/umlaut.sass */
+svg .element .handle.O, svg .group .handle.O {
+  cursor: crosshair;
+}
+/* line 248, ../sass/umlaut.sass */
+svg .element:hover .handle, svg .group:hover .handle {
+  fill: rgba(0, 0, 0, 0.05);
+  stroke: rgba(0, 0, 0, 0.25);
+}
+/* line 253, ../sass/umlaut.sass */
 svg .underlay .selection {
   fill: rgba(0, 255, 0, 0.05);
   stroke: rgba(0, 255, 0, 0.3);
 }
-/* line 235, ../sass/umlaut.sass */
+/* line 258, ../sass/umlaut.sass */
 svg .overlay .selection {
   fill: rgba(0, 0, 255, 0.05);
   stroke: rgba(0, 0, 255, 0.3);
   stroke-width: 2;
-  stroke-width: 2;
 }
 
-/* line 242, ../sass/umlaut.sass */
+/* line 264, ../sass/umlaut.sass */
 svg.icon text {
   dominant-baseline: text-before-edge;
 }

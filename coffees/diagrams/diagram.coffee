@@ -13,7 +13,11 @@ class Diagram extends Base
         @links = []
         @groups = []
 
-        @snap = 25
+        @snap =
+            x: 25
+            y: 25
+            a: 22.5
+
         @freemode = false
 
         @types = {}

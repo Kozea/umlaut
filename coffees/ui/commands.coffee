@@ -157,8 +157,8 @@ commands =
     snaptogrid:
         fun: ->
             for node in diagram.nodes()
-                node.x = node.px = diagram.snap * Math.floor(node.x / diagram.snap)
-                node.y = node.py = diagram.snap * Math.floor(node.y / diagram.snap)
+                node.x = node.px = diagram.snap.x * Math.floor(node.x / diagram.snap.x)
+                node.y = node.py = diagram.snap.y * Math.floor(node.y / diagram.snap.y)
             svg.tick()
         label: 'Snap to grid'
         glyph: 'magnet'
@@ -229,7 +229,6 @@ init_commands = ->
         element.enter()
             .call(enter_node)
         element
-            .call(update_node)
             .call(update_node)
 
         margin = 3

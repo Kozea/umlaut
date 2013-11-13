@@ -162,9 +162,6 @@ svg
 
   .ghost
     +transition(stroke 500ms)
-    fill: none
-    stroke: rgba(0, 0, 255, 0)
-    stroke-width: 20
 
     &:hover
       stroke: rgba(0, 0, 255, .1)
@@ -177,7 +174,9 @@ svg
       stroke-dasharray: 5 5
 
     .ghost
+      fill: none
       stroke-width: 30
+      stroke: rgba(0, 0, 255, 0)
 
   .group
     .ghost
@@ -208,7 +207,6 @@ svg
     .shape
       fill: none
 
-
     text
       fill: $fg
       stroke: none
@@ -226,6 +224,31 @@ svg
       &.fill-none
         fill: transparent
 
+    .ghost
+      fill: transparent
+      stroke: none
+
+    .handle
+      +transition(fill 500ms, stroke 500ms)
+      fill: rgba(0, 0, 0, 0)
+      stroke: rgba(0, 0, 0, 0)
+
+      &.NW
+        cursor: nw-resize
+      &.NE
+        cursor: ne-resize
+      &.SW
+        cursor: sw-resize
+      &.SE
+        cursor: se-resize
+      &.O
+        cursor: crosshair
+
+    &:hover
+      .handle
+        fill: rgba(0, 0, 0, .05)
+        stroke: rgba(0, 0, 0, .25)
+
   .underlay
     .selection
       fill: rgba(0, 255, 0, .05)
@@ -235,7 +258,6 @@ svg
     .selection
       fill: rgba(0, 0, 255, .05)
       stroke: rgba(0, 0, 255, .3)
-      stroke-width: 2
       stroke-width: 2
 
 svg.icon
