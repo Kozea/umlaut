@@ -55,7 +55,9 @@ update_node = (nodes) ->
         .selectAll('tspan')
             .attr('x', (node) -> node.txt_x())
 
-    nodes.select('.shape').attr('d', (node) -> node.path())
+    nodes.select('.shape')
+        .attr('class', (node) -> "shape fill-#{node.cls.fill} stroke-#{node.cls.stroke}")
+        .attr('d', (node) -> node.path())
     nodes.select('.ghost').attr('d', (node) -> Rect::path.apply(node))
 
 
@@ -132,10 +134,11 @@ tick_node = (nodes) ->
                 .attr('d', (handle) ->
                     h = node.handles[handle]()
                     if handle != 'O'
-                        "M #{h.x - s} #{h.y - s}
-                         L #{h.x + s} #{h.y - s}
-                         L #{h.x + s} #{h.y + s}
-                         L #{h.x - s} #{h.y + s}
+                        signs = cardinal_to_direction handle
+                        "M #{h.x} #{h.y}
+                         L #{h.x + signs.x * s} #{h.y}
+                         L #{h.x + signs.x * s} #{h.y  + signs.y *  s}
+                         L #{h.x} #{h.y + signs.y * s}
                         z"
                     else
                         "M #{h.x} #{h.y}
@@ -144,7 +147,7 @@ tick_node = (nodes) ->
                          A #{s} #{s} 0 1 1 #{h.x} #{h.y - 2 * s}
                         ")
             # Anchors
-            s = 10
+            s = s / 2
             d3.select(@)
                 .selectAll('.anchor')
                 .data(node.anchor_list())
@@ -152,9 +155,10 @@ tick_node = (nodes) ->
                     a = node.anchors[anchor]()
                     a.x -= node.x
                     a.y -= node.y
-                    "M #{a.x} #{a.y + s}
-                     A #{s} #{s} 0 1 1 #{a.x} #{a.y - s}
-                     A #{s} #{s} 0 1 1 #{a.x} #{a.y + s}"))
+                    signs = cardinal_to_direction anchor
+                    "M #{a.x + signs.x * s} #{a.y + s + signs.y * s}
+                     A #{s} #{s} 0 1 1 #{a.x + signs.x * s} #{a.y - s + signs.y * s}
+                     A #{s} #{s} 0 1 1 #{a.x + signs.x * s} #{a.y + s + signs.y * s}"))
 
 tick_link = (links) ->
     links

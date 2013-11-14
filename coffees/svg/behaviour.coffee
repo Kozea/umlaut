@@ -81,28 +81,18 @@ nsweo_resize_drag = d3.behavior.drag()
             delta =
                 x: m.x - diagram._origin.x
                 y: m.y - diagram._origin.y
-            switch handle
-                when 'SE'
-                    signs =
-                        x: 1
-                        y: 1
-                when 'SW'
-                    signs =
-                        x: -1
-                        y: 1
-                when 'NW'
-                    signs =
-                        x: -1
-                        y: -1
-                when 'NE'
-                    signs =
-                        x: 1
-                        y: -1
+            delta = rotate delta, 360 - node._rotation
 
+
+            signs = cardinal_to_direction handle
             node.width(node.pwidth + signs.x * delta.x)
             node.height(node.pheight + signs.y * delta.y)
-            node.x = node.px + signs.x * (node.width() - node.pwidth) / 2
-            node.y = node.py + signs.y * (node.height() - node.pheight) / 2
+            shift =
+                x: signs.x * (node.width() - node.pwidth) / 2
+                y: signs.y * (node.height() - node.pheight) / 2
+            shift = rotate shift, node._rotation
+            node.x = node.px + shift.x
+            node.y = node.py + shift.y
 
             nodes.select('.shape').attr('d', node.path())
             nodes.select('.ghost').attr('d', Rect::path.apply(node))

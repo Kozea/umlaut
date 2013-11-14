@@ -42,12 +42,15 @@ class Element extends Base
                 x: 0
                 y: - @height() / 2
 
-    rotate: (pos) ->
-        rad = Math.PI * @_rotation / 180
-        x = pos.x - @x
-        y = pos.y - @y
-        x: x * Math.cos(rad) - y * Math.sin(rad) + @x
-        y: x * Math.sin(rad) + y * Math.cos(rad) + @y
+    rotate: (pos, direct=true) ->
+        ang = if direct then @_rotation else 360 - @_rotation
+        normed =
+            x: pos.x - @x
+            y: pos.y - @y
+        normed = rotate(normed, ang)
+        normed.x += @x
+        normed.y += @y
+        normed
 
     anchor_list: ->
         ['N', 'S', 'W', 'E']
