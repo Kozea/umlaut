@@ -33,3 +33,10 @@ cardinal_to_direction = (c) ->
         when 'NE'
             x: 1
             y: -1
+
+angle_to_cardinal = (a) ->
+    switch a
+        when  45 < a <= 135 then 'E'
+        when 135 < a <= 225 then 'S'
+        when 225 < a <= 315 then 'W'
+        else 'N'

@@ -90,9 +90,6 @@ class Svg extends Base
                     width: 0
                     height: 0
             d3.event.preventDefault()
-        ).on('contextmenu', ->
-            if not d3.event.shiftKey
-                d3.event.preventDefault()
         )
 
         d3.select(window).on("mousemove", =>

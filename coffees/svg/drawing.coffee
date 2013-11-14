@@ -85,6 +85,7 @@ enter_link = (links, connect=true) ->
 
     if connect
         g.call(mouse_link)
+        g.call(link_drag)
 
 
 update_link = (links) ->
