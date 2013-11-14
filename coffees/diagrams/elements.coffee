@@ -43,7 +43,7 @@ class Element extends Base
                 y: - @height() / 2
 
     rotate: (pos, direct=true) ->
-        ang = if direct then @_rotation else 360 - @_rotation
+        ang = if direct then @_rotation else 2 * pi - @_rotation
         normed =
             x: pos.x - @x
             y: pos.y - @y
@@ -94,28 +94,7 @@ class Element extends Base
         Math.max(@_height or 0, @txt_height())
 
     direction: (x, y) ->
-        delta = @height() / @width()
-
-        if @x <= x and @y <= y
-            if y > delta * (x - @x) + @y
-                return 'S'
-            else
-                return 'E'
-        if @x >= x and @y <= y
-            if y > delta * (@x - x) + @y
-                return 'S'
-            else
-                return 'W'
-        if @x <= x and @y >= y
-            if y > delta * (@x - x) + @y
-                return 'E'
-            else
-                return 'N'
-        if @x >= x and @y >= y
-            if y > delta * (x - @x) + @y
-                return 'W'
-            else
-                return 'N'
+        angle_to_cardinal(atan2(y - @y, x - @x))
 
     in: (rect) ->
         rect.x < @x < rect.x + rect.width and rect.y < @y < rect.y + rect.height

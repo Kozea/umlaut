@@ -134,7 +134,7 @@ class Wire extends Link
 
         path = "M #{@a1.x} #{@a1.y} L"
 
-        if @source._rotation < 45 or 135 < @source._rotation < 225 or @source._rotation > 315
+        if angle_to_cardinal(@source._rotation) in ['E', 'W']
             path = "#{path} #{@a2.x} #{@a1.y} L"
         else
             path = "#{path} #{@a1.x} #{@a2.y} L"

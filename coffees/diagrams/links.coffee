@@ -37,17 +37,24 @@ class Link extends Base
         text: @text
 
     nearest: (pos) ->
-        if dist(pos, @source) < dist(pos, @target) then @source else @target
+        if dist(pos, @a1) < dist(pos, @a2) then @source else @target
 
     path: ->
         c1 = @source.pos()
         c2 = @target.pos()
         if undefined in [c1.x, c1.y, c2.x, c2.y]
             return 'M 0 0'
+
         @d1 = @source_anchor or @source.direction(c2.x, c2.y)
         @a1 = @source.rotate(@source.anchors[@d1]())
 
-        @d2 = @target_anchor or @target.direction(c1.x, c1.y)
+        @d2 = @target_anchor or @target.direction(@a1.x, @a1.y)
+        @a2 = @target.rotate(@target.anchors[@d2]())
+
+        @d1 = @source_anchor or @source.direction(@a2.x, @a2.y)
+        @a1 = @source.rotate(@source.anchors[@d1]())
+
+        @d2 = @target_anchor or @target.direction(@a1.x, @a1.y)
         @a2 = @target.rotate(@target.anchors[@d2]())
 
         path = "M #{@a1.x} #{@a1.y}"

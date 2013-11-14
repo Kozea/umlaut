@@ -67,21 +67,17 @@ nsweo_resize_drag = d3.behavior.drag()
                 x: m.x - node.x
                 y: m.y - node.y
 
-            if delta.x != 0
-                angle = 90 + 180 * (Math.atan(delta.y / delta.x)) / Math.PI
-            else
-                angle = 0
-            if delta.x < 0
-                angle += 180
+            angle = atan2(delta.y, delta.x) + pi / 2  # Mouse is above
+
             if not d3.event.sourceEvent.shiftKey
-                angle = diagram.snap.a * Math.floor(angle / diagram.snap.a)
+                angle = to_rad(diagram.snap.a * Math.floor(to_deg(angle) / diagram.snap.a))
 
             node._rotation = angle
         else
             delta =
                 x: m.x - diagram._origin.x
                 y: m.y - diagram._origin.y
-            delta = rotate delta, 360 - node._rotation
+            delta = rotate delta, 2 * pi - node._rotation
 
 
             signs = cardinal_to_direction handle
@@ -245,6 +241,8 @@ mouse_link = (link) ->
 link_drag = d3.behavior.drag()
     .on("dragstart", (link) ->
         return if d3.event.ctrlKey
+        if Math.min(dist(diagram.mouse, link.a1), dist(diagram.mouse, link.a2)) > 60
+            return
         svg.svg.classed('dragging', true)
         svg.svg.classed('linking', true)
 

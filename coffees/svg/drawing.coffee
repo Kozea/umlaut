@@ -123,7 +123,7 @@ update_link = (links) ->
 
 tick_node = (nodes) ->
     nodes
-        .attr("transform", ((node) -> "translate(#{node.x},#{node.y})rotate(#{node._rotation})"))
+        .attr("transform", ((node) -> "translate(#{node.x},#{node.y})rotate(#{to_svg_angle(node._rotation)})"))
         .classed('moving', (node) -> not node.fixed)
         .classed('selected', (node) -> node in diagram.selection)
         .each((node) ->
