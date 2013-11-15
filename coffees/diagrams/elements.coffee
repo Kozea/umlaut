@@ -5,25 +5,29 @@ class Element extends Base
     @fill: 'bg'
     @stroke: 'fg'
 
-    constructor: (@x, @y, @text, @fixed=true) ->
+    constructor: (@x, @y, @text, @fixed=false) ->
         super
         @margin = x: 10, y: 5
         @_width = null
         @_height = null
         @_rotation = 0
-        @anchors =
-            N: =>
-                x: @x
-                y: @y - @height() / 2
-            S: =>
-                x: @x
-                y: @y + @height() / 2
-            E: =>
-                x: @x + @width() / 2
-                y: @y
-            W: =>
-                x: @x - @width() / 2
-                y: @y
+        @anchors = {}
+
+        @anchors[cardinal.N] = =>
+            x: @x
+            y: @y - @height() / 2
+
+        @anchors[cardinal.S] = =>
+            x: @x
+            y: @y + @height() / 2
+
+        @anchors[cardinal.E] = =>
+            x: @x + @width() / 2
+            y: @y
+
+        @anchors[cardinal.W] = =>
+            x: @x - @width() / 2
+            y: @y
 
         @handles =
             NE: =>
@@ -53,7 +57,7 @@ class Element extends Base
         normed
 
     anchor_list: ->
-        ['N', 'S', 'W', 'E']
+        [cardinal.N, cardinal.S, cardinal.W, cardinal.E]
 
     handle_list: ->
         l = []
@@ -94,7 +98,13 @@ class Element extends Base
         Math.max(@_height or 0, @txt_height())
 
     direction: (x, y) ->
-        angle_to_cardinal(atan2(y - @y, x - @x))
+        angle = atan2(y - @y, x - @x)
+        diff = Infinity
+        for anchor, pos of @anchors
+            if Math.abs(anchor + @_rotation - angle) < diff
+                min_anchor = anchor
+                diff = Math.abs(anchor + @_rotation  - angle)
+        min_anchor
 
     in: (rect) ->
         rect.x < @x < rect.x + rect.width and rect.y < @y < rect.y + rect.height

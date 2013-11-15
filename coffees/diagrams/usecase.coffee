@@ -4,11 +4,11 @@ class Actor extends Element
     constructor: ->
         super
 
-        @anchors.E = =>
+        @anchors[cardinal.E] = =>
             x: @x + (@width() - @super('txt_width')) / 2
             y: @y
 
-        @anchors.W = =>
+        @anchors[cardinal.W] = =>
             x: @x - (@width() - @super('txt_width')) / 2
             y: @y
 

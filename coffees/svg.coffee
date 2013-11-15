@@ -65,12 +65,6 @@ class Svg extends Base
             .exit()
             .remove()
 
-        @force = d3.layout.force()
-            .gravity(.2)
-            .linkDistance(100)
-            .charge(-5000)
-            .size([@width, @height])
-
         @svg.on("mousedown", (event) =>
             return if not d3.select(d3.event.target).classed('background') or d3.event.ctrlKey or d3.event.which is 2
             # return if diagram.dragging or d3.event.ctrlKey or d3.event.which is 2
@@ -139,6 +133,9 @@ class Svg extends Base
 
         ).on("mouseup", =>
             return if d3.event.ctrlKey
+            if diagram.linking.length
+                diagram.linking = []
+                @sync()
 
             if diagram.groupping
                 sel = @svg.select("rect.selection")
@@ -154,7 +151,7 @@ class Svg extends Base
                     grp._height = height
                     diagram.groups.push grp
                 diagram.groupping = false
-                @sync()
+                @sync(true)
 
             @svg.selectAll("rect.selection").remove()
             d3.event.preventDefault()
@@ -164,17 +161,6 @@ class Svg extends Base
         ).on("keyup", =>
             d3.select('.background').classed('move', false)
         )
-
-        @force
-            .on('tick', => @tick())
-            .on('end', =>
-                if not diagram.freemode
-                    for elt in diagram.nodes()
-                        elt.fixed = true
-                # Last adjustements
-                @tick()
-                generate_url()
-            )
 
     create: (svg) =>
         defs = svg
@@ -233,14 +219,11 @@ class Svg extends Base
             .attr('class', 'overlay')
 
 
-    sync: ->
+    sync: (persist=false) ->
         @zoom.scale(diagram.zoom.scale)
         @zoom.translate(diagram.zoom.translate)
         @zoom.event(d3.select('#bg'))
         @title.text(diagram.title)
-
-        @force.nodes(diagram.nodes())
-            .links(diagram.links)
 
         group = @svg.select('g.groups').selectAll('g.group').data(diagram.groups)
         element = @svg.select('g.elements').selectAll('g.element').data(diagram.elements)
@@ -257,23 +240,13 @@ class Svg extends Base
         group.exit().remove()
         element.exit().remove()
         link.exit().remove()
-
         @tick()
 
-        @force.start()
+        if persist
+            generate_url()
+
 
     tick: ->
-        need_force = false
-        for elt in diagram.nodes()
-            if not elt.fixed
-                need_force = true
-                break
-
-        need_force = need_force and (diagram.freemode or (@force.alpha() or 1) > .03)
-
-        if not need_force and not diagram.dragging
-            @force.stop()
-
         @svg.select('g.groups').selectAll('g.group').call(tick_node)
         @svg.select('g.elements').selectAll('g.element').call(tick_node)
         @svg.select('g.links').selectAll('g.link').call(tick_link)

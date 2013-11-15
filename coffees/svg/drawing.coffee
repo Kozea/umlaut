@@ -31,7 +31,7 @@ enter_node = (nodes, connect=true) ->
                 .call(mouse_anchor)
                 .call(anchor_link_drag))
 
-    g.call(force_drag(svg.force.drag()))
+    g.call(move_drag)
     g.call(mouse_node)
 
 
@@ -124,7 +124,6 @@ update_link = (links) ->
 tick_node = (nodes) ->
     nodes
         .attr("transform", ((node) -> "translate(#{node.x},#{node.y})rotate(#{to_svg_angle(node._rotation)})"))
-        .classed('moving', (node) -> not node.fixed)
         .classed('selected', (node) -> node in diagram.selection)
         .each((node) ->
             # Handles
@@ -148,18 +147,21 @@ tick_node = (nodes) ->
                          A #{s} #{s} 0 1 1 #{h.x} #{h.y - 2 * s}
                         ")
             # Anchors
-            s = s / 2
             d3.select(@)
                 .selectAll('.anchor')
                 .data(node.anchor_list())
+                .attr('transform', (anchor) ->
+                    a = node.anchors[anchor]()
+                    "rotate(#{to_svg_angle(anchor)}, #{a.x - node.x}, #{a.y - node.y})")
                 .attr('d', (anchor) ->
                     a = node.anchors[anchor]()
                     a.x -= node.x
                     a.y -= node.y
-                    signs = cardinal_to_direction anchor
-                    "M #{a.x + signs.x * s} #{a.y + s + signs.y * s}
-                     A #{s} #{s} 0 1 1 #{a.x + signs.x * s} #{a.y - s + signs.y * s}
-                     A #{s} #{s} 0 1 1 #{a.x + signs.x * s} #{a.y + s + signs.y * s}"))
+                    "M #{a.x} #{a.y}
+                     L #{a.x} #{a.y + s}
+                     L #{a.x + s} #{a.y}
+                     L #{a.x} #{a.y - s}
+                     z"))
 
 tick_link = (links) ->
     links
@@ -173,26 +175,26 @@ tick_link = (links) ->
         .select('text.start')
         .attr('transform', (link) -> "translate(#{link.a1.x}, #{link.a1.y})")
         .attr('dx', (link) ->
-            if link.d1 in ['N', 'E']
-                link.text_margin + @getBBox().width / 2
-            else
-                - (link.text_margin + @getBBox().width / 2))
+            # if link.d1 in ['N', 'E']
+            link.text_margin + @getBBox().width / 2)
+            # else
+                # - (link.text_margin + @getBBox().width / 2))
         .attr('dy', (link) ->
-            if link.d1 in ['N', 'E']
-                 - (@getBBox().height + link.text_margin)
-            else
-                link.text_margin)
+            # if link.d1 in ['N', 'E']
+            - (@getBBox().height + link.text_margin))
+            # else
+                # link.text_margin)
 
     links
         .select('text.end')
         .attr('transform', (link) -> "translate(#{link.a2.x}, #{link.a2.y})")
         .attr('dx', (link) ->
-            if link.d2 in ['N', 'E']
-                link.text_margin + @getBBox().width / 2
-            else
-                - (link.text_margin + @getBBox().width / 2))
+            # if link.d2 in ['N', 'E']
+            link.text_margin + @getBBox().width / 2)
+            # else
+                # - (link.text_margin + @getBBox().width / 2))
         .attr('dy', (link) ->
-            if link.d2 in ['N', 'E']
-                 - (@getBBox().height + link.text_margin)
-            else
-                link.text_margin)
+            # if link.d2 in ['N', 'E']
+            - (@getBBox().height + link.text_margin))
+            # else
+                # link.text_margin)

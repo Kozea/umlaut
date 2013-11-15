@@ -22,6 +22,12 @@ atan2 = (y, x) ->
 to_svg_angle = (a) ->
     to_deg mod2pi(a)
 
+cardinal =
+    N: 3 * pi / 2
+    S: pi / 2
+    W: pi
+    E: 0
+
 angle_to_cardinal = (a) ->
     if pi / 4 < a <= 3 * pi / 4
         return 'S'

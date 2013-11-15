@@ -18,8 +18,6 @@ class Diagram extends Base
             y: 25
             a: 22.5
 
-        @freemode = false
-
         @types = {}
         @selection = []
         @linking = []
@@ -61,7 +59,6 @@ class Diagram extends Base
         title: @title
         linkstyle: @linkstyle
         zoom: @zoom
-        freemode: @freemode
         elements: @elements.map (elt) -> elt.objectify()
         groups: @groups.map (grp) -> grp.objectify()
         links: @links.map (lnk) -> lnk.objectify()
@@ -76,12 +73,10 @@ class Diagram extends Base
             @linkstyle = obj.linkstyle
         if obj.zoom
             @zoom = obj.zoom
-        if obj.freemode
-            @freemode = obj.freemode
 
         for grp in (obj.groups or [])
             group_type = @group(grp.name)
-            group = new group_type(grp.x, grp.y, grp.text, grp.fixed)
+            group = new group_type(grp.x, grp.y, grp.text, false)
             group._width = grp.width or null
             group._height = grp.height or null
             group._rotation = grp.rotation or 0
@@ -89,7 +84,7 @@ class Diagram extends Base
 
         for elt in obj.elements
             element_type = @element(elt.name)
-            element = new element_type(elt.x, elt.y, elt.text, elt.fixed)
+            element = new element_type(elt.x, elt.y, elt.text, false)
             element._width = elt.width or null
             element._height = elt.height or null
             element._rotation = elt.rotation or 0

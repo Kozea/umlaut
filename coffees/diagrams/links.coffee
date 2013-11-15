@@ -45,50 +45,56 @@ class Link extends Base
         if undefined in [c1.x, c1.y, c2.x, c2.y]
             return 'M 0 0'
 
-        @d1 = @source_anchor or @source.direction(c2.x, c2.y)
-        @a1 = @source.rotate(@source.anchors[@d1]())
+        d1 = +if @source_anchor? and @source_anchor != null then @source_anchor else @source.direction(c2.x, c2.y)
+        @a1 = @source.rotate(@source.anchors[d1]())
 
-        @d2 = @target_anchor or @target.direction(@a1.x, @a1.y)
-        @a2 = @target.rotate(@target.anchors[@d2]())
-
-        @d1 = @source_anchor or @source.direction(@a2.x, @a2.y)
-        @a1 = @source.rotate(@source.anchors[@d1]())
-
-        @d2 = @target_anchor or @target.direction(@a1.x, @a1.y)
-        @a2 = @target.rotate(@target.anchors[@d2]())
+        d2 = +if @target_anchor? and @target_anchor != null then @target_anchor else @target.direction(@a1.x, @a1.y)
+        @a2 = @target.rotate(@target.anchors[d2]())
 
         path = "M #{@a1.x} #{@a1.y}"
-        vert = ['N', 'S']
-        horz = ['E', 'W']
 
-        if diagram.linkstyle == 'curve'
+        horizontal_1 = Math.abs(d1 % pi) < pi / 4
+        horizontal_2 = Math.abs(d2 % pi) < pi / 4
+
+        if diagram.linkstyle == 'demicurve'
             path = "#{path} C"
             m =
                 x: .5 * (@a1.x + @a2.x)
                 y: .5 * (@a1.y + @a2.y)
 
-            if @d1 in vert
-                path = "#{path} #{@a1.x} #{m.y}"
-            else
+            if horizontal_1
                 path = "#{path} #{m.x} #{@a1.y}"
-
-            if @d2 in vert
-                path = "#{path} #{@a2.x} #{m.y}"
             else
+                path = "#{path} #{@a1.x} #{m.y}"
+
+            if horizontal_2
                 path = "#{path} #{m.x} #{@a2.y}"
+            else
+                path = "#{path} #{@a2.x} #{m.y}"
         else if diagram.linkstyle == 'diagonal'
             path = "#{path} L"
         else if diagram.linkstyle == 'rectangular'
             path = "#{path} L"
-            if @d1 in vert and @d2 in horz
+            if not horizontal_1 and horizontal_2
                 path = "#{path} #{@a1.x} #{@a2.y} L"
-            else if @d1 in horz and @d2 in vert
+            else if horizontal_1 and not horizontal_2
                 path = "#{path} #{@a2.x} #{@a1.y} L"
-            else if @d1 in horz and @d2 in horz
+            else if horizontal_1 and horizontal_2
                 mid = @a1.x + .5 * (@a2.x - @a1.x)
                 path = "#{path} #{mid} #{@a1.y} L #{mid} #{@a2.y} L"
-            else if @d1 in vert and @d2 in vert
+            else if not horizontal_1 and not horizontal_2
                 mid = @a1.y + .5 * (@a2.y - @a1.y)
                 path = "#{path} #{@a1.x} #{mid} L #{@a2.x} #{mid} L"
+        else if diagram.linkstyle == 'curve'
+            path = "#{path} C"
+            d = dist(@a1, @a2) / 2
+
+            dx =  Math.cos(d1 + @source._rotation) * d
+            dy =  Math.sin(d1 + @source._rotation) * d
+            path = "#{path} #{@a1.x + dx} #{@a1.y + dy}"
+
+            dx =  Math.cos(d2 + @target._rotation) * d
+            dy =  Math.sin(d2 + @target._rotation) * d
+            path = "#{path} #{@a2.x + dx} #{@a2.y + dy}"
 
         "#{path} #{@a2.x} #{@a2.y}"

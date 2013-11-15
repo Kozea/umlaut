@@ -15,7 +15,7 @@ node_add = (type) =>
     if d3.event
         diagram.selection = [new_node]
 
-    svg.sync()
+    svg.sync(true)
 
     if d3.event
         # Hack to trigger d3 drag event on newly created element
@@ -69,7 +69,6 @@ commands =
                     ''), ((txt) ->
                 for node in diagram.selection
                     node.text = txt))
-            svg.sync()
         label: 'Edit elements text'
         glyph: 'edit'
         hotkey: 'e'
@@ -87,7 +86,7 @@ commands =
                     if node == lnk.source or node == lnk.target
                         diagram.links.splice(diagram.links.indexOf(lnk), 1)
             diagram.selection = []
-            svg.sync()
+            svg.sync(true)
         label: 'Remove elements'
         glyph: 'remove-sign'
         hotkey: 'del'
@@ -102,25 +101,23 @@ commands =
         glyph: 'fullscreen'
         hotkey: 'ctrl+a'
 
-    reorganize:
-        fun: ->
-            sel = if diagram.selection.length > 0 then diagram.selection else diagram.elements
-            for node in sel
-                node.fixed = false
-            svg.sync()
-        label: 'Reorganize'
-        glyph: 'th'
-        hotkey: 'r'
-
     freemode:
         fun: ->
-            for node in diagram.nodes()
-                node.fixed = diagram.freemode
-            if diagram.freemode
-                svg.force.stop()
-            else
-                svg.sync()
-            diagram.freemode = not diagram.freemode
+            if diagram.force
+                diagram.force.stop()
+                diagram.force = null
+                return
+
+            diagram.force = d3.layout.force()
+                .gravity(.7)
+                .linkDistance(200)
+                .charge((node) -> - node.width() * node.height())
+                .size([svg.width, svg.height])
+
+            diagram.force.on('tick', => svg.tick())
+            diagram.force.nodes(diagram.nodes()).links(diagram.links)
+            svg.sync()
+            diagram.force.start()
         label: 'Toggle free mode'
         glyph: 'send'
         hotkey: 'tab'
@@ -130,7 +127,8 @@ commands =
             diagram.linkstyle = switch diagram.linkstyle
                 when 'curve' then 'diagonal'
                 when 'diagonal' then 'rectangular'
-                when 'rectangular' then 'curve'
+                when 'rectangular' then 'demicurve'
+                when 'demicurve' then 'curve'
             svg.tick()
         label: 'Change link style'
         glyph: 'retweet'

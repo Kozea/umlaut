@@ -4,19 +4,19 @@ class IO extends Element
     constructor: ->
         super
 
-        @anchors.N = =>
+        @anchors[cardinal.N] = =>
             x: @x - @height() / 4
             y: @y - @height() / 2
 
-        @anchors.S = =>
+        @anchors[cardinal.S] = =>
             x: @x + @height() / 4
             y: @y + @height() / 2
 
-        @anchors.E = =>
+        @anchors[cardinal.E] = =>
             x: @x + @width() / 2 - @height() / 4
             y: @y
 
-        @anchors.W = =>
+        @anchors[cardinal.W] = =>
             x: @x - @width() / 2 + @height() / 4
             y: @y
 
@@ -60,11 +60,11 @@ class Delay extends Element
     constructor: ->
         super
 
-        @anchors.N = =>
+        @anchors[cardinal.N] = =>
             x: @x + @txt_x()
             y: @y - @height() / 2
 
-        @anchors.S = =>
+        @anchors[cardinal.S] = =>
             x: @x + @txt_x()
             y: @y + @height() / 2
 
@@ -178,11 +178,11 @@ class ManualInput extends Element
 
     constructor: ->
         super
-        @anchors.N = =>
+        @anchors[cardinal.N] = =>
             x: @x
             y: @y - @shift_height() / 2
 
-        @anchors.W = =>
+        @anchors[cardinal.W] = =>
             x: @x - @width() / 2
             y: @y + @shift_height() / 2
 

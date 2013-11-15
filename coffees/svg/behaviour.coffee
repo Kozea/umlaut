@@ -1,49 +1,57 @@
-force_drag = (force) ->
-    force
-        .on('dragstart', (node) ->
-            svg.svg.classed('dragging', true)
-            svg.svg.classed('translating', true)
-            return if d3.event.sourceEvent.which is 3 or d3.event.sourceEvent.ctrlKey
+move_drag = d3.behavior.drag()
+    .on('dragstart', (node) ->
+        return if d3.event.sourceEvent.which is not 1 or d3.event.sourceEvent.ctrlKey
+        svg.svg.classed('dragging', true)
+        svg.svg.classed('translating', true)
 
-            diagram.dragging = true
-        ).on("drag.force", (node) ->
-            return if not diagram.dragging or d3.event.sourceEvent.ctrlKey
+        diagram.dragging = true
+    ).on("drag", (node) ->
+        return if not diagram.dragging or d3.event.sourceEvent.ctrlKey
+        x = if diagram.force then 'px' else 'x'
+        y = if diagram.force then 'py' else 'y'
 
-            if not node in diagram.selection
-                diagram.selection.push node
+        if not node in diagram.selection
+            diagram.selection.push node
 
-            if d3.event.sourceEvent.shiftKey
-                delta =
-                    x: node.px - d3.event.x
-                    y: node.py - d3.event.y
-            else
-                delta =
-                    x: node.px - diagram.snap.x * Math.floor(d3.event.x / diagram.snap.x)
-                    y: node.py - diagram.snap.y * Math.floor(d3.event.y / diagram.snap.y)
+        for node in diagram.selection
+            node.fixed = true
 
-            for node in diagram.selection
-                node.px -= delta.x
-                node.py -= delta.y
+        if d3.event.sourceEvent.shiftKey
+            delta =
+                x: node[x] - d3.event.x
+                y: node[y] - d3.event.y
+        else
+            delta =
+                x: node[x] - diagram.snap.x * Math.floor(d3.event.x / diagram.snap.x)
+                y: node[y] - diagram.snap.y * Math.floor(d3.event.y / diagram.snap.y)
 
-            svg.force.resume()
-        ).on('dragend', (node) ->
-            svg.svg.classed('dragging', false)
-            svg.svg.classed('translating', false)
-            return if not diagram.dragging
-            diagram.dragging = false
-            if not $(d3.event.sourceEvent.target).closest('.inside').size()
-                if node in diagram.elements
-                    diagram.elements.splice(diagram.elements.indexOf(node), 1)
-                if node in diagram.groups
-                    diagram.groups.splice(diagram.groups.indexOf(node), 1)
-                if node in diagram.selection
-                    diagram.selection.splice(diagram.selection.indexOf(node), 1)
-                for lnk in diagram.links.slice()
-                    if node == lnk.source or node == lnk.target
-                        diagram.links.splice(diagram.links.indexOf(lnk), 1)
-                svg.sync()
-            if not diagram.freemode
-                node.fixed = true)
+        for node in diagram.selection
+            node[x] -= delta.x
+            node[y] -= delta.y
+
+        if diagram.force
+            diagram.force.resume()
+        else
+            svg.tick()
+    ).on('dragend', (node) ->
+        svg.svg.classed('dragging', false)
+        svg.svg.classed('translating', false)
+        return if not diagram.dragging
+        for node in diagram.nodes()
+            node.fixed = false
+
+        diagram.dragging = false
+        if not $(d3.event.sourceEvent.target).closest('.inside').size()
+            if node in diagram.elements
+                diagram.elements.splice(diagram.elements.indexOf(node), 1)
+            if node in diagram.groups
+                diagram.groups.splice(diagram.groups.indexOf(node), 1)
+            if node in diagram.selection
+                diagram.selection.splice(diagram.selection.indexOf(node), 1)
+            for lnk in diagram.links.slice()
+                if node == lnk.source or node == lnk.target
+                    diagram.links.splice(diagram.links.indexOf(lnk), 1)
+        svg.sync(true))
 
 nsweo_resize_drag = d3.behavior.drag()
     .on("dragstart", (handle) ->
@@ -52,10 +60,11 @@ nsweo_resize_drag = d3.behavior.drag()
         svg.svg.classed('resizing', true)
         node = d3.select($(@).closest('.element,.group').get(0)).data()[0]
         diagram._origin = mouse_xy svg.svg.node()
-        node.px = node.x
-        node.py = node.y
-        node.pwidth = node.width()
-        node.pheight = node.height()
+        node.ox = node.x
+        node.oy = node.y
+        node.owidth = node.width()
+        node.oheight = node.height()
+        node.fixed = true
         d3.event.sourceEvent.stopPropagation()
     ).on("drag", (handle) ->
         return if d3.event.ctrlKey
@@ -78,17 +87,18 @@ nsweo_resize_drag = d3.behavior.drag()
                 x: m.x - diagram._origin.x
                 y: m.y - diagram._origin.y
             delta = rotate delta, 2 * pi - node._rotation
-
+            x = if diagram.force then 'px' else 'x'
+            y = if diagram.force then 'py' else 'y'
 
             signs = cardinal_to_direction handle
-            node.width(node.pwidth + signs.x * delta.x)
-            node.height(node.pheight + signs.y * delta.y)
+            node.width(node.owidth + signs.x * delta.x)
+            node.height(node.oheight + signs.y * delta.y)
             shift =
-                x: signs.x * (node.width() - node.pwidth) / 2
-                y: signs.y * (node.height() - node.pheight) / 2
+                x: signs.x * (node.width() - node.owidth) / 2
+                y: signs.y * (node.height() - node.oheight) / 2
             shift = rotate shift, node._rotation
-            node.x = node.px + shift.x
-            node.y = node.py + shift.y
+            node[x] = node.ox + shift.x
+            node[y] = node.oy + shift.y
 
             nodes.select('.shape').attr('d', node.path())
             nodes.select('.ghost').attr('d', Rect::path.apply(node))
@@ -104,10 +114,9 @@ nsweo_resize_drag = d3.behavior.drag()
         svg.svg.classed('dragging', false)
         svg.svg.classed('resizing', false)
         node = d3.select($(@).closest('.element,.group').get(0)).data()[0]
-        node.px = node.x
-        node.py = node.y
-        node.pwidth = node.pheight = null
-        generate_url())
+        node.ox = node.oy = node.owidth = node.oheight = null
+        node.fixed = false
+        svg.sync(true))
 
 anchor_link_drag = d3.behavior.drag()
     .on("dragstart", (anchor) ->
@@ -119,7 +128,7 @@ anchor_link_drag = d3.behavior.drag()
         link = new type(node, diagram.mouse)
         link.source_anchor = anchor
         diagram.linking.push(link)
-        svg.sync()
+        svg.sync(true)
         d3.event.sourceEvent.stopPropagation()
     ).on("drag", (anchor) ->
         return if d3.event.ctrlKey
@@ -131,7 +140,7 @@ anchor_link_drag = d3.behavior.drag()
         svg.svg.classed('linking', false)
         node = d3.select($(@).closest('.element,.group').get(0)).data()[0]
         diagram.linking = []
-        svg.sync())
+        svg.sync(true))
 
 
 mouse_anchor = (anchor) ->
@@ -141,7 +150,7 @@ mouse_anchor = (anchor) ->
             d3.select(@).classed('active', true)
             node = d3.select($(@).closest('.element,.group').get(0)).data()[0]
             for lnk in diagram.linking
-                if lnk._drag == 'source'
+                if lnk._drag and lnk._drag == 'source'
                     lnk.source_anchor = anchor
                     lnk.source = node
                 else
@@ -151,7 +160,7 @@ mouse_anchor = (anchor) ->
             return if d3.event.ctrlKey
             d3.select(@).classed('active', false)
             for lnk in diagram.linking
-                if lnk._drag == 'source'
+                if lnk._drag and lnk._drag == 'source'
                     lnk.source_anchor = null
                     lnk.source = diagram.mouse
                 else
@@ -162,10 +171,10 @@ mouse_anchor = (anchor) ->
             node = d3.select($(@).closest('.element,.group').get(0)).data()[0]
             if diagram.linking.length
                 for lnk in diagram.linking
-                    if lnk.source != lnk.target
+                    if lnk.source != lnk.target and diagram.mouse not in [lnk.source, lnk.target]
                         diagram.links.push(lnk)
                 diagram.linking = []
-                svg.sync()
+                svg.sync(true)
                 d3.event.preventDefault())
 
 mouse_node = (node) ->
@@ -198,14 +207,14 @@ mouse_node = (node) ->
         .on("mousemove", (node) ->
             return if d3.event.ctrlKey
             for lnk in diagram.linking
-                if lnk._drag == 'source'
+                if lnk._drag and lnk._drag == 'source'
                     lnk.source = node
                 else
                     lnk.target = node)
         .on("mouseout", (node) ->
             return if d3.event.ctrlKey
             for lnk in diagram.linking
-                if lnk._drag == 'source'
+                if lnk._drag and lnk._drag == 'source'
                     lnk.source = diagram.mouse
                 else
                     lnk.target = diagram.mouse)
@@ -213,10 +222,10 @@ mouse_node = (node) ->
             return if d3.event.ctrlKey
             if diagram.linking.length
                 for lnk in diagram.linking
-                    if lnk.source != lnk.target
+                    if lnk.source != lnk.target and diagram.mouse not in [lnk.source, lnk.target]
                         diagram.links.push(lnk)
                 diagram.linking = []
-                svg.sync()
+                svg.sync(true)
                 d3.event.preventDefault())
         .on('dblclick', (node) ->
             return if d3.event.ctrlKey
@@ -269,4 +278,4 @@ link_drag = d3.behavior.drag()
         svg.svg.classed('dragging', false)
         svg.svg.classed('linking', false)
         diagram.linking = []
-        svg.sync())
+        svg.sync(true))
