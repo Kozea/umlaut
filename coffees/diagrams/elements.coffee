@@ -7,6 +7,7 @@ class Element extends Base
 
     constructor: (@x, @y, @text, @fixed=false) ->
         super
+        @ts = timestamp()
         @margin = x: 10, y: 5
         @_width = null
         @_height = null
@@ -127,3 +128,14 @@ class Mouse extends Element
     width: -> 1
     height: -> 1
     weight: 1
+
+    constructor: ->
+        super
+        @lasts = []
+        for i in [0..5]
+            @lasts.push x:0, y: 0
+
+    dynamic_rotation: ->
+        @_rotation = atan2(
+            @lasts.map((e) -> e.y).reduce(((e, l) -> e + l), 0)
+            @lasts.map((e) -> e.x).reduce(((e, l) -> e + l), 0))

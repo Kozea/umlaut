@@ -1,7 +1,7 @@
 enter_node = (nodes, connect=true) ->
     g = nodes
         .append('g')
-        .attr('class', (node) -> if node instanceof Group then 'group' else 'element')
+        .attr('class', (node) -> 'node ' + if node instanceof Group then 'group' else 'element')
     g.append('path').attr('class', 'ghost')
     g.append('path').attr('class', (node) -> "shape fill-#{node.cls.fill} stroke-#{node.cls.stroke}")
     g.append('text')
@@ -173,28 +173,18 @@ tick_link = (links) ->
 
     links
         .select('text.start')
-        .attr('transform', (link) -> "translate(#{link.a1.x}, #{link.a1.y})")
-        .attr('dx', (link) ->
-            # if link.d1 in ['N', 'E']
-            link.text_margin + @getBBox().width / 2)
-            # else
-                # - (link.text_margin + @getBBox().width / 2))
-        .attr('dy', (link) ->
-            # if link.d1 in ['N', 'E']
-            - (@getBBox().height + link.text_margin))
-            # else
-                # link.text_margin)
+        .attr('transform', (link) ->
+            pos =
+                x: link.text_margin + @getBBox().width / 2
+                y: - link.text_margin - @getBBox().width / 2
+            delta = rotate(pos, link.o1)
+            "translate(#{link.a1.x + delta.x}, #{link.a1.y + delta.y})")
 
     links
         .select('text.end')
-        .attr('transform', (link) -> "translate(#{link.a2.x}, #{link.a2.y})")
-        .attr('dx', (link) ->
-            # if link.d2 in ['N', 'E']
-            link.text_margin + @getBBox().width / 2)
-            # else
-                # - (link.text_margin + @getBBox().width / 2))
-        .attr('dy', (link) ->
-            # if link.d2 in ['N', 'E']
-            - (@getBBox().height + link.text_margin))
-            # else
-                # link.text_margin)
+        .attr('transform', (link) ->
+            pos =
+                x: link.text_margin + @getBBox().width / 2
+                y: - link.text_margin - @getBBox().height / 2
+            delta = rotate(pos, link.o2)
+            "translate(#{link.a2.x + delta.x}, #{link.a2.y + delta.y})")

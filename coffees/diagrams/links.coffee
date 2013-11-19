@@ -51,6 +51,9 @@ class Link extends Base
         d2 = +if @target_anchor? and @target_anchor != null then @target_anchor else @target.direction(@a1.x, @a1.y)
         @a2 = @target.rotate(@target.anchors[d2]())
 
+        @o1 = d1 + @source._rotation
+        @o2 = d2 + @target._rotation
+
         path = "M #{@a1.x} #{@a1.y}"
 
         horizontal_1 = Math.abs(d1 % pi) < pi / 4
@@ -89,12 +92,12 @@ class Link extends Base
             path = "#{path} C"
             d = dist(@a1, @a2) / 2
 
-            dx =  Math.cos(d1 + @source._rotation) * d
-            dy =  Math.sin(d1 + @source._rotation) * d
+            dx =  Math.cos(@o1) * d
+            dy =  Math.sin(@o1) * d
             path = "#{path} #{@a1.x + dx} #{@a1.y + dy}"
 
-            dx =  Math.cos(d2 + @target._rotation) * d
-            dy =  Math.sin(d2 + @target._rotation) * d
+            dx =  Math.cos(@o2) * d
+            dy =  Math.sin(@o2) * d
             path = "#{path} #{@a2.x + dx} #{@a2.y + dy}"
 
         "#{path} #{@a2.x} #{@a2.y}"

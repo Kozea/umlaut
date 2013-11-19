@@ -1,3 +1,5 @@
+order = (a, b) -> d3.ascending(a.ts, b.ts)
+
 node_add = (type) =>
     x = diagram.mouse.x
     y = diagram.mouse.y
@@ -20,7 +22,7 @@ node_add = (type) =>
     if d3.event
         # Hack to trigger d3 drag event on newly created element
         dom_node = null
-        svg.svg.selectAll('g.element,g.group').each((node) ->
+        svg.svg.selectAll('g.node').each((node) ->
             if node == new_node
                 dom_node = @)
         mouse_evt = document.createEvent('MouseEvent')

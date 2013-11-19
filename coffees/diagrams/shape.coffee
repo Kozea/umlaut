@@ -15,10 +15,11 @@ class ShapeDiagram extends Diagram
     label: ' Shapes Diagram'
 
     constructor: ->
-       super
-       @types =
-           elements: [rectangle, ellipsis, lozenge, note]
-           groups: []
-           links: uml_links
+        super
+        @linkstyle = 'curve'
+        @types =
+            elements: [rectangle, ellipsis, lozenge, note]
+            groups: []
+            links: uml_links
 
 Diagram.diagrams['ShapeDiagram'] = ShapeDiagram

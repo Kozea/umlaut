@@ -3,7 +3,7 @@ class Electric extends Element
     @rotationable: true
 
     anchor_list: ->
-        ['W', 'E']
+        [cardinal.W, cardinal.E]
 
     base_height: ->
         20
@@ -28,6 +28,7 @@ class Electric extends Element
 
 
 class Node extends Electric
+    @fill: 'fg'
 
     constructor: ->
         super
@@ -42,7 +43,7 @@ class Node extends Electric
         super() / 4
 
     anchor_list: ->
-        ['N', 'S', 'W', 'E']
+        [cardinal.N, cardinal.S, cardinal.W, cardinal.E]
 
     path: ->
         w2 = @width() / 2
@@ -50,7 +51,7 @@ class Node extends Electric
         "M 0 #{-h2}
          A #{w2} #{h2} 0 0 1 0 #{h2}
          A #{w2} #{h2} 0 0 1 0 #{-h2}
-        "
+            "
 
 class Resistor extends Electric
     @fill: 'none'
@@ -118,6 +119,110 @@ class Battery extends Electric
          L #{w2} 0
         "
 
+class Transistor extends Electric
+
+    constructor: ->
+        super
+        @anchors[cardinal.N] = =>
+            x: @x + (@width() / 2 - @wire_margin()) * .6
+            y: @y - @height() / 2
+
+        @anchors[cardinal.S] = =>
+            x: @x + (@width() / 2 - @wire_margin()) * .6
+            y: @y + @height() / 2
+
+    base_width: ->
+        2 * @_base_width() + 2 * @wire_margin()
+
+    base_height: ->
+        2 * super() + 2 * @wire_margin()
+
+    anchor_list: ->
+        [cardinal.W, cardinal.N, cardinal.S]
+
+    wire_margin: ->
+        super()
+
+    path: ->
+        w2 = @width() / 2
+        h2 = @height() / 2
+
+        lw2 = w2 - @wire_margin()
+        lh2 = h2 - @wire_margin()
+
+        wI = lw2 / 4
+        hI = lh2 * .6
+        hv = hI / 2
+        ww = lw2 * .6
+        hw = lh2 * .8
+
+        "
+         M #{-w2} 0
+         L #{-lw2} 0
+         A #{lw2} #{lw2} 0 1 1 #{lw2} 0
+         A #{lw2} #{lw2} 0 1 1 #{-lw2} 0
+         L #{-wI} 0
+         M #{-wI} #{-hI}
+         L #{-wI} #{hI}
+
+         M #{-wI} #{-hv}
+         L #{ww} #{-hw}
+         M #{ww} #{-hw}
+         L #{ww} #{-h2}
+
+         M #{-wI} #{hv}
+         L #{ww} #{hw}
+         L #{ww} #{h2}
+        "
+
+class PNPTransistor extends Transistor
+    path: ->
+        w2 = @width() / 2
+        h2 = @height() / 2
+
+        lw2 = w2 - @wire_margin()
+        lh2 = h2 - @wire_margin()
+
+        ww = lw2 * .6
+        hw = lh2 * .8
+
+        wa = lw2 * .1
+        ha = lh2 * .7
+
+        wb = lw2 * .3
+        hb = lh2 * .4
+
+        "#{super()}
+        M #{ww} #{-hw}
+        L #{wa} #{-ha}
+        M #{ww} #{-hw}
+        L #{wb} #{-hb}
+        "
+
+class NPNTransistor extends Transistor
+    path: ->
+        w2 = @width() / 2
+        h2 = @height() / 2
+
+        lw2 = w2 - @wire_margin()
+        lh2 = h2 - @wire_margin()
+
+        ww = lw2 * .6
+        hw = lh2 * .8
+
+        wa = lw2 * .1
+        ha = lh2 * .7
+
+        wb = lw2 * .3
+        hb = lh2 * .4
+
+        "#{super()}
+        M #{ww} #{hw}
+        L #{wa} #{ha}
+        M #{ww} #{hw}
+        L #{wb} #{hb}
+        "
+
 class Wire extends Link
 
     path: ->
@@ -147,7 +252,7 @@ class ElectricDiagram extends Diagram
     constructor: ->
        super
        @types =
-           elements: [Diode, Resistor, Node, Battery]
+           elements: [Diode, Resistor, Node, Battery, NPNTransistor, PNPTransistor]
            groups: []
            links: [Wire]
 

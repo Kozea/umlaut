@@ -63,3 +63,6 @@ cardinal_to_direction = (c) ->
         when 'NE'
             x: 1
             y: -1
+
+timestamp = ->
+    new Date().getTime()

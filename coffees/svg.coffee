@@ -89,6 +89,13 @@ class Svg extends Base
         d3.select(window).on("mousemove", =>
             return if d3.event.ctrlKey
             mouse = mouse_xy(@svg.node())
+            diagram.mouse.lasts.push
+                x: diagram.mouse.x - mouse.x
+                y: diagram.mouse.y - mouse.y
+
+            diagram.mouse.dynamic_rotation()
+            diagram.mouse.lasts.shift()
+
             diagram.mouse.x = mouse.x
             diagram.mouse.y = mouse.y
 
@@ -120,7 +127,7 @@ class Svg extends Base
 
                 sel.attr rect
 
-                @svg.selectAll('g.element,g.group').each((elt) ->
+                @svg.selectAll('g.node').each((elt) ->
                     g = d3.select @
                     selected = elt in diagram.selection
                     if elt.in(rect) and not selected
@@ -151,7 +158,7 @@ class Svg extends Base
                     grp._height = height
                     diagram.groups.push grp
                 diagram.groupping = false
-                @sync(true)
+                @sync()
 
             @svg.selectAll("rect.selection").remove()
             d3.event.preventDefault()
@@ -225,8 +232,8 @@ class Svg extends Base
         @zoom.event(d3.select('#bg'))
         @title.text(diagram.title)
 
-        group = @svg.select('g.groups').selectAll('g.group').data(diagram.groups)
-        element = @svg.select('g.elements').selectAll('g.element').data(diagram.elements)
+        group = @svg.select('g.groups').selectAll('g.group').data(diagram.groups.sort(order))
+        element = @svg.select('g.elements').selectAll('g.element').data(diagram.elements.sort(order))
         link = @svg.select('g.links').selectAll('g.link').data(diagram.links.concat(diagram.linking))
 
         group.enter().call(enter_node)
@@ -240,6 +247,7 @@ class Svg extends Base
         group.exit().remove()
         element.exit().remove()
         link.exit().remove()
+
         @tick()
 
         if persist
