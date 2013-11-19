@@ -42,7 +42,7 @@ class Link extends Base
     path: ->
         c1 = @source.pos()
         c2 = @target.pos()
-        if undefined in [c1.x, c1.y, c2.x, c2.y]
+        if null in [c1, c2] or undefined in [c1.x, c1.y, c2.x, c2.y]
             return 'M 0 0'
 
         d1 = +if @source_anchor? and @source_anchor != null then @source_anchor else @source.direction(c2.x, c2.y)

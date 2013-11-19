@@ -12,7 +12,7 @@ node_add = (type) =>
         diagram.last_types.element = type
 
     nth = set.filter((node) -> node instanceof type).length + 1
-    new_node = new type(x, y, "#{type.name} ##{nth}", not diagram.freemode)
+    new_node = new type(x, y, "#{type.name} ##{nth}", not diagram.force)
     set.push(new_node)
     if d3.event
         diagram.selection = [new_node]
@@ -103,24 +103,15 @@ commands =
         glyph: 'fullscreen'
         hotkey: 'ctrl+a'
 
-    freemode:
+    force:
         fun: ->
             if diagram.force
                 diagram.force.stop()
                 diagram.force = null
                 return
+            diagram.start_force()
 
-            diagram.force = d3.layout.force()
-                .gravity(.7)
-                .linkDistance(200)
-                .charge((node) -> - node.width() * node.height())
-                .size([svg.width, svg.height])
-
-            diagram.force.on('tick', => svg.tick())
-            diagram.force.nodes(diagram.nodes()).links(diagram.links)
-            svg.sync()
-            diagram.force.start()
-        label: 'Toggle free mode'
+        label: 'Toggle force'
         glyph: 'send'
         hotkey: 'tab'
 

@@ -30,6 +30,18 @@ class Diagram extends Base
         @dragging = false
         @groupping = false
 
+    start_force: ->
+        @force = d3.layout.force()
+            .gravity(.7)
+            .linkDistance(200)
+            .charge((node) -> - node.width() * node.height())
+            .size([svg.width, svg.height])
+
+        @force.on('tick', => svg.tick())
+        @force.nodes(@nodes()).links(@links)
+        svg.sync()
+        @force.start()
+
     markers: ->
         markers = {}
         for type in @types.links
@@ -62,6 +74,7 @@ class Diagram extends Base
         elements: @elements.map (elt) -> elt.objectify()
         groups: @groups.map (grp) -> grp.objectify()
         links: @links.map (lnk) -> lnk.objectify()
+        force: if @force then true else false
 
     hash: ->
         btoa(unescape(encodeURIComponent(JSON.stringify(@objectify()))))
@@ -96,3 +109,6 @@ class Diagram extends Base
             link.source_anchor = lnk.source_anchor
             link.target_anchor = lnk.target_anchor
             @links.push(link)
+
+        if obj.force
+            @start_force()

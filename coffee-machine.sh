@@ -17,4 +17,5 @@ coffee -wcb -j umlaut.js -o javascripts/ \
     coffees/svg/*.coffee                 \
     coffees/svg.coffee                   \
     coffees/storage/*.coffee             \
+    coffees/lang/*.coffee                \
     coffees/init.coffee                  \

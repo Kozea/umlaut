@@ -48,6 +48,8 @@ class Element extends Base
                 y: - @height() / 2
 
     rotate: (pos, direct=true) ->
+        if undefined in [pos.x, pos.y]
+            return null
         ang = if direct then @_rotation else 2 * pi - @_rotation
         normed =
             x: pos.x - @x

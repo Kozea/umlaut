@@ -153,7 +153,7 @@ class Svg extends Base
                 type = diagram.last_types.group or diagram.types.groups[0]
                 if type
                     nth = diagram.groups.filter((grp) -> grp instanceof type).length + 1
-                    grp = new type(x + width / 2, y + height / 2, "#{type.name} ##{nth}", not diagram.freemode)
+                    grp = new type(x + width / 2, y + height / 2, "#{type.name} ##{nth}", not diagram.force)
                     grp._width = width
                     grp._height = height
                     diagram.groups.push grp

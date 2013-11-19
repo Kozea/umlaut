@@ -155,6 +155,8 @@ tick_node = (nodes) ->
                     "rotate(#{to_svg_angle(anchor)}, #{a.x - node.x}, #{a.y - node.y})")
                 .attr('d', (anchor) ->
                     a = node.anchors[anchor]()
+                    if undefined in [a.x, a.y]
+                        return 'M 0 0'
                     a.x -= node.x
                     a.y -= node.y
                     "M #{a.x} #{a.y}
