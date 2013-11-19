@@ -3398,7 +3398,6 @@ tokenize = function(s) {
       token = new Number(parseFloat(id));
     }
     if (token) {
-      console.log(token);
       tokens.push(token);
     }
   }
@@ -3509,27 +3508,25 @@ parse = function(tokens) {
   parse_attribute = function() {
     var left, right;
     if (tokens[pos] instanceof Brace && tokens[pos].value === ']') {
-      pos++;
-      if (tokens[pos] instanceof Brace && tokens[pos].value === '[') {
-        pos++;
+      if (tokens[pos + 1] instanceof Brace && tokens[pos + 1].value === '[') {
+        pos += 2;
       } else {
         return null;
       }
     }
-    if (!token[pos] instanceof Id) {
-      throw "Invalid left hand side of attribute '" + token[pos].value + "'";
+    if (!tokens[pos] instanceof Id) {
+      throw "Invalid left hand side of attribute '" + tokens[pos].value + "'";
     }
-    left = token[pos].value;
+    left = tokens[pos].value;
     pos++;
-    if (!token[pos] instanceof Assign) {
-      throw "Invalid assignement '" + token[pos].value + "'";
+    if (!tokens[pos] instanceof Assign) {
+      throw "Invalid assignement '" + tokens[pos].value + "'";
     }
     pos++;
-    if (!token[pos] instanceof Id) {
-      throw "Invalid right hand side of attribute '" + token[pos].value + "'";
+    if (!tokens[pos] instanceof Id) {
+      throw "Invalid right hand side of attribute '" + tokens[pos].value + "'";
     }
-    right = token[pos].value;
-    pos++;
+    right = tokens[pos].value;
     return new Attribute(left, right);
   };
   parse_attribute_list = function() {
@@ -3570,7 +3567,7 @@ parse = function(tokens) {
         node = parse_subgraph();
       } else {
         if (!tokens[pos] instanceof Id) {
-          throw "Invalid edge id '" + token[pos].value + "'";
+          throw "Invalid edge id '" + tokens[pos].value + "'";
         }
         node = new Node(tokens[pos].value);
       }
@@ -3599,7 +3596,7 @@ parse = function(tokens) {
       if (tokens[pos] instanceof Assign) {
         pos++;
         if (!tokens[pos] instanceof Id) {
-          throw "Invalid right hand side of attribute '" + token[pos].value + "'";
+          throw "Invalid right hand side of attribute '" + tokens[pos].value + "'";
         }
         statement = new Attribute(id, tokens[pos++].value);
         return statement;

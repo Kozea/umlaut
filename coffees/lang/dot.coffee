@@ -71,9 +71,7 @@ tokenize = (s) ->
             token = new Number(parseFloat(id))
 
         if token
-            console.log token
             tokens.push(token)
-
     tokens
 
 
@@ -127,23 +125,21 @@ parse = (tokens) ->
 
     parse_attribute = ->
         if tokens[pos] instanceof Brace and tokens[pos].value == ']'
-            pos++
             # Concatenate multiple lists
-            if tokens[pos] instanceof Brace and tokens[pos].value == '['
-                pos++
+            if tokens[pos+1] instanceof Brace and tokens[pos+1].value == '['
+                pos+=2
             else
                 return null
-        if not token[pos] instanceof Id
-            throw "Invalid left hand side of attribute '#{token[pos].value}'"
-        left = token[pos].value
+        if not tokens[pos] instanceof Id
+            throw "Invalid left hand side of attribute '#{tokens[pos].value}'"
+        left = tokens[pos].value
         pos++
-        if not token[pos] instanceof Assign
-            throw "Invalid assignement '#{token[pos].value}'"
+        if not tokens[pos] instanceof Assign
+            throw "Invalid assignement '#{tokens[pos].value}'"
         pos++
-        if not token[pos] instanceof Id
-            throw "Invalid right hand side of attribute '#{token[pos].value}'"
-        right = token[pos].value
-        pos++
+        if not tokens[pos] instanceof Id
+            throw "Invalid right hand side of attribute '#{tokens[pos].value}'"
+        right = tokens[pos].value
         new Attribute(left, right)
 
     parse_attribute_list = ->
@@ -177,7 +173,7 @@ parse = (tokens) ->
                 node = parse_subgraph()
             else
                 if not tokens[pos] instanceof Id
-                    throw "Invalid edge id '#{token[pos].value}'"
+                    throw "Invalid edge id '#{tokens[pos].value}'"
                 node = new Node(tokens[pos].value)
             node_list.push(node)
             pos++
@@ -201,7 +197,7 @@ parse = (tokens) ->
             if tokens[pos] instanceof Assign
                 pos++
                 if not tokens[pos] instanceof Id
-                    throw "Invalid right hand side of attribute '#{token[pos].value}'"
+                    throw "Invalid right hand side of attribute '#{tokens[pos].value}'"
                 statement = new Attribute(id, tokens[pos++].value)
                 return statement
             else
