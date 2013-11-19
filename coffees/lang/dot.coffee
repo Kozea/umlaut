@@ -13,7 +13,8 @@ class Token
 
 class Keyword extends Token
 class Id extends Token
-class Number extends Token
+class Number extends Id
+class QuotedId extends Id
 class Brace extends Token
 class Delimiter extends Token
 class Assign extends Token
@@ -55,7 +56,7 @@ tokenize = (s) ->
         else if chr.match(/\w/)
             id = chr
 
-            while (chr = s[pos++]).match(/\w|\d/)
+            while (chr = s[pos++])?.match(/\w|\d/)
                 id += chr
             pos--
             if id in KEYWORDS
@@ -63,12 +64,43 @@ tokenize = (s) ->
             else
                 token = new Id(id)
 
+        # Quoted id
+        else if chr == '"'
+            id = ''
+            escape = false
+            while ((chr = s[pos++]) != '"' or escape) and chr?
+                if chr == '\\' and not escape
+                    escape = true
+                    continue
+
+                if escape
+                    if chr == 'n'
+                        chr = '\n'
+                    else if chr == 't'
+                        chr = '\t'
+                    else if chr == 'r'
+                        chr = '\r'
+                    else if chr == '"'
+                        chr = '"'
+                    else if chr == '\\'
+                        chr = '\\'
+                    else if chr == '\n'
+                        chr = ''
+
+                id += chr
+                escape = false
+
+            token = new QuotedId(id)
+
         # Number
         else if chr.match(/\d|\./)
             id = chr
-            while (chr = s[pos++]).match(/\d|\./)
+            while (chr = s[pos++])?.match(/\d|\./)
                 id += chr
             token = new Number(parseFloat(id))
+
+        else
+            throw "Syntax error #{chr} at #{pos}"
 
         if token
             tokens.push(token)
@@ -211,7 +243,8 @@ parse = (tokens) ->
 
             if tokens[pos] instanceof Brace and tokens[pos].value == '['
                 statement.attributes = parse_attribute_list()
-
+        else
+            throw "Unexpected statement"
         statement
 
     # Populate graph statements list
@@ -233,6 +266,9 @@ parse = (tokens) ->
 
     graph = new Graph(type, id, strict)
     graph.statements = parse_statement_list()
+    if ++pos != tokens.length
+        throw "Error in dot file, parsed #{pos} elements out of #{tokens.length}"
+
     window.g = graph
 
 
