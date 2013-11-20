@@ -311,7 +311,7 @@ dot_lex = (tokens) ->
 
 dot = (src) ->
     mknode = (l) ->
-        new rectangle(undefined, undefined, l)
+        new rectangle(undefined, undefined, l.toString())
 
     tokens = dot_tokenize src
     graph = dot_lex tokens

@@ -3735,7 +3735,7 @@ dot_lex = function(tokens) {
 dot = function(src) {
   var d, graph, link_type, mknode, nodes_by_id, populate, tokens;
   mknode = function(l) {
-    return new rectangle(void 0, void 0, l);
+    return new rectangle(void 0, void 0, l.toString());
   };
   tokens = dot_tokenize(src);
   graph = dot_lex(tokens);
