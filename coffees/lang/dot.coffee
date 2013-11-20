@@ -20,7 +20,7 @@ class Delimiter extends Token
 class Assign extends Token
 class Operator extends Token
 
-tokenize = (s) ->
+dot_tokenize = (s) ->
     pos = 0
     len = s.length
     tokens = []
@@ -100,7 +100,7 @@ tokenize = (s) ->
             token = new Number(parseFloat(id))
 
         else
-            throw "Syntax error #{chr} at #{pos}"
+            throw "[Dot Tokenizer] Syntax error in dot #{chr} at #{pos}"
 
         if token
             tokens.push(token)
@@ -132,7 +132,7 @@ class Attributes extends Statement
     constructor: (@type) ->
         @attributes = []
 
-parse = (tokens) ->
+parse_dot_tokens = (tokens) ->
     pos = 0
     level = 0
     if not tokens[pos] instanceof Keyword
@@ -157,8 +157,8 @@ parse = (tokens) ->
 
     parse_attribute = ->
         if tokens[pos] instanceof Brace and tokens[pos].value == ']'
-            # Concatenate multiple lists
             if tokens[pos+1] instanceof Brace and tokens[pos+1].value == '['
+                # Concatenate multiple lists by skipping both
                 pos+=2
             else
                 return null
@@ -185,38 +185,48 @@ parse = (tokens) ->
                 break
             else
                 attributes.push attribute
-                if tokens[++pos] instanceof Delimiter and tokens[pos].value == ','
+                if tokens[pos+1] instanceof Delimiter and tokens[pos+1].value == ','
                     pos++
         attributes
 
     parse_subgraph = ->
         id = null
-        if tokens[++pos] instanceof Id
-            id = tokens[pos++].value
+        if tokens[pos] instanceof Keyword and tokens[pos].value == 'subgraph'
+            pos++
+            if tokens[pos] instanceof Id
+                id = tokens[pos++].value
 
         subgraph = new SubGraph(id)
         subgraph.statements = parse_statement_list()
         subgraph
 
-    parse_edge_node_list = (first_elt) ->
-        node_list = [first_elt]
+    parse_node = ->
+        if tokens[pos] instanceof Keyword and tokens[pos].value == 'subgraph'
+            node = parse_subgraph()
+        else if tokens[pos] instanceof Brace and tokens[pos].value == '{'
+            node = parse_subgraph()
+        else
+            if not tokens[pos] instanceof Id
+                throw "Invalid edge id '#{tokens[pos].value}'"
+
+    parse_node_list = ->
+        node_list = []
+
         while tokens[pos] instanceof Operator
-            if tokens[++pos].value == 'subgraph'
-                node = parse_subgraph()
-            else
-                if not tokens[pos] instanceof Id
-                    throw "Invalid edge id '#{tokens[pos].value}'"
-                node = new Node(tokens[pos].value)
+            parse_node()
+            node = new Node(tokens[pos].value)
             node_list.push(node)
-            pos++
         node_list
 
     parse_statement = ->
         if tokens[pos] instanceof Brace and tokens[pos].value == '}'
             return null
-        if tokens[pos] instanceof Keyword
+        if tokens[pos] instanceof Brace and tokens[pos].value == '{'
+            statement = parse_subgraph()
+        else if tokens[pos] instanceof Keyword
             # Subgraph
             if tokens[pos].value == 'subgraph'
+                pos++
                 statement = parse_subgraph()
             else if tokens[pos].value in ['graph', 'node', 'edge']
                 statement = new Attributes(tokens[pos].value)
@@ -225,26 +235,20 @@ parse = (tokens) ->
             else
                 throw 'Unexpected keyword ' + tokens[pos]
         else if tokens[pos] instanceof Id
-            id = tokens[pos++].value
-            if tokens[pos] instanceof Assign
-                pos++
+            if tokens[pos+1] instanceof Assign
+                pos+=2
                 if not tokens[pos] instanceof Id
                     throw "Invalid right hand side of attribute '#{tokens[pos].value}'"
-                statement = new Attribute(id, tokens[pos++].value)
+                statement = new Attribute(id, tokens[pos].value)
                 return statement
-            else
-                statement = new Node(id)
 
-            if tokens[pos] instanceof Operator
-                # Statement is a edge
-                node = statement
-                statement = new Edge()
-                statement.node_list = parse_edge_node_list(node)
+            statement = new Edge()
+            statement.node_list = parse_node_list()
 
-            if tokens[pos] instanceof Brace and tokens[pos].value == '['
+            if tokens[pos+1] instanceof Brace and tokens[pos+1].value == '['
                 statement.attributes = parse_attribute_list()
         else
-            throw "Unexpected statement"
+            throw "Unexpected statement '#{tokens[pos].value}'"
         statement
 
     # Populate graph statements list
@@ -257,16 +261,17 @@ parse = (tokens) ->
         while true
             statement = parse_statement()
             if statement == null
+                pos++
                 break
             else
                 statements.push statement
-                if tokens[++pos] instanceof Delimiter and tokens[pos].value == ';'
+                if tokens[pos] instanceof Delimiter and tokens[pos].value == ';'
                     pos++
         statements
 
     graph = new Graph(type, id, strict)
     graph.statements = parse_statement_list()
-    if ++pos != tokens.length
+    if pos != tokens.length
         throw "Error in dot file, parsed #{pos} elements out of #{tokens.length}"
 
     window.g = graph
@@ -276,14 +281,15 @@ dot = (src) ->
     mknode = (l) ->
         new rectangle(undefined, undefined, l)
 
-    tokens = tokenize src
-    graph = parse tokens
+    tokens = dot_tokenize src
+    graph = parse_dot_tokens tokens
 
     d = window.diagram = new ShapeDiagram()
     window.svg = new Svg()
 
     nodes_by_id = {}
     d.title = graph.id
+    link_type = if graph.type == 'directed' then blackarrow else bare_link
     for statement in graph.statements
         if statement instanceof Node
             if statement.id not of nodes_by_id
@@ -298,7 +304,7 @@ dot = (src) ->
                     nodes_by_id[edge.id] = node
 
                 if i != 0
-                    link = new blackarrow(nodes_by_id[statement.node_list[i - 1].id], nodes_by_id[edge.id])
+                    link = new link_type(nodes_by_id[statement.node_list[i - 1].id], nodes_by_id[edge.id])
                     d.links.push link
 
     d.force = true

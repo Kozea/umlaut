@@ -1,4 +1,6 @@
 $ =>
+    if location.pathname != '/'
+        return
     list_diagrams()
 
     $('.dot2umlaut').click(->

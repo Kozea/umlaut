@@ -22,10 +22,19 @@ class CoffeeScript(Process):
         call(['./coffee-machine.sh'], shell=True)
 
 
+class CoffeeScriptTest(Process):
+    daemon = True
+
+    def run(self):
+        call(['./coffee-test-machine.sh'], shell=True)
+
+
 print('Lauching compass')
 Compass().start()
-print('Lauching compass')
+print('Lauching coffee')
 CoffeeScript().start()
+print('Lauching coffee for tests')
+CoffeeScriptTest().start()
 
 print('Lauching http server')
 server = ThreadedHTTPServer(('localhost', 1212), SimpleHTTPRequestHandler)
