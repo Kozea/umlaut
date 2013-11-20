@@ -11,6 +11,7 @@ end = ->
     ok not tok[i]?
 
 test("simple tokenization", ->
+    i = 0
     tok = dot_tokenize 'graph {}'
     node Keyword, 'graph'
     node Brace, '{'
@@ -124,14 +125,14 @@ test("tokenization with comments", ->
     i = 0
     tok = dot_tokenize(
         """graph graphname {
-             // This attribute applies to the graph itself
-             size=\"1,1\";
+             // This attribute applies /to the graph itself
+             size=\"1,1\"; /* size to 1,1 */
              // The label attribute can be used to change the label of a node
-             a [label=\"Foo\"];
-             # Here, the node shape is changed.
-             b [shape=box];
+             a [label=\"Foo\"]; // label to Foo
+             # Here, the node /shape is changed.
+             b [shape=box]; # Shape to box
              /* These edges both
-                have different line
+                have different /line
                 properties
              */
              a -- b -- c [color=blue];
@@ -178,5 +179,6 @@ test("tokenization with comments", ->
     node Id, 'dotted'
     node Brace, ']'
     node Delimiter, ';'
+    node Brace, '}'
     end()
 )

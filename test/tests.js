@@ -17,6 +17,7 @@ end = function() {
 };
 
 test("simple tokenization", function() {
+  i = 0;
   tok = dot_tokenize('graph {}');
   node(Keyword, 'graph');
   node(Brace, '{');
@@ -106,7 +107,7 @@ test("tokenization with attributes", function() {
 
 test("tokenization with comments", function() {
   i = 0;
-  tok = dot_tokenize("graph graphname {\n    // This attribute applies to the graph itself\n    size=\"1,1\";\n    // The label attribute can be used to change the label of a node\n    a [label=\"Foo\"];\n    # Here, the node shape is changed.\n    b [shape=box];\n    /* These edges both\n       have different line\n       properties\n    */\n    a -- b -- c [color=blue];\n    b -- d [style=dotted];\n}");
+  tok = dot_tokenize("graph graphname {\n    // This attribute applies /to the graph itself\n    size=\"1,1\"; /* size to 1,1 */\n    // The label attribute can be used to change the label of a node\n    a [label=\"Foo\"]; // label to Foo\n    # Here, the node /shape is changed.\n    b [shape=box]; # Shape to box\n    /* These edges both\n       have different /line\n       properties\n    */\n    a -- b -- c [color=blue];\n    b -- d [style=dotted];\n}");
   node(Keyword, 'graph');
   node(Id, 'graphname');
   node(Brace, '{');
@@ -148,5 +149,6 @@ test("tokenization with comments", function() {
   node(Id, 'dotted');
   node(Brace, ']');
   node(Delimiter, ';');
+  node(Brace, '}');
   return end();
 });

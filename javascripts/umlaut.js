@@ -3369,16 +3369,23 @@ Operator = (function(_super) {
 })(Token);
 
 dot_tokenize = function(s) {
-  var chr, escape, id, last_chr, len, op, pos, token, tokens, _ref55, _ref56;
+  var chr, col, escape, id, last_chr, len, op, pos, row, token, tokens, _ref55, _ref56;
   pos = 0;
+  row = 0;
+  col = 0;
   len = s.length;
   tokens = [];
   last_chr = chr = null;
   while (pos < len) {
     last_chr = chr;
     token = null;
+    col++;
     chr = s[pos++];
     if (chr.match(/\s/)) {
+      if (chr === '\n') {
+        row++;
+        col = 0;
+      }
       continue;
     } else if (chr === '=') {
       token = new Assign(chr);
@@ -3435,8 +3442,29 @@ dot_tokenize = function(s) {
         id += chr;
       }
       token = new Number(parseFloat(id));
+    } else if (chr.match(/\/|\#/)) {
+      if (chr === '/' && s[pos] === '*') {
+        pos += 2;
+        while (!((chr = s[pos]) === '*' && s[pos + 1] === '/') && (chr != null)) {
+          if (chr === '\n') {
+            row++;
+            col = 0;
+          } else {
+            col++;
+          }
+          pos++;
+        }
+        pos += 2;
+      } else {
+        if (chr === '#' || (chr === '/' && s[pos] === '/')) {
+          while (!((chr = s[pos]) === '\n') && (chr != null)) {
+            col++;
+            pos++;
+          }
+        }
+      }
     } else {
-      throw "[Dot Tokenizer] Syntax error in dot " + chr + " at " + pos;
+      throw "[Dot Tokenizer] Syntax error in dot " + chr + " at " + row + ", " + col;
     }
     if (token) {
       tokens.push(token);

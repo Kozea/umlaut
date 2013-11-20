@@ -22,6 +22,9 @@ class Operator extends Token
 
 dot_tokenize = (s) ->
     pos = 0
+    row = 0
+    col = 0
+
     len = s.length
     tokens = []
     last_chr = chr = null
@@ -29,10 +32,14 @@ dot_tokenize = (s) ->
     while pos < len
         last_chr = chr
         token = null
+        col++
         chr = s[pos++]
 
         # Space
         if chr.match(/\s/)
+            if chr == '\n'
+                row++
+                col = 0
             continue
 
         # Assign
@@ -99,8 +106,26 @@ dot_tokenize = (s) ->
                 id += chr
             token = new Number(parseFloat(id))
 
+        # Comment
+        else if chr.match(/\/|\#/)
+            if chr == '/' and s[pos] == '*'
+                # Multiline comment
+                pos+=2
+                while not ((chr = s[pos]) == '*' and s[pos+1] == '/') and chr?
+                    if chr == '\n'
+                        row++
+                        col = 0
+                    else
+                        col++
+                    pos++
+                pos+=2
+            else
+                if chr == '#' or (chr == '/' and s[pos] == '/')
+                    while not ((chr = s[pos]) == '\n') and chr?
+                        col++
+                        pos++
         else
-            throw "[Dot Tokenizer] Syntax error in dot #{chr} at #{pos}"
+            throw "[Dot Tokenizer] Syntax error in dot #{chr} at #{row}, #{col}"
 
         if token
             tokens.push(token)
