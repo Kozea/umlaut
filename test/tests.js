@@ -77,7 +77,7 @@ lex_test('simple node directed', "digraph graphname {\n    a -> b -> c\n    b ->
   return eq(g.statements[1].attributes.length, 0);
 });
 
-lex_test('with attributes', "graph {\n    red -- blue [label=\"lbl\"];\n    red [shape=box, \"size\"=.9 id=ea];\n}", function() {
+lex_test('with attributes', "graph {\n    red -- blue [label=\"lbl\"];\n    red [shape=box, \"size\"=.9 id=ea]\n}", function() {
   eq(g.statements.length, 2);
   ok(g.statements[0] instanceof Edge);
   eq(g.statements[0].nodes.length, 2);
@@ -99,6 +99,15 @@ lex_test('with attributes', "graph {\n    red -- blue [label=\"lbl\"];\n    red 
   eq(g.statements[1].attributes[1].right, .9);
   eq(g.statements[1].attributes[2].left, 'id');
   return eq(g.statements[1].attributes[2].right, 'ea');
+});
+
+lex_test('test attr_stmt', "digraph {\n    edge [one = 1.00]\n}", function() {
+  eq(g.statements.length, 1);
+  ok(g.statements[0] instanceof Attributes);
+  eq(g.statements[0].type, 'edge');
+  eq(g.statements[0].attributes.length, 1);
+  eq(g.statements[0].attributes[0].left, 'one');
+  return eq(g.statements[0].attributes[0].right, 1);
 });
 
 lex_test('basic subgraph', "digraph {\n    a -> b;\n    { c; b -> c }\n}", function() {
@@ -126,7 +135,7 @@ lex_test('basic subgraph', "digraph {\n    a -> b;\n    { c; b -> c }\n}", funct
   return eq(g.statements[1].nodes[0].statements[1].nodes[1].id, 'c');
 });
 
-lex_test('linked subgraph', "digraph {\n    a -> b;\n    { c -> d o } -> { e -> a }\n}", function() {
+lex_test('linked subgraph', "digraph {\n    a -> b;\n    { c -> d o } -> subgraph { e -> a }\n}", function() {
   eq(g.statements.length, 2);
   ok(g.statements[0] instanceof Edge);
   eq(g.statements[0].nodes.length, 2);
@@ -237,7 +246,7 @@ token_test('with quoted strings', "digraph \"Graph name\" {\n    \"Node with \\\
   return end();
 });
 
-token_test('with attributes', "graph {\n    red -- blue [label=\"lbl\"];\n    red -- green [shape=box, \"size\"=.9 id=ea];\n}", function() {
+token_test('with attributes', "graph {\n    red -- blue [label=\"lbl\"];\n    red -- green [shape=box, \"size\"=1.9 id=ea];\n}", function() {
   node(Keyword, 'graph');
   node(Brace, '{');
   node(Id, 'red');
@@ -259,12 +268,25 @@ token_test('with attributes', "graph {\n    red -- blue [label=\"lbl\"];\n    re
   node(Delimiter, ',');
   node(Id, 'size');
   node(Assign, '=');
-  node(Id, .9);
+  node(Id, 1.9);
   node(Id, 'id');
   node(Assign, '=');
   node(Id, 'ea');
   node(Brace, ']');
   return node(Delimiter, ';');
+});
+
+token_test('test attr_stmt', "digraph {\n    edge [one = 1.00]\n}", function() {
+  node(Keyword, 'digraph');
+  node(Brace, '{');
+  node(Keyword, 'edge');
+  node(Brace, '[');
+  node(Id, 'one');
+  node(Assign, '=');
+  node(Number, 1);
+  node(Brace, ']');
+  node(Brace, '}');
+  return end();
 });
 
 token_test("with comments", "graph graphname {\n     // This attribute applies /to the graph itself\n     size=\"1,1\"; /* size to 1,1 */\n     // The label attribute can be used to change the label of a node\n     a [label=\"Foo\"]; // label to Foo\n     # Here, the node /shape is changed.\n     b [shape=box]; # Shape to box\n     /* These edges both\n        have different /line\n        properties\n     */\n     a -- b -- c [color=blue];\n     b -- d [style=dotted];\n }", function() {

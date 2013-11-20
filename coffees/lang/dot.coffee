@@ -62,10 +62,10 @@ dot_tokenize = (s) ->
             token = new Delimiter(chr)
 
         # Identifier
-        else if chr.match(/\w/)
+        else if chr.match(/[A-Za-z_]/)
             id = chr
 
-            while (chr = s[pos++])?.match(/\w|\d/)
+            while (chr = s[pos++])?.match(/\w/)
                 id += chr
             pos--
             if id in KEYWORDS
@@ -106,6 +106,7 @@ dot_tokenize = (s) ->
             id = chr
             while (chr = s[pos++])?.match(/\d|\./)
                 id += chr
+            pos--
             token = new Number(parseFloat(id))
 
         # Comment
@@ -209,10 +210,10 @@ dot_lex = (tokens) ->
         panic = 0
         while panic++ < PANIC_THRESHOLD
             attribute = parse_attribute()
-            pos++
             if attribute == null
                 break
             else
+                pos++
                 attributes.push attribute
                 if tokens[pos] instanceof Delimiter and tokens[pos].value == ','
                     pos++
@@ -253,14 +254,14 @@ dot_lex = (tokens) ->
         if tokens[pos] instanceof Brace and tokens[pos].value == '}'
             return null
 
-        if tokens[pos] instanceof Keyword
+        if tokens[pos] instanceof Keyword and tokens[pos].value != 'subgraph'
             if tokens[pos].value not in ['graph', 'node', 'edge']
                 throw 'Unexpected keyword ' + tokens[pos]
             statement = new Attributes(tokens[pos++].value)
             statement.attributes = parse_attribute_list()
             return statement
 
-        if not (tokens[pos] instanceof Id or (tokens[pos] instanceof Brace and tokens[pos].value == '{'))
+        if not (tokens[pos] instanceof Id or (tokens[pos] instanceof Keyword and tokens[pos].value == 'subgraph') or (tokens[pos] instanceof Brace and tokens[pos].value == '{'))
             throw "Unexpected statement '#{tokens[pos].value}'"
 
         if tokens[pos] instanceof Id and tokens[pos+1] instanceof Assign
@@ -321,17 +322,43 @@ dot = (src) ->
     nodes_by_id = {}
     d.title = graph.id
     link_type = if graph.type == 'directed' then blackarrow else bare_link
-    for statement in graph.statements
-        if statement instanceof Edge
-            for edge, i in statement.nodes
-                if edge.id not of nodes_by_id
-                    node = mknode edge.id
-                    d.elements.push node
-                    nodes_by_id[edge.id] = node
+    populate = (statements) ->
+        for statement in statements
+            if statement not instanceof Edge
+                continue
+
+            for node, i in statement.nodes
+                if node instanceof SubGraph
+                    populate node.statements
+                else
+                    if node.id not of nodes_by_id
+                        elt = mknode node.id
+                        d.elements.push elt
+                        nodes_by_id[node.id] = elt
+                    node._elt = nodes_by_id[node.id]
 
                 if i != 0
-                    link = new link_type(nodes_by_id[statement.nodes[i - 1].id], nodes_by_id[edge.id])
-                    d.links.push link
+                    prev_node = statement.nodes[i - 1]
+                    if prev_node instanceof SubGraph
+                        for sub_prev_statement in prev_node.statements
+                            for sub_prev_node in sub_prev_statement.nodes
+                                if node instanceof SubGraph
+                                    for sub_statement in node.statements
+                                        for sub_node in sub_statement.nodes
+                                            d.links.push new link_type(sub_prev_node._elt, sub_node._elt)
+                                else
+                                    d.links.push new link_type(sub_prev_node._elt, node._elt)
+                    else
+                        if node instanceof SubGraph
+                            for sub_statement in node.statements
+                                for sub_node in sub_statement.nodes
+                                    d.links.push new link_type(prev_node._elt, sub_node._elt)
+                        else
+                            d.links.push new link_type(prev_node._elt, node._elt)
+
+    populate graph.statements
+
+
 
     d.force = true
     d.hash()

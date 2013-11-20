@@ -3408,9 +3408,9 @@ dot_tokenize = function(s) {
       token = new Brace(chr);
     } else if (__indexOf.call(DELIMITERS, chr) >= 0) {
       token = new Delimiter(chr);
-    } else if (chr.match(/\w/)) {
+    } else if (chr.match(/[A-Za-z_]/)) {
       id = chr;
-      while ((_ref55 = (chr = s[pos++])) != null ? _ref55.match(/\w|\d/) : void 0) {
+      while ((_ref55 = (chr = s[pos++])) != null ? _ref55.match(/\w/) : void 0) {
         id += chr;
       }
       pos--;
@@ -3451,6 +3451,7 @@ dot_tokenize = function(s) {
       while ((_ref56 = (chr = s[pos++])) != null ? _ref56.match(/\d|\./) : void 0) {
         id += chr;
       }
+      pos--;
       token = new Number(parseFloat(id));
     } else if (chr.match(/\/|\#/)) {
       if (chr === '/' && s[pos] === '*') {
@@ -3618,10 +3619,10 @@ dot_lex = function(tokens) {
     panic = 0;
     while (panic++ < PANIC_THRESHOLD) {
       attribute = parse_attribute();
-      pos++;
       if (attribute === null) {
         break;
       } else {
+        pos++;
         attributes.push(attribute);
         if (tokens[pos] instanceof Delimiter && tokens[pos].value === ',') {
           pos++;
@@ -3674,7 +3675,7 @@ dot_lex = function(tokens) {
     if (tokens[pos] instanceof Brace && tokens[pos].value === '}') {
       return null;
     }
-    if (tokens[pos] instanceof Keyword) {
+    if (tokens[pos] instanceof Keyword && tokens[pos].value !== 'subgraph') {
       if ((_ref55 = tokens[pos].value) !== 'graph' && _ref55 !== 'node' && _ref55 !== 'edge') {
         throw 'Unexpected keyword ' + tokens[pos];
       }
@@ -3682,7 +3683,7 @@ dot_lex = function(tokens) {
       statement.attributes = parse_attribute_list();
       return statement;
     }
-    if (!(tokens[pos] instanceof Id || (tokens[pos] instanceof Brace && tokens[pos].value === '{'))) {
+    if (!(tokens[pos] instanceof Id || (tokens[pos] instanceof Keyword && tokens[pos].value === 'subgraph') || (tokens[pos] instanceof Brace && tokens[pos].value === '{'))) {
       throw "Unexpected statement '" + tokens[pos].value + "'";
     }
     if (tokens[pos] instanceof Id && tokens[pos + 1] instanceof Assign) {
@@ -3732,7 +3733,7 @@ dot_lex = function(tokens) {
 };
 
 dot = function(src) {
-  var d, edge, graph, i, link, link_type, mknode, node, nodes_by_id, statement, tokens, _i, _j, _len, _len1, _ref55, _ref56;
+  var d, graph, link_type, mknode, nodes_by_id, populate, tokens;
   mknode = function(l) {
     return new rectangle(void 0, void 0, l);
   };
@@ -3743,25 +3744,109 @@ dot = function(src) {
   nodes_by_id = {};
   d.title = graph.id;
   link_type = graph.type === 'directed' ? blackarrow : bare_link;
-  _ref55 = graph.statements;
-  for (_i = 0, _len = _ref55.length; _i < _len; _i++) {
-    statement = _ref55[_i];
-    if (statement instanceof Edge) {
-      _ref56 = statement.nodes;
-      for (i = _j = 0, _len1 = _ref56.length; _j < _len1; i = ++_j) {
-        edge = _ref56[i];
-        if (!(edge.id in nodes_by_id)) {
-          node = mknode(edge.id);
-          d.elements.push(node);
-          nodes_by_id[edge.id] = node;
-        }
-        if (i !== 0) {
-          link = new link_type(nodes_by_id[statement.nodes[i - 1].id], nodes_by_id[edge.id]);
-          d.links.push(link);
-        }
+  populate = function(statements) {
+    var elt, i, node, prev_node, statement, sub_node, sub_prev_node, sub_prev_statement, sub_statement, _i, _len, _results;
+    _results = [];
+    for (_i = 0, _len = statements.length; _i < _len; _i++) {
+      statement = statements[_i];
+      if (!(statement instanceof Edge)) {
+        continue;
       }
+      _results.push((function() {
+        var _j, _len1, _ref55, _results1;
+        _ref55 = statement.nodes;
+        _results1 = [];
+        for (i = _j = 0, _len1 = _ref55.length; _j < _len1; i = ++_j) {
+          node = _ref55[i];
+          if (node instanceof SubGraph) {
+            populate(node.statements);
+          } else {
+            if (!(node.id in nodes_by_id)) {
+              elt = mknode(node.id);
+              d.elements.push(elt);
+              nodes_by_id[node.id] = elt;
+            }
+            node._elt = nodes_by_id[node.id];
+          }
+          if (i !== 0) {
+            prev_node = statement.nodes[i - 1];
+            if (prev_node instanceof SubGraph) {
+              _results1.push((function() {
+                var _k, _len2, _ref56, _results2;
+                _ref56 = prev_node.statements;
+                _results2 = [];
+                for (_k = 0, _len2 = _ref56.length; _k < _len2; _k++) {
+                  sub_prev_statement = _ref56[_k];
+                  _results2.push((function() {
+                    var _l, _len3, _ref57, _results3;
+                    _ref57 = sub_prev_statement.nodes;
+                    _results3 = [];
+                    for (_l = 0, _len3 = _ref57.length; _l < _len3; _l++) {
+                      sub_prev_node = _ref57[_l];
+                      if (node instanceof SubGraph) {
+                        _results3.push((function() {
+                          var _len4, _m, _ref58, _results4;
+                          _ref58 = node.statements;
+                          _results4 = [];
+                          for (_m = 0, _len4 = _ref58.length; _m < _len4; _m++) {
+                            sub_statement = _ref58[_m];
+                            _results4.push((function() {
+                              var _len5, _n, _ref59, _results5;
+                              _ref59 = sub_statement.nodes;
+                              _results5 = [];
+                              for (_n = 0, _len5 = _ref59.length; _n < _len5; _n++) {
+                                sub_node = _ref59[_n];
+                                _results5.push(d.links.push(new link_type(sub_prev_node._elt, sub_node._elt)));
+                              }
+                              return _results5;
+                            })());
+                          }
+                          return _results4;
+                        })());
+                      } else {
+                        _results3.push(d.links.push(new link_type(sub_prev_node._elt, node._elt)));
+                      }
+                    }
+                    return _results3;
+                  })());
+                }
+                return _results2;
+              })());
+            } else {
+              if (node instanceof SubGraph) {
+                _results1.push((function() {
+                  var _k, _len2, _ref56, _results2;
+                  _ref56 = node.statements;
+                  _results2 = [];
+                  for (_k = 0, _len2 = _ref56.length; _k < _len2; _k++) {
+                    sub_statement = _ref56[_k];
+                    _results2.push((function() {
+                      var _l, _len3, _ref57, _results3;
+                      _ref57 = sub_statement.nodes;
+                      _results3 = [];
+                      for (_l = 0, _len3 = _ref57.length; _l < _len3; _l++) {
+                        sub_node = _ref57[_l];
+                        _results3.push(d.links.push(new link_type(prev_node._elt, sub_node._elt)));
+                      }
+                      return _results3;
+                    })());
+                  }
+                  return _results2;
+                })());
+              } else {
+                _results1.push(d.links.push(new link_type(prev_node._elt, node._elt)));
+              }
+            }
+          } else {
+            _results1.push(void 0);
+          }
+        }
+        return _results1;
+      })());
     }
-  }
+    return _results;
+  };
+  populate(graph.statements);
   d.force = true;
   return d.hash();
 };

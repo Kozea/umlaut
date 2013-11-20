@@ -81,7 +81,7 @@ lex_test('simple node directed', """
 lex_test('with attributes', """
     graph {
         red -- blue [label=\"lbl\"];
-        red [shape=box, \"size\"=.9 id=ea];
+        red [shape=box, \"size\"=.9 id=ea]
     }""", ->
     eq g.statements.length, 2
     ok g.statements[0] instanceof Edge
@@ -107,6 +107,18 @@ lex_test('with attributes', """
     eq g.statements[1].attributes[1].right, .9
     eq g.statements[1].attributes[2].left, 'id'
     eq g.statements[1].attributes[2].right, 'ea'
+)
+
+lex_test('test attr_stmt', """
+    digraph {
+        edge [one = 1.00]
+    }""", ->
+    eq g.statements.length, 1
+    ok g.statements[0] instanceof Attributes
+    eq g.statements[0].type, 'edge'
+    eq g.statements[0].attributes.length, 1
+    eq g.statements[0].attributes[0].left, 'one'
+    eq g.statements[0].attributes[0].right, 1
 )
 
 lex_test('basic subgraph', """
@@ -142,7 +154,7 @@ lex_test('basic subgraph', """
 lex_test('linked subgraph', """
     digraph {
         a -> b;
-        { c -> d o } -> { e -> a }
+        { c -> d o } -> subgraph { e -> a }
     }""", ->
     eq g.statements.length, 2
     ok g.statements[0] instanceof Edge

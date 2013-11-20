@@ -87,7 +87,7 @@ line break\";
 token_test('with attributes', """
     graph {
         red -- blue [label=\"lbl\"];
-        red -- green [shape=box, \"size\"=.9 id=ea];
+        red -- green [shape=box, \"size\"=1.9 id=ea];
     }""", ->
     node Keyword, 'graph'
     node Brace, '{'
@@ -110,12 +110,28 @@ token_test('with attributes', """
     node Delimiter, ','
     node Id, 'size'
     node Assign, '='
-    node Id, .9
+    node Id, 1.9
     node Id, 'id'
     node Assign, '='
     node Id, 'ea'
     node Brace, ']'
     node Delimiter, ';'
+)
+
+token_test('test attr_stmt', """
+    digraph {
+        edge [one = 1.00]
+    }""", ->
+    node Keyword, 'digraph'
+    node Brace, '{'
+    node Keyword, 'edge'
+    node Brace, '['
+    node Id, 'one'
+    node Assign, '='
+    node Number, 1
+    node Brace, ']'
+    node Brace, '}'
+    end()
 )
 
 token_test("with comments", """
