@@ -252,35 +252,31 @@ dot_lex = (tokens) ->
     parse_statement = ->
         if tokens[pos] instanceof Brace and tokens[pos].value == '}'
             return null
-        if tokens[pos] instanceof Brace and tokens[pos].value == '{'
-            statement = parse_subgraph()
-        else if tokens[pos] instanceof Keyword
-            # Subgraph
-            if tokens[pos].value == 'subgraph'
-                pos++
-                statement = parse_subgraph()
-            else if tokens[pos].value in ['graph', 'node', 'edge']
-                statement = new Attributes(tokens[pos++].value)
-                statement.attributes = parse_attribute_list()
-                return statement
-            else
+
+        if tokens[pos] instanceof Keyword
+            if tokens[pos].value not in ['graph', 'node', 'edge']
                 throw 'Unexpected keyword ' + tokens[pos]
-        else if tokens[pos] instanceof Id
-            if tokens[pos+1] instanceof Assign
-                pos+=2
-                if tokens[pos] not instanceof Id
-                    throw "Invalid right hand side of attribute '#{tokens[pos].value}'"
-                statement = new Attribute(id, tokens[pos].value)
-                return statement
+            statement = new Attributes(tokens[pos++].value)
+            statement.attributes = parse_attribute_list()
+            return statement
 
-            statement = new Edge()
-            statement.nodes = parse_node_list()
-
-            if tokens[pos+1] instanceof Brace and tokens[pos+1].value == '['
-                pos++
-                statement.attributes = parse_attribute_list()
-        else
+        if not (tokens[pos] instanceof Id or (tokens[pos] instanceof Brace and tokens[pos].value == '{'))
             throw "Unexpected statement '#{tokens[pos].value}'"
+
+        if tokens[pos] instanceof Id and tokens[pos+1] instanceof Assign
+            pos+=2
+            if tokens[pos] not instanceof Id
+                throw "Invalid right hand side of attribute '#{tokens[pos].value}'"
+            statement = new Attribute(id, tokens[pos].value)
+            return statement
+
+        statement = new Edge()
+        statement.nodes = parse_node_list()
+
+        if tokens[pos+1] instanceof Brace and tokens[pos+1].value == '['
+            pos++
+            statement.attributes = parse_attribute_list()
+
         statement
 
     # Populate graph statements list
@@ -293,10 +289,10 @@ dot_lex = (tokens) ->
         panic = 0
         while panic++ < PANIC_THRESHOLD
             statement = parse_statement()
-            pos++
             if statement == null
                 break
             else
+                pos++
                 statements.push statement
                 if tokens[pos] instanceof Delimiter and tokens[pos].value == ';'
                     pos++

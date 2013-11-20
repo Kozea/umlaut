@@ -3674,36 +3674,30 @@ dot_lex = function(tokens) {
     if (tokens[pos] instanceof Brace && tokens[pos].value === '}') {
       return null;
     }
-    if (tokens[pos] instanceof Brace && tokens[pos].value === '{') {
-      statement = parse_subgraph();
-    } else if (tokens[pos] instanceof Keyword) {
-      if (tokens[pos].value === 'subgraph') {
-        pos++;
-        statement = parse_subgraph();
-      } else if ((_ref55 = tokens[pos].value) === 'graph' || _ref55 === 'node' || _ref55 === 'edge') {
-        statement = new Attributes(tokens[pos++].value);
-        statement.attributes = parse_attribute_list();
-        return statement;
-      } else {
+    if (tokens[pos] instanceof Keyword) {
+      if ((_ref55 = tokens[pos].value) !== 'graph' && _ref55 !== 'node' && _ref55 !== 'edge') {
         throw 'Unexpected keyword ' + tokens[pos];
       }
-    } else if (tokens[pos] instanceof Id) {
-      if (tokens[pos + 1] instanceof Assign) {
-        pos += 2;
-        if (!(tokens[pos] instanceof Id)) {
-          throw "Invalid right hand side of attribute '" + tokens[pos].value + "'";
-        }
-        statement = new Attribute(id, tokens[pos].value);
-        return statement;
-      }
-      statement = new Edge();
-      statement.nodes = parse_node_list();
-      if (tokens[pos + 1] instanceof Brace && tokens[pos + 1].value === '[') {
-        pos++;
-        statement.attributes = parse_attribute_list();
-      }
-    } else {
+      statement = new Attributes(tokens[pos++].value);
+      statement.attributes = parse_attribute_list();
+      return statement;
+    }
+    if (!(tokens[pos] instanceof Id || (tokens[pos] instanceof Brace && tokens[pos].value === '{'))) {
       throw "Unexpected statement '" + tokens[pos].value + "'";
+    }
+    if (tokens[pos] instanceof Id && tokens[pos + 1] instanceof Assign) {
+      pos += 2;
+      if (!(tokens[pos] instanceof Id)) {
+        throw "Invalid right hand side of attribute '" + tokens[pos].value + "'";
+      }
+      statement = new Attribute(id, tokens[pos].value);
+      return statement;
+    }
+    statement = new Edge();
+    statement.nodes = parse_node_list();
+    if (tokens[pos + 1] instanceof Brace && tokens[pos + 1].value === '[') {
+      pos++;
+      statement.attributes = parse_attribute_list();
     }
     return statement;
   };
@@ -3717,10 +3711,10 @@ dot_lex = function(tokens) {
     panic = 0;
     while (panic++ < PANIC_THRESHOLD) {
       statement = parse_statement();
-      pos++;
       if (statement === null) {
         break;
       } else {
+        pos++;
         statements.push(statement);
         if (tokens[pos] instanceof Delimiter && tokens[pos].value === ';') {
           pos++;
