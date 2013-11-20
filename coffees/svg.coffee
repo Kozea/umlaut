@@ -8,14 +8,12 @@ mouse_xy = (e) ->
 class Svg extends Base
     constructor: ->
         super
-        @aside = d3.select('aside')
-        @article = d3.select("article")
-        @width = @article.node().clientWidth
-        @height = @article.node().clientHeight or 500
+        article = d3.select("article").node()
+        @width = article.clientWidth
+        @height = article.clientHeight or 500
         @title = d3.select('#editor h2')
             .on('dblclick', ->
-                edit((-> diagram.title), ((txt) -> diagram.title = txt))
-        )
+                edit((-> diagram.title), ((txt) -> diagram.title = txt)))
 
         @zoom = d3.behavior.zoom()
             .scale(diagram.zoom.scale)
@@ -32,7 +30,7 @@ class Svg extends Base
                     @zoom.translate(diagram.zoom.translate)
             )
 
-        @article
+        d3.select("article")
             .selectAll('svg')
             .data([diagram])
             .enter()
@@ -253,6 +251,10 @@ class Svg extends Base
         if persist
             generate_url()
 
+        if diagram.force
+            diagram.force.stop()
+            diagram.force.nodes(diagram.nodes()).links(diagram.links)
+            diagram.force.start()
 
     tick: ->
         @svg.select('g.groups').selectAll('g.group').call(tick_node)
@@ -260,8 +262,9 @@ class Svg extends Base
         @svg.select('g.links').selectAll('g.link').call(tick_link)
 
     resize: ->
-        @width = @article.node().clientWidth
-        @height = @article.node().clientHeight or 500
+        article = d3.select("article").node()
+        @width = article.clientWidth
+        @height = article.clientHeight or 500
         @svg
             .attr("width", @width)
             .attr("height", @height)

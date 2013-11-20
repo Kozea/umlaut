@@ -104,13 +104,13 @@ commands =
         hotkey: 'ctrl+a'
 
     force:
-        fun: ->
+        fun: (e) ->
             if diagram.force
                 diagram.force.stop()
                 diagram.force = null
                 return
             diagram.start_force()
-
+            e?.preventDefault()
         label: 'Toggle force'
         glyph: 'send'
         hotkey: 'tab'

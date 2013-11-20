@@ -32,8 +32,8 @@ class dotted extends Link
     @marker: new Arrow()
     @type: 'dashed'
 
-class ShapeDiagram extends Diagram
-    label: ' Shapes Diagram'
+class DotDiagram extends Diagram
+    label: 'Dot diagram'
 
     constructor: ->
         super
@@ -43,4 +43,4 @@ class ShapeDiagram extends Diagram
             groups: []
             links: [bare_link, arrow, blackarrow, whitearrow, blackdiamond, whitediamond, dotted]
 
-Diagram.diagrams['ShapeDiagram'] = ShapeDiagram
+Diagram.diagrams['DotDiagram'] = DotDiagram

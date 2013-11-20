@@ -1,31 +1,34 @@
-module "dot tokenization"
+module "Dot Tokenizer"
 
-i = 0
-tok = null
+i = tok = null
 
 node = (type, value) ->
-    ok tok[i] instanceof type
-    equal tok[i++].value, value
+    ok tok[i] instanceof type, "Node is #{type.name}"
+    equal tok[i++].value, value, "Node contains #{value}"
 
 end = ->
-    ok not tok[i]?
+    ok not tok[i]?, "There's no extra elements"
 
-test("simple tokenization", ->
-    i = 0
-    tok = dot_tokenize 'graph {}'
+token_test = (title, s, tests) ->
+    test("#{title}: \n\n#{s}\n\n", ->
+        i = 0
+        tok = dot_tokenize s
+        tests()
+        i = null
+        tok = null)
+
+token_test('simple', 'graph {}', ->
     node Keyword, 'graph'
     node Brace, '{'
     node Brace, '}'
     end()
 )
 
-test("tokenization normal", ->
-    i = 0
-    tok = dot_tokenize(
-        """graph graphname {
-            a -- b -- c;
-            b -- d;
-         }""")
+token_test("normal", """
+    graph graphname {
+        a -- b -- c;
+        b -- d;
+    }""", ->
     node Keyword, 'graph'
     node Id, 'graphname'
     node Brace, '{'
@@ -43,13 +46,11 @@ test("tokenization normal", ->
     end()
 )
 
-test("tokenization directed", ->
-    i = 0
-    tok = dot_tokenize(
-        """digraph graphname {
-            a -> b -> c;
-            b -> d;
-         }""")
+token_test('directed', """
+    digraph graphname {
+        a -> b -> c;
+        b -> d;
+    }""", ->
     node Keyword, 'digraph'
     node Id, 'graphname'
     node Brace, '{'
@@ -67,13 +68,11 @@ test("tokenization directed", ->
     end()
 )
 
-test("tokenization with quoted strings", ->
-    i = 0
-    tok = dot_tokenize(
-        """digraph \"Graph name\" {
-            \"Node with \\\" in it\" -> \"Node with
+token_test('with quoted strings', """
+    digraph \"Graph name\" {
+        \"Node with \\\" in it\" -> \"Node with
 line break\";
-         }""")
+    }""", ->
     node Keyword, 'digraph'
     node Id, 'Graph name'
     node Brace, '{'
@@ -85,59 +84,55 @@ line break\";
     end()
 )
 
-
-test("tokenization with attributes", ->
-    i = 0
-    tok = dot_tokenize(
-        """graph ethane {
-             C_0 -- H_0 [type=s];
-             C_0 -- H_1 [type=s];
-             C_0 -- H_2 [type=s];
-             C_0 -- C_1 [type=s];
-             C_1 -- H_3 [type=s];
-             C_1 -- H_4 [type=s];
-             C_1 -- H_5 [type=s];
-         }""")
+token_test('with attributes', """
+    graph {
+        red -- blue [label=\"lbl\"];
+        red -- green [shape=box, \"size\"=.9 id=ea];
+    }""", ->
     node Keyword, 'graph'
-    node Id, 'ethane'
     node Brace, '{'
-    node Id, 'C_0'
+    node Id, 'red'
     node Operator, '--'
-    node Id, 'H_0'
+    node Id, 'blue'
     node Brace, '['
-    node Id, 'type'
+    node Id, 'label'
     node Assign, '='
-    node Id, 's'
+    node Id, 'lbl'
     node Brace, ']'
     node Delimiter, ';'
-    node Id, 'C_0'
+    node Id, 'red'
     node Operator, '--'
-    node Id, 'H_1'
+    node Id, 'green'
     node Brace, '['
-    node Id, 'type'
+    node Id, 'shape'
     node Assign, '='
-    node Id, 's'
+    node Id, 'box'
+    node Delimiter, ','
+    node Id, 'size'
+    node Assign, '='
+    node Id, .9
+    node Id, 'id'
+    node Assign, '='
+    node Id, 'ea'
     node Brace, ']'
     node Delimiter, ';'
 )
 
-test("tokenization with comments", ->
-    i = 0
-    tok = dot_tokenize(
-        """graph graphname {
-             // This attribute applies /to the graph itself
-             size=\"1,1\"; /* size to 1,1 */
-             // The label attribute can be used to change the label of a node
-             a [label=\"Foo\"]; // label to Foo
-             # Here, the node /shape is changed.
-             b [shape=box]; # Shape to box
-             /* These edges both
-                have different /line
-                properties
-             */
-             a -- b -- c [color=blue];
-             b -- d [style=dotted];
-         }""")
+token_test("with comments", """
+    graph graphname {
+         // This attribute applies /to the graph itself
+         size=\"1,1\"; /* size to 1,1 */
+         // The label attribute can be used to change the label of a node
+         a [label=\"Foo\"]; // label to Foo
+         # Here, the node /shape is changed.
+         b [shape=box]; # Shape to box
+         /* These edges both
+            have different /line
+            properties
+         */
+         a -- b -- c [color=blue];
+         b -- d [style=dotted];
+     }""", ->
     node Keyword, 'graph'
     node Id, 'graphname'
     node Brace, '{'

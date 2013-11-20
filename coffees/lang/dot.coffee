@@ -8,6 +8,8 @@ RE_ALPHA = /\w/
 RE_DIGIT = /[\d|.]/
 RE_ALPHADIGIT = /[\d|\w]/
 
+PANIC_THRESHOLD = 9999
+
 class Token
     constructor: (@value) ->
 
@@ -144,11 +146,11 @@ class SubGraph
 
 class Node extends Statement
     constructor: (@id, @port, @compass_pt) ->
-        @attributes = []
 
 class Edge extends Statement
     constructor:  ->
-        @node_list = []
+        @nodes = []
+        @attributes = []
 
 class Attribute
     constructor: (@left, @right) ->
@@ -157,10 +159,10 @@ class Attributes extends Statement
     constructor: (@type) ->
         @attributes = []
 
-parse_dot_tokens = (tokens) ->
+dot_lex = (tokens) ->
     pos = 0
     level = 0
-    if not tokens[pos] instanceof Keyword
+    if tokens[pos] not instanceof Keyword
         throw 'First token is not a keyword'
 
     strict = false
@@ -187,31 +189,35 @@ parse_dot_tokens = (tokens) ->
                 pos+=2
             else
                 return null
-        if not tokens[pos] instanceof Id
+        if tokens[pos] not instanceof Id
             throw "Invalid left hand side of attribute '#{tokens[pos].value}'"
         left = tokens[pos].value
         pos++
-        if not tokens[pos] instanceof Assign
+        if tokens[pos] not instanceof Assign
             throw "Invalid assignement '#{tokens[pos].value}'"
         pos++
-        if not tokens[pos] instanceof Id
+        if tokens[pos] not instanceof Id
             throw "Invalid right hand side of attribute '#{tokens[pos].value}'"
         right = tokens[pos].value
         new Attribute(left, right)
 
     parse_attribute_list = ->
-        if not tokens[pos] instanceof Brace and tokens[pos].value == '['
+        if not (tokens[pos] instanceof Brace and tokens[pos].value == '[')
             throw 'No opening brace "[" for attribute list'
         pos++
         attributes = []
-        while true
+        panic = 0
+        while panic++ < PANIC_THRESHOLD
             attribute = parse_attribute()
+            pos++
             if attribute == null
                 break
             else
                 attributes.push attribute
-                if tokens[pos+1] instanceof Delimiter and tokens[pos+1].value == ','
+                if tokens[pos] instanceof Delimiter and tokens[pos].value == ','
                     pos++
+        if --panic == PANIC_THRESHOLD
+            throw 'Infinite loop for statement list parsing'
         attributes
 
     parse_subgraph = ->
@@ -231,16 +237,16 @@ parse_dot_tokens = (tokens) ->
         else if tokens[pos] instanceof Brace and tokens[pos].value == '{'
             node = parse_subgraph()
         else
-            if not tokens[pos] instanceof Id
+            if tokens[pos] not instanceof Id
                 throw "Invalid edge id '#{tokens[pos].value}'"
+            node = new Node(tokens[pos].value)
+        node
 
     parse_node_list = ->
-        node_list = []
-
-        while tokens[pos] instanceof Operator
-            parse_node()
-            node = new Node(tokens[pos].value)
-            node_list.push(node)
+        node_list = [parse_node()]
+        while tokens[pos+1] instanceof Operator
+            pos+=2
+            node_list.push(parse_node())
         node_list
 
     parse_statement = ->
@@ -254,7 +260,7 @@ parse_dot_tokens = (tokens) ->
                 pos++
                 statement = parse_subgraph()
             else if tokens[pos].value in ['graph', 'node', 'edge']
-                statement = new Attributes(tokens[pos].value)
+                statement = new Attributes(tokens[pos++].value)
                 statement.attributes = parse_attribute_list()
                 return statement
             else
@@ -262,15 +268,16 @@ parse_dot_tokens = (tokens) ->
         else if tokens[pos] instanceof Id
             if tokens[pos+1] instanceof Assign
                 pos+=2
-                if not tokens[pos] instanceof Id
+                if tokens[pos] not instanceof Id
                     throw "Invalid right hand side of attribute '#{tokens[pos].value}'"
                 statement = new Attribute(id, tokens[pos].value)
                 return statement
 
             statement = new Edge()
-            statement.node_list = parse_node_list()
+            statement.nodes = parse_node_list()
 
             if tokens[pos+1] instanceof Brace and tokens[pos+1].value == '['
+                pos++
                 statement.attributes = parse_attribute_list()
         else
             throw "Unexpected statement '#{tokens[pos].value}'"
@@ -278,26 +285,29 @@ parse_dot_tokens = (tokens) ->
 
     # Populate graph statements list
     parse_statement_list = ->
-        if not tokens[pos] instanceof Brace and tokens[pos].value == '{'
+        if not (tokens[pos] instanceof Brace and tokens[pos].value == '{')
             throw 'No opening brace "{" for statement list'
         pos++
 
         statements = []
-        while true
+        panic = 0
+        while panic++ < PANIC_THRESHOLD
             statement = parse_statement()
+            pos++
             if statement == null
-                pos++
                 break
             else
                 statements.push statement
                 if tokens[pos] instanceof Delimiter and tokens[pos].value == ';'
                     pos++
+        if --panic == PANIC_THRESHOLD
+            throw 'Infinite loop for statement list parsing'
         statements
 
     graph = new Graph(type, id, strict)
     graph.statements = parse_statement_list()
-    if pos != tokens.length
-        throw "Error in dot file, parsed #{pos} elements out of #{tokens.length}"
+    # if pos != tokens.length
+        # throw "Error in dot file, parsed #{pos} elements out of #{tokens.length}"
 
     window.g = graph
 
@@ -307,29 +317,24 @@ dot = (src) ->
         new rectangle(undefined, undefined, l)
 
     tokens = dot_tokenize src
-    graph = parse_dot_tokens tokens
+    graph = dot_lex tokens
 
-    d = window.diagram = new ShapeDiagram()
+    d = window.diagram = new DotDiagram()
     window.svg = new Svg()
 
     nodes_by_id = {}
     d.title = graph.id
     link_type = if graph.type == 'directed' then blackarrow else bare_link
     for statement in graph.statements
-        if statement instanceof Node
-            if statement.id not of nodes_by_id
-                node = mknode statement.id
-                d.elements.push node
-                nodes_by_id[statement.id] = node
-        else if statement instanceof Edge
-            for edge, i in statement.node_list
+        if statement instanceof Edge
+            for edge, i in statement.nodes
                 if edge.id not of nodes_by_id
                     node = mknode edge.id
                     d.elements.push node
                     nodes_by_id[edge.id] = node
 
                 if i != 0
-                    link = new link_type(nodes_by_id[statement.node_list[i - 1].id], nodes_by_id[edge.id])
+                    link = new link_type(nodes_by_id[statement.nodes[i - 1].id], nodes_by_id[edge.id])
                     d.links.push link
 
     d.force = true

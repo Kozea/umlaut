@@ -45,10 +45,10 @@ class Link extends Base
         if null in [c1, c2] or undefined in [c1.x, c1.y, c2.x, c2.y]
             return 'M 0 0'
 
-        d1 = +if @source_anchor? and @source_anchor != null then @source_anchor else @source.direction(c2.x, c2.y)
+        d1 = +if @source_anchor? then @source_anchor else @source.direction(c2.x, c2.y)
         @a1 = @source.rotate(@source.anchors[d1]())
 
-        d2 = +if @target_anchor? and @target_anchor != null then @target_anchor else @target.direction(@a1.x, @a1.y)
+        d2 = +if @target_anchor? then @target_anchor else @target.direction(@a1.x, @a1.y)
         @a2 = @target.rotate(@target.anchors[d2]())
 
         @o1 = d1 + @source._rotation

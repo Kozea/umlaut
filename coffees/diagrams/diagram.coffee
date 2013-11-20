@@ -32,13 +32,12 @@ class Diagram extends Base
 
     start_force: ->
         @force = d3.layout.force()
-            .gravity(.7)
+            .gravity(.2)
             .linkDistance(200)
             .charge((node) -> - node.width() * node.height())
             .size([svg.width, svg.height])
 
         @force.on('tick', => svg.tick())
-        @force.nodes(@nodes()).links(@links)
         svg.sync()
         @force.start()
 
