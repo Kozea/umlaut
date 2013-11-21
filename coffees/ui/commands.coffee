@@ -73,6 +73,7 @@ commands =
 
     save:
         fun: (e) ->
+            svg.sync(true)
             save()
             e?.preventDefault()
 
@@ -276,6 +277,7 @@ init_commands = ->
 
         link.enter().call(enter_link, false)
         link.call(update_link)
+        link.call(tick_link)
 
         svgicon
             .attr('height', 20)

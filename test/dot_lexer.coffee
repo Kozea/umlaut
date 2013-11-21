@@ -57,43 +57,64 @@ lex_test("graph with id", 'graph "My Graph" {}', ->
 
 lex_test("simple nodes", """
     graph graphname {
-        a -- b -- c;
-        b -- d;
+        a -- b -- c:h;
+        b:e -- d;
     }""", ->
     eq g.statements.length, 2
     ok g.statements[0] instanceof Edge
     eq g.statements[0].nodes.length, 3
     ok g.statements[0].nodes[0] instanceof Node
     eq g.statements[0].nodes[0].id, 'a'
+    eq g.statements[0].nodes[0].port, null
+    eq g.statements[0].nodes[0].compass_pt, null
     ok g.statements[0].nodes[1] instanceof Node
     eq g.statements[0].nodes[1].id, 'b'
+    eq g.statements[0].nodes[1].port, null
+    eq g.statements[0].nodes[1].compass_pt, null
     ok g.statements[0].nodes[2] instanceof Node
     eq g.statements[0].nodes[2].id, 'c'
+    eq g.statements[0].nodes[2].port, 'h'
+    eq g.statements[0].nodes[2].compass_pt, null
     ok g.statements[1].nodes[0] instanceof Node
     eq g.statements[1].nodes[0].id, 'b'
+    eq g.statements[1].nodes[0].port, null
+    eq g.statements[1].nodes[0].compass_pt, 'e'
     ok g.statements[1].nodes[1] instanceof Node
     eq g.statements[1].nodes[1].id, 'd'
+    eq g.statements[1].nodes[1].port, null
+    eq g.statements[1].nodes[1].compass_pt, null
 )
 
 lex_test('simple node directed', """
     digraph graphname {
         a -> b -> c
-        b -> d
+        b -> d:id:nw
     }""", ->
     eq g.statements.length, 2
     ok g.statements[0] instanceof Edge
     eq g.statements[0].nodes.length, 3
     ok g.statements[0].nodes[0] instanceof Node
     eq g.statements[0].nodes[0].id, 'a'
+    eq g.statements[0].nodes[0].port, null
+    eq g.statements[0].nodes[0].compass_pt, null
     ok g.statements[0].nodes[1] instanceof Node
     eq g.statements[0].nodes[1].id, 'b'
+    eq g.statements[0].nodes[1].port, null
+    eq g.statements[0].nodes[1].compass_pt, null
     ok g.statements[0].nodes[2] instanceof Node
     eq g.statements[0].nodes[2].id, 'c'
+    eq g.statements[0].nodes[2].id, 'c'
+    eq g.statements[0].nodes[2].port, null
+    eq g.statements[0].nodes[2].compass_pt, null
     eq g.statements[0].attributes.length, 0
     ok g.statements[1].nodes[0] instanceof Node
     eq g.statements[1].nodes[0].id, 'b'
+    eq g.statements[1].nodes[0].port, null
+    eq g.statements[1].nodes[0].compass_pt, null
     ok g.statements[1].nodes[1] instanceof Node
     eq g.statements[1].nodes[1].id, 'd'
+    eq g.statements[1].nodes[1].port, 'id'
+    eq g.statements[1].nodes[1].compass_pt, 'nw'
     eq g.statements[1].attributes.length, 0
 )
 

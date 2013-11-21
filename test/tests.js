@@ -43,37 +43,58 @@ lex_test("graph with id", 'graph "My Graph" {}', function() {
   return deepEqual(g.statements, []);
 });
 
-lex_test("simple nodes", "graph graphname {\n    a -- b -- c;\n    b -- d;\n}", function() {
+lex_test("simple nodes", "graph graphname {\n    a -- b -- c:h;\n    b:e -- d;\n}", function() {
   eq(g.statements.length, 2);
   ok(g.statements[0] instanceof Edge);
   eq(g.statements[0].nodes.length, 3);
   ok(g.statements[0].nodes[0] instanceof Node);
   eq(g.statements[0].nodes[0].id, 'a');
+  eq(g.statements[0].nodes[0].port, null);
+  eq(g.statements[0].nodes[0].compass_pt, null);
   ok(g.statements[0].nodes[1] instanceof Node);
   eq(g.statements[0].nodes[1].id, 'b');
+  eq(g.statements[0].nodes[1].port, null);
+  eq(g.statements[0].nodes[1].compass_pt, null);
   ok(g.statements[0].nodes[2] instanceof Node);
   eq(g.statements[0].nodes[2].id, 'c');
+  eq(g.statements[0].nodes[2].port, 'h');
+  eq(g.statements[0].nodes[2].compass_pt, null);
   ok(g.statements[1].nodes[0] instanceof Node);
   eq(g.statements[1].nodes[0].id, 'b');
+  eq(g.statements[1].nodes[0].port, null);
+  eq(g.statements[1].nodes[0].compass_pt, 'e');
   ok(g.statements[1].nodes[1] instanceof Node);
-  return eq(g.statements[1].nodes[1].id, 'd');
+  eq(g.statements[1].nodes[1].id, 'd');
+  eq(g.statements[1].nodes[1].port, null);
+  return eq(g.statements[1].nodes[1].compass_pt, null);
 });
 
-lex_test('simple node directed', "digraph graphname {\n    a -> b -> c\n    b -> d\n}", function() {
+lex_test('simple node directed', "digraph graphname {\n    a -> b -> c\n    b -> d:id:nw\n}", function() {
   eq(g.statements.length, 2);
   ok(g.statements[0] instanceof Edge);
   eq(g.statements[0].nodes.length, 3);
   ok(g.statements[0].nodes[0] instanceof Node);
   eq(g.statements[0].nodes[0].id, 'a');
+  eq(g.statements[0].nodes[0].port, null);
+  eq(g.statements[0].nodes[0].compass_pt, null);
   ok(g.statements[0].nodes[1] instanceof Node);
   eq(g.statements[0].nodes[1].id, 'b');
+  eq(g.statements[0].nodes[1].port, null);
+  eq(g.statements[0].nodes[1].compass_pt, null);
   ok(g.statements[0].nodes[2] instanceof Node);
   eq(g.statements[0].nodes[2].id, 'c');
+  eq(g.statements[0].nodes[2].id, 'c');
+  eq(g.statements[0].nodes[2].port, null);
+  eq(g.statements[0].nodes[2].compass_pt, null);
   eq(g.statements[0].attributes.length, 0);
   ok(g.statements[1].nodes[0] instanceof Node);
   eq(g.statements[1].nodes[0].id, 'b');
+  eq(g.statements[1].nodes[0].port, null);
+  eq(g.statements[1].nodes[0].compass_pt, null);
   ok(g.statements[1].nodes[1] instanceof Node);
   eq(g.statements[1].nodes[1].id, 'd');
+  eq(g.statements[1].nodes[1].port, 'id');
+  eq(g.statements[1].nodes[1].compass_pt, 'nw');
   return eq(g.statements[1].attributes.length, 0);
 });
 
@@ -198,7 +219,7 @@ token_test('simple', 'graph {}', function() {
   return end();
 });
 
-token_test("normal", "graph graphname {\n    a -- b -- c;\n    b -- d;\n}", function() {
+token_test("normal", "graph graphname {\n    a -- b -- c:h;\n    b:e -- d;\n}", function() {
   node(Keyword, 'graph');
   node(Id, 'graphname');
   node(Brace, '{');
@@ -207,8 +228,12 @@ token_test("normal", "graph graphname {\n    a -- b -- c;\n    b -- d;\n}", func
   node(Id, 'b');
   node(Operator, '--');
   node(Id, 'c');
+  node(Delimiter, ':');
+  node(Id, 'h');
   node(Delimiter, ';');
   node(Id, 'b');
+  node(Delimiter, ':');
+  node(Id, 'e');
   node(Operator, '--');
   node(Id, 'd');
   node(Delimiter, ';');
@@ -216,7 +241,7 @@ token_test("normal", "graph graphname {\n    a -- b -- c;\n    b -- d;\n}", func
   return end();
 });
 
-token_test('directed', "digraph graphname {\n    a -> b -> c;\n    b -> d;\n}", function() {
+token_test('directed', "digraph graphname {\n    a -> b -> c;\n    b -> d:id:nw;\n}", function() {
   node(Keyword, 'digraph');
   node(Id, 'graphname');
   node(Brace, '{');
@@ -229,6 +254,10 @@ token_test('directed', "digraph graphname {\n    a -> b -> c;\n    b -> d;\n}", 
   node(Id, 'b');
   node(Operator, '->');
   node(Id, 'd');
+  node(Delimiter, ':');
+  node(Id, 'id');
+  node(Delimiter, ':');
+  node(Id, 'nw');
   node(Delimiter, ';');
   node(Brace, '}');
   return end();

@@ -20,6 +20,7 @@ KEYWORDS = ['node', 'edge', 'graph', 'digraph', 'subgraph', 'strict']
 BRACES = ['[', '{', '}', ']']
 DELIMITERS = [':', ';', ',']
 OPERATORS = ['--', '->']
+COMPASS_PTS = ['n', 'ne', 'e', 'se', 's', 'sw', 'w', 'nw', 'c', '_']
 
 RE_SPACE = /\s/
 RE_ALPHA = /\w/
@@ -258,7 +259,23 @@ dot_lex = (tokens) ->
         else
             if tokens[pos] not instanceof Id
                 throw "Invalid edge id '#{tokens[pos].value}'"
-            node = new Node(tokens[pos].value)
+            id = tokens[pos].value
+            port = null
+            compass_pt = null
+            if tokens[pos+1] instanceof Delimiter and tokens[pos+1].value == ':'
+                pos+=2
+                if tokens[pos] not instanceof Id
+                    throw "Invalid port id '#{tokens[pos].value}'"
+                port = tokens[pos].value
+                if tokens[pos+1] instanceof Delimiter and tokens[pos+1].value == ':'
+                    pos+=2
+                    if tokens[pos] not instanceof Id or tokens[pos].value not in COMPASS_PTS
+                        throw "Invalid compass point '#{tokens[pos].value}'"
+                    compass_pt = tokens[pos].value
+                if port and not compass_pt and port in COMPASS_PTS
+                    compass_pt = port
+                    port = null
+            node = new Node(id, port, compass_pt)
         node
 
     parse_node_list = ->
@@ -350,7 +367,11 @@ dot = (src) ->
                     populate node.statements
                 else
                     if node.id not of nodes_by_id
-                        elt = mknode node.id
+                        label = node.id
+                        for attr in statement.attributes
+                            if attr.left == 'label'
+                                label = attr.right
+                        elt = mknode label
                         d.elements.push elt
                         nodes_by_id[node.id] = elt
                     node._elt = nodes_by_id[node.id]

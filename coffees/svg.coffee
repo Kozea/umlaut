@@ -37,7 +37,7 @@ class Svg extends Base
         @zoom = zoom
             .scale(diagram.zoom.scale)
             .translate(diagram.zoom.translate)
-            .scaleExtent([.15, 5])
+            .scaleExtent([.05, 5])
             .on("zoom", =>
                 if not d3.event.sourceEvent or d3.event.sourceEvent.type in ['wheel', 'click'] or d3.event.sourceEvent.ctrlKey or d3.event.sourceEvent.which is 2
                     diagram.zoom.translate = d3.event.translate

@@ -44,8 +44,8 @@ token_test('simple', 'graph {}', ->
 
 token_test("normal", """
     graph graphname {
-        a -- b -- c;
-        b -- d;
+        a -- b -- c:h;
+        b:e -- d;
     }""", ->
     node Keyword, 'graph'
     node Id, 'graphname'
@@ -55,8 +55,12 @@ token_test("normal", """
     node Id, 'b'
     node Operator, '--'
     node Id, 'c'
+    node Delimiter, ':'
+    node Id, 'h'
     node Delimiter, ';'
     node Id, 'b'
+    node Delimiter, ':'
+    node Id, 'e'
     node Operator, '--'
     node Id, 'd'
     node Delimiter, ';'
@@ -67,7 +71,7 @@ token_test("normal", """
 token_test('directed', """
     digraph graphname {
         a -> b -> c;
-        b -> d;
+        b -> d:id:nw;
     }""", ->
     node Keyword, 'digraph'
     node Id, 'graphname'
@@ -81,6 +85,10 @@ token_test('directed', """
     node Id, 'b'
     node Operator, '->'
     node Id, 'd'
+    node Delimiter, ':'
+    node Id, 'id'
+    node Delimiter, ':'
+    node Id, 'nw'
     node Delimiter, ';'
     node Brace, '}'
     end()
