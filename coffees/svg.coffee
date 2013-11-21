@@ -243,6 +243,7 @@ class Svg extends Base
 
 
     sync: (persist=false) ->
+        console.log 'sync'
         @zoom.scale(diagram.zoom.scale)
         @zoom.translate(diagram.zoom.translate)
         @zoom.event(d3.select('#bg'))

@@ -69,7 +69,8 @@ move_drag = d3.behavior.drag()
             for lnk in diagram.links.slice()
                 if node == lnk.source or node == lnk.target
                     diagram.links.splice(diagram.links.indexOf(lnk), 1)
-        svg.sync(true))
+        if not diagram.force
+            svg.sync(true))
 
 nsweo_resize_drag = d3.behavior.drag()
     .on("dragstart", (handle) ->
@@ -257,7 +258,7 @@ mouse_link = (link) ->
 link_drag = d3.behavior.drag()
     .on("dragstart", (link) ->
         return if d3.event.ctrlKey
-        if Math.min(dist(diagram.mouse, link.a1), dist(diagram.mouse, link.a2)) > 60
+        if Math.min(dist(diagram.mouse, link.a1), dist(diagram.mouse, link.a2)) > 20
             return
         svg.svg.classed('dragging', true)
         svg.svg.classed('linking', true)

@@ -34,7 +34,8 @@ edit = (getter, setter) ->
                 textarea.on('input', null)
                 textarea.on('keydown', null)
                 textarea_node.value = ''
-                overlay.classed('visible', false))
+                overlay.classed('visible', false)
+                svg.sync(true))
     textarea_node.value = getter()
     textarea_node.select()
     textarea_node.focus()

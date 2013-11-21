@@ -79,6 +79,17 @@ update_node = (nodes) ->
     nodes.select('.ghost').attr('d', (node) -> Rect::path.apply(node))
 
 
+write_text = (txt, text) ->
+    txt.selectAll('tspan').remove()
+    for line, i in text.split('\n')
+        tspan = txt.append('tspan')
+            .text(line)
+            .attr('x', 0)
+        if i != 0
+            tspan
+                .attr('dy', '1.2em')
+
+
 enter_link = (links, connect=true) ->
     g = links
         .append('g')
@@ -94,12 +105,21 @@ enter_link = (links, connect=true) ->
         .attr("marker-end", (link) -> "url(##{link.cls.marker.id})")
 
     g
-        .append("text")
-        .attr('class', "start")
+        .each((link) ->
+            node = d3.select(@)
+            if link.text.source
+                txt = node
+                    .append("text")
+                    .attr('class', "start")
+                    .call(write_text, link.text.source)
+                link._source_bbox = txt.node().getBBox()
 
-    g
-        .append("text")
-        .attr('class', "end")
+            if link.text.target
+                txt = node
+                    .append("text")
+                    .attr('class', "end")
+                    .call(write_text, link.text.target)
+                link._target_bbox = txt.node().getBBox())
 
     if connect
         g.call(mouse_link)
@@ -112,32 +132,40 @@ update_link = (links) ->
             $(@).find('path').attr('d', link.path()))
 
     links
+        .each((link) ->
+            g = d3.select(@)
+            txt = g.select('text.start').node()
+            if link.text.source and not txt
+                g.append('text')
+                .attr('class', 'start')
+            txt = g.select('text.end').node()
+            if link.text.target and not txt
+                g.append('text')
+                .attr('class', 'end'))
+
+    links
         .select('text.start')
         .each((link) ->
             txt = d3.select @
-            return if link.text.source == txt.text
-            txt.selectAll('tspan').remove()
-            for line, i in link.text.source.split('\n')
-                tspan = txt.append('tspan')
-                    .text(line)
-                    .attr('x', 0)
-                if i != 0
-                    tspan
-                        .attr('dy', '1.2em'))
+            text = txt.text()
+            return if link.text.source == text
+            if link.text.source.trim() == ''
+                txt.remove()
+                return
+            txt.call(write_text, link.text.source)
+            link._source_bbox = txt.node().getBBox())
 
     links
         .select('text.end')
         .each((link) ->
             txt = d3.select @
-            return if not link.text.target == txt.text
-            txt.selectAll('tspan').remove()
-            for line, i in link.text.target.split('\n')
-                tspan = txt.append('tspan')
-                    .text(line)
-                    .attr('x', 0)
-                if i != 0
-                    tspan
-                        .attr('dy', '1.2em'))
+            text = txt.text()
+            return if not link.text.target == text
+            if link.text.target.trim() == ''
+                txt.remove()
+                return
+            txt.call(write_text, link.text.target)
+            link._target_bbox = txt.node().getBBox())
 
 tick_node = (nodes) ->
     nodes
@@ -194,17 +222,19 @@ tick_link = (links) ->
     links
         .select('text.start')
         .attr('transform', (link) ->
+            bb = link._source_bbox or (width: 0, height: 0)
             pos =
-                x: link.text_margin + @getBBox().width / 2
-                y: - link.text_margin - @getBBox().width / 2
+                x: link.text_margin + bb.width / 2
+                y: - link.text_margin - bb.height / 2
             delta = rotate(pos, link.o1)
             "translate(#{link.a1.x + delta.x}, #{link.a1.y + delta.y})")
 
     links
         .select('text.end')
         .attr('transform', (link) ->
+            bb = link._target_bbox or (width: 0, height: 0)
             pos =
-                x: link.text_margin + @getBBox().width / 2
-                y: - link.text_margin - @getBBox().height / 2
+                x: link.text_margin + bb.width / 2
+                y: - link.text_margin - bb.height / 2
             delta = rotate(pos, link.o2)
             "translate(#{link.a2.x + delta.x}, #{link.a2.y + delta.y})")
