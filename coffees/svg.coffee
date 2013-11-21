@@ -22,6 +22,7 @@ mouse_xy = (e) ->
     x: (m[0] - diagram.zoom.translate[0]) / diagram.zoom.scale
     y: (m[1] - diagram.zoom.translate[1]) / diagram.zoom.scale
 
+zoom = d3.behavior.zoom()
 
 class Svg extends Base
     constructor: ->
@@ -33,7 +34,7 @@ class Svg extends Base
             .on('dblclick', ->
                 edit((-> diagram.title), ((txt) -> diagram.title = txt)))
 
-        @zoom = d3.behavior.zoom()
+        @zoom = zoom
             .scale(diagram.zoom.scale)
             .translate(diagram.zoom.translate)
             .scaleExtent([.15, 5])
@@ -43,9 +44,6 @@ class Svg extends Base
                     diagram.zoom.scale = d3.event.scale
                     d3.select('.root').attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")")
                     d3.select('#grid').attr("patternTransform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")")
-                else
-                    @zoom.scale(diagram.zoom.scale)
-                    @zoom.translate(diagram.zoom.translate)
             )
 
         d3.select("article")
