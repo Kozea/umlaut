@@ -243,7 +243,6 @@ class Svg extends Base
 
 
     sync: (persist=false) ->
-        console.log 'sync'
         @zoom.scale(diagram.zoom.scale)
         @zoom.translate(diagram.zoom.translate)
         @zoom.event(d3.select('#bg'))
@@ -267,7 +266,7 @@ class Svg extends Base
 
         @tick()
 
-        if persist
+        if persist and not diagram.force
             generate_url()
 
         if diagram.force

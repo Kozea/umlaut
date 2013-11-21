@@ -69,8 +69,7 @@ move_drag = d3.behavior.drag()
             for lnk in diagram.links.slice()
                 if node == lnk.source or node == lnk.target
                     diagram.links.splice(diagram.links.indexOf(lnk), 1)
-        if not diagram.force
-            svg.sync(true))
+        svg.sync(true))
 
 nsweo_resize_drag = d3.behavior.drag()
     .on("dragstart", (handle) ->
@@ -119,14 +118,7 @@ nsweo_resize_drag = d3.behavior.drag()
             node[x] = node.ox + shift.x
             node[y] = node.oy + shift.y
 
-            nodes.select('.shape').attr('d', node.path())
-            nodes.select('.ghost').attr('d', Rect::path.apply(node))
-            nodes
-                .select('text')
-                .attr('x', node.txt_x())
-                .attr('y', node.txt_y())
-                .selectAll('tspan')
-                .attr('x', node.txt_x())
+            nodes.call(update_node)
         svg.tick()
     ).on("dragend", (handle) ->
         return if d3.event.ctrlKey

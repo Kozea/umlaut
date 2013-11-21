@@ -56,6 +56,7 @@ class Diagram extends Base
             .size([svg.width, svg.height])
 
         @force.on('tick', => svg.tick())
+        @force.on('end', generate_url)
         svg.sync()
         @force.start()
 

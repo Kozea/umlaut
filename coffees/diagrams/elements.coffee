@@ -119,13 +119,14 @@ class Element extends Base
         Math.max(@_height or 0, @txt_height())
 
     direction: (x, y) ->
+        pi2 = 2 * pi
         target = atan2(y - @y, x - @x)
         min_diff = Infinity
         for anchor, pos of @anchors
-            origin = +anchor + @_rotation
+            deviation = target - (+anchor) - @_rotation
             diff = Math.min(
-                Math.abs(target - origin) % (2 * pi),
-                Math.abs(target - origin - 2 * pi) % (2 * pi))
+                Math.abs(deviation) % pi2,
+                Math.abs(deviation - pi2) % pi2)
             if diff < min_diff
                 min_diff = diff
                 min_anchor = anchor

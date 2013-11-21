@@ -52,13 +52,12 @@ enter_node = (nodes, connect=true) ->
     g.call(move_drag)
     g.call(mouse_node)
 
-
 update_node = (nodes) ->
     nodes
         .select('text')
         .each((node) ->
             txt = d3.select @
-            return if node.text == txt.text
+            return if node.text == txt.text()
             txt.selectAll('tspan').remove()
             for line, i in node.text.split('\n')
                 tspan = txt.append('tspan')
@@ -78,6 +77,8 @@ update_node = (nodes) ->
         .attr('d', (node) -> node.path())
     nodes.select('.ghost').attr('d', (node) -> Rect::path.apply(node))
 
+    nodes.call(update_handles)
+    nodes.call(update_anchors)
 
 write_text = (txt, text) ->
     txt.selectAll('tspan').remove()
@@ -129,10 +130,6 @@ enter_link = (links, connect=true) ->
 update_link = (links) ->
     links
         .each((link) ->
-            $(@).find('path').attr('d', link.path()))
-
-    links
-        .each((link) ->
             g = d3.select(@)
             txt = g.select('text.start').node()
             if link.text.source and not txt
@@ -167,49 +164,53 @@ update_link = (links) ->
             txt.call(write_text, link.text.target)
             link._target_bbox = txt.node().getBBox())
 
+update_handles = (nodes) ->
+    nodes.each (node) ->
+        s = node.cls.handle_size
+        d3.select(@)
+            .selectAll('.handle')
+            .data(node.handle_list())
+            .attr('d', (handle) ->
+                h = node.handles[handle]()
+                if handle != 'O'
+                    signs = cardinal_to_direction handle
+                    "M #{h.x} #{h.y}
+                     L #{h.x + signs.x * s} #{h.y}
+                     L #{h.x + signs.x * s} #{h.y  + signs.y *  s}
+                     L #{h.x} #{h.y + signs.y * s}
+                    z"
+                else
+                    "M #{h.x} #{h.y}
+                     L #{h.x} #{h.y - 2 * s}
+                     A #{s} #{s} 0 1 1 #{h.x} #{h.y - 4 * s}
+                     A #{s} #{s} 0 1 1 #{h.x} #{h.y - 2 * s}
+                    ")
+
+update_anchors = (nodes) ->
+    nodes.each (node) ->
+        s = node.cls.handle_size
+        d3.select(@)
+            .selectAll('.anchor')
+            .data(node.anchor_list())
+            .attr('transform', (anchor) ->
+                a = node.anchors[anchor]()
+                "rotate(#{to_svg_angle(anchor)}, #{a.x - node.x}, #{a.y - node.y})")
+            .attr('d', (anchor) ->
+                a = node.anchors[anchor]()
+                if undefined in [a.x, a.y]
+                    return 'M 0 0'
+                a.x -= node.x
+                a.y -= node.y
+                "M #{a.x} #{a.y}
+                 L #{a.x} #{a.y + s}
+                 L #{a.x + s} #{a.y}
+                 L #{a.x} #{a.y - s}
+                 z")
+
 tick_node = (nodes) ->
     nodes
         .attr("transform", ((node) -> "translate(#{node.x},#{node.y})rotate(#{to_svg_angle(node._rotation)})"))
         .classed('selected', (node) -> node in diagram.selection)
-        .each((node) ->
-            # Handles
-            s = node.cls.handle_size
-            d3.select(@)
-                .selectAll('.handle')
-                .data(node.handle_list())
-                .attr('d', (handle) ->
-                    h = node.handles[handle]()
-                    if handle != 'O'
-                        signs = cardinal_to_direction handle
-                        "M #{h.x} #{h.y}
-                         L #{h.x + signs.x * s} #{h.y}
-                         L #{h.x + signs.x * s} #{h.y  + signs.y *  s}
-                         L #{h.x} #{h.y + signs.y * s}
-                        z"
-                    else
-                        "M #{h.x} #{h.y}
-                         L #{h.x} #{h.y - 2 * s}
-                         A #{s} #{s} 0 1 1 #{h.x} #{h.y - 4 * s}
-                         A #{s} #{s} 0 1 1 #{h.x} #{h.y - 2 * s}
-                        ")
-            # Anchors
-            d3.select(@)
-                .selectAll('.anchor')
-                .data(node.anchor_list())
-                .attr('transform', (anchor) ->
-                    a = node.anchors[anchor]()
-                    "rotate(#{to_svg_angle(anchor)}, #{a.x - node.x}, #{a.y - node.y})")
-                .attr('d', (anchor) ->
-                    a = node.anchors[anchor]()
-                    if undefined in [a.x, a.y]
-                        return 'M 0 0'
-                    a.x -= node.x
-                    a.y -= node.y
-                    "M #{a.x} #{a.y}
-                     L #{a.x} #{a.y + s}
-                     L #{a.x + s} #{a.y}
-                     L #{a.x} #{a.y - s}
-                     z"))
 
 tick_link = (links) ->
     links
@@ -217,7 +218,7 @@ tick_link = (links) ->
 
     links
         .each((link) ->
-            $(@).find('path').attr('d', link.path()))
+            d3.select(@).selectAll('path').attr('d', link.path()))
 
     links
         .select('text.start')
