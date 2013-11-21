@@ -2890,7 +2890,7 @@ update_link = function(links) {
     var text, txt;
     txt = d3.select(this);
     text = txt.text();
-    if (link.text.source === text) {
+    if (link.text.source === text && (link._source_bbox != null)) {
       return;
     }
     if (link.text.source.trim() === '') {
@@ -2904,7 +2904,7 @@ update_link = function(links) {
     var text, txt;
     txt = d3.select(this);
     text = txt.text();
-    if (!link.text.target === text) {
+    if (!link.text.target === text && (link._target_bbox != null)) {
       return;
     }
     if (link.text.target.trim() === '') {

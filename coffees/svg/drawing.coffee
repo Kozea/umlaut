@@ -145,7 +145,7 @@ update_link = (links) ->
         .each((link) ->
             txt = d3.select @
             text = txt.text()
-            return if link.text.source == text
+            return if link.text.source == text and link._source_bbox?
             if link.text.source.trim() == ''
                 txt.remove()
                 return
@@ -157,7 +157,7 @@ update_link = (links) ->
         .each((link) ->
             txt = d3.select @
             text = txt.text()
-            return if not link.text.target == text
+            return if not link.text.target == text and link._target_bbox?
             if link.text.target.trim() == ''
                 txt.remove()
                 return
