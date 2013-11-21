@@ -50,9 +50,12 @@ class Diagram extends Base
 
     start_force: ->
         @force = d3.layout.force()
-            .gravity(.2)
-            .linkDistance(200)
-            .charge((node) -> - node.width() * node.height())
+            .gravity(.1)
+            .linkDistance(20)
+            .linkStrength(1)
+            .friction(.9)
+            # .theta(.9)
+            .charge((node) -> - 2000 - node.width() * node.height() / 4)
             .size([svg.width, svg.height])
 
         @force.on('tick', => svg.tick())

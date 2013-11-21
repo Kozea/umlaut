@@ -81,6 +81,24 @@ commands =
         glyph: 'save'
         hotkey: 'ctrl+s'
 
+    export:
+        fun: (e) ->
+            css = ''
+            for rule in $('#style').get(0).sheet.cssRules
+                if rule.selectorText.match(/^svg\s/)
+                    css += rule.cssText
+            svg = $('#diagram').clone()
+            svg.find('.background').remove()
+            svg.find('.handles,.anchors').remove()
+            svg.find('defs').append(
+                $('<style>').text(css))
+
+            location.href = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg'>#{svg.html()}</svg>"
+
+        label: 'Export to svg'
+        glyph: 'export'
+        hotkey: 'ctrl+enter'
+
     edit:
         fun: ->
             edit((->

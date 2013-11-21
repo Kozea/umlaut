@@ -580,8 +580,8 @@ Diagram = (function(_super) {
 
   Diagram.prototype.start_force = function() {
     var _this = this;
-    this.force = d3.layout.force().gravity(.2).linkDistance(200).charge(function(node) {
-      return -node.width() * node.height();
+    this.force = d3.layout.force().gravity(.1).linkDistance(20).linkStrength(1).friction(.9).charge(function(node) {
+      return -2000 - node.width() * node.height() / 4;
     }).size([svg.width, svg.height]);
     this.force.on('tick', function() {
       return svg.tick();
@@ -2101,6 +2101,27 @@ commands = {
     label: 'Save locally',
     glyph: 'save',
     hotkey: 'ctrl+s'
+  },
+  "export": {
+    fun: function(e) {
+      var css, rule, svg, _i, _len, _ref47;
+      css = '';
+      _ref47 = $('#style').get(0).sheet.cssRules;
+      for (_i = 0, _len = _ref47.length; _i < _len; _i++) {
+        rule = _ref47[_i];
+        if (rule.selectorText.match(/^svg\s/)) {
+          css += rule.cssText;
+        }
+      }
+      svg = $('#diagram').clone();
+      svg.find('.background').remove();
+      svg.find('.handles,.anchors').remove();
+      svg.find('defs').append($('<style>').text(css));
+      return location.href = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg'>" + (svg.html()) + "</svg>";
+    },
+    label: 'Export to svg',
+    glyph: 'export',
+    hotkey: 'ctrl+enter'
   },
   edit: {
     fun: function() {
