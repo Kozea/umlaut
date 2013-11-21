@@ -17,7 +17,7 @@
 
 
 $ =>
-    if location.pathname != '/'
+    if location.pathname.match /\/test\//
         return
     list_diagrams()
 

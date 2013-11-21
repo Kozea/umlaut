@@ -3900,7 +3900,7 @@ dot = function(src) {
 };
 
 $(function() {
-  if (location.pathname !== '/') {
+  if (location.pathname.match(/\/test\//)) {
     return;
   }
   list_diagrams();
