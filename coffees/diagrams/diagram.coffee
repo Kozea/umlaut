@@ -95,7 +95,7 @@ class Diagram extends Base
         force: if @force then true else false
 
     hash: ->
-        btoa(unescape(encodeURIComponent(JSON.stringify(@objectify()))))
+        LZString.compressToBase64(JSON.stringify(@objectify()))
 
     loads: (obj) ->
         if obj.title

@@ -223,7 +223,7 @@ tick_link = (links) ->
     links
         .select('text.start')
         .attr('transform', (link) ->
-            bb = link._source_bbox or (width: 0, height: 0)
+            bb = link._source_bbox
             pos =
                 x: link.text_margin + bb.width / 2
                 y: - link.text_margin - bb.height / 2
@@ -233,7 +233,7 @@ tick_link = (links) ->
     links
         .select('text.end')
         .attr('transform', (link) ->
-            bb = link._target_bbox or (width: 0, height: 0)
+            bb = link._target_bbox
             pos =
                 x: link.text_margin + bb.width / 2
                 y: - link.text_margin - bb.height / 2

@@ -28,8 +28,14 @@ history_pop = () ->
 
     $editor.removeClass('hidden')
     $diagrams.addClass('hidden')
-
-    load(JSON.parse(decodeURIComponent(escape(atob(location.hash.slice(1))))))
+    try
+        load(JSON.parse(LZString.decompressFromBase64(location.hash.slice(1))))
+    catch
+        # Compat
+        try
+            load(JSON.parse(decodeURIComponent(escape(atob(location.hash.slice(1))))))
+        catch
+            console.log('Nope')
 
     if diagram.cls.name != $('aside h3').attr('id')
         init_commands()

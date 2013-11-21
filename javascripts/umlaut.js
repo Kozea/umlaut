@@ -664,7 +664,7 @@ Diagram = (function(_super) {
   };
 
   Diagram.prototype.hash = function() {
-    return btoa(unescape(encodeURIComponent(JSON.stringify(this.objectify()))));
+    return LZString.compressToBase64(JSON.stringify(this.objectify()));
   };
 
   Diagram.prototype.loads = function(obj) {
@@ -2971,10 +2971,7 @@ tick_link = function(links) {
   });
   links.select('text.start').attr('transform', function(link) {
     var bb, delta, pos;
-    bb = link._source_bbox || {
-      width: 0,
-      height: 0
-    };
+    bb = link._source_bbox;
     pos = {
       x: link.text_margin + bb.width / 2,
       y: -link.text_margin - bb.height / 2
@@ -2984,10 +2981,7 @@ tick_link = function(links) {
   });
   return links.select('text.end').attr('transform', function(link) {
     var bb, delta, pos;
-    bb = link._target_bbox || {
-      width: 0,
-      height: 0
-    };
+    bb = link._target_bbox;
     pos = {
       x: link.text_margin + bb.width / 2,
       y: -link.text_margin - bb.height / 2
@@ -3267,7 +3261,15 @@ history_pop = function() {
   }
   $editor.removeClass('hidden');
   $diagrams.addClass('hidden');
-  load(JSON.parse(decodeURIComponent(escape(atob(location.hash.slice(1))))));
+  try {
+    load(JSON.parse(LZString.decompressFromBase64(location.hash.slice(1))));
+  } catch (_error) {
+    try {
+      load(JSON.parse(decodeURIComponent(escape(atob(location.hash.slice(1))))));
+    } catch (_error) {
+      console.log('Nope');
+    }
+  }
   if (diagram.cls.name !== $('aside h3').attr('id')) {
     init_commands();
     svg.resize();
