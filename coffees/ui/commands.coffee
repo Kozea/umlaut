@@ -92,8 +92,8 @@ commands =
             svg.find('.handles,.anchors').remove()
             svg.find('defs').append(
                 $('<style>').text(css))
-
-            location.href = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg'>#{svg.html()}</svg>"
+            svg = btoa("<svg xmlns='http://www.w3.org/2000/svg'>#{svg.html()}</svg>")
+            location.href = "data:image/svg+xml;base64,#{svg}"
 
         label: 'Export to svg'
         glyph: 'export'
