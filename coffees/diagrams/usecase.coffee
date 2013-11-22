@@ -67,7 +67,7 @@ class UseCase extends Diagram
     constructor: ->
         super
 
-        @linkstyle = 'diagonal'
+        @linkstyle = new LinkStyles.Diagonal()
         @types =
             elements: [Actor, Case]
             groups: [System]

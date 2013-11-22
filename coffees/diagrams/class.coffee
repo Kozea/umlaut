@@ -42,7 +42,7 @@ class ClassDiagram extends Diagram
     constructor: ->
         super
 
-        @linkstyle = 'diagonal'
+        @linkstyle = new LinkStyles.Diagonal()
         @types =
             elements: [Class].concat(uml_elements)
             groups: [System]

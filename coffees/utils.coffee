@@ -87,3 +87,7 @@ timestamp = ->
 
 capitalize = (s) ->
     s.charAt(0).toUpperCase() + s.substr(1).toLowerCase()
+
+next = (o, k) ->
+    keys = Object.keys(o)
+    keys[(keys.indexOf(k) + 1) % keys.length]

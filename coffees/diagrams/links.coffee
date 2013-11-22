@@ -69,81 +69,10 @@ class Link extends Base
         d2 = +if @target_anchor? then @target_anchor else @target.direction(@a1.x, @a1.y)
 
         if @source == @target and d1 == d2
-            anchors = Object.keys(@target.anchors)
-            d2 = +anchors[(anchors.indexOf(d1.toString()) + 1) % anchors.length]
+            d2 = +next(@target.anchors, d1.toString())
+
         @a2 = @target.rotate(@target.anchors[d2]())
         @o1 = d1 + @source._rotation
         @o2 = d2 + @target._rotation
 
-        path = "M #{@a1.x} #{@a1.y}"
-
-        horizontal_1 = Math.abs(d1 % pi) < pi / 4
-        horizontal_2 = Math.abs(d2 % pi) < pi / 4
-
-        if diagram.linkstyle == 'demicurve'
-            path = "#{path} C"
-            m =
-                x: .5 * (@a1.x + @a2.x)
-                y: .5 * (@a1.y + @a2.y)
-
-            if horizontal_1
-                path = "#{path} #{m.x} #{@a1.y}"
-            else
-                path = "#{path} #{@a1.x} #{m.y}"
-
-            if horizontal_2
-                path = "#{path} #{m.x} #{@a2.y}"
-            else
-                path = "#{path} #{@a2.x} #{m.y}"
-        else if diagram.linkstyle == 'diagonal'
-            path = "#{path} L"
-        else if diagram.linkstyle == 'rectangular'
-            path = "#{path} L"
-            if not horizontal_1 and horizontal_2
-                path = "#{path} #{@a1.x} #{@a2.y} L"
-            else if horizontal_1 and not horizontal_2
-                path = "#{path} #{@a2.x} #{@a1.y} L"
-            else if horizontal_1 and horizontal_2
-                mid = @a1.x + .5 * (@a2.x - @a1.x)
-                path = "#{path} #{mid} #{@a1.y} L #{mid} #{@a2.y} L"
-            else if not horizontal_1 and not horizontal_2
-                mid = @a1.y + .5 * (@a2.y - @a1.y)
-                path = "#{path} #{@a1.x} #{mid} L #{@a2.x} #{mid} L"
-        else if diagram.linkstyle == 'curve'
-            path = "#{path} C"
-            d = dist(@a1, @a2) / 2
-            if @source == @target
-                d *= 4
-                if (@o1 + @o2) % pi == 0
-                    @o1 -= pi / 4
-                    @o2 += pi / 4
-
-            dx =  Math.cos(@o1) * d
-            dy =  Math.sin(@o1) * d
-            path = "#{path} #{@a1.x + dx} #{@a1.y + dy}"
-
-            dx =  Math.cos(@o2) * d
-            dy =  Math.sin(@o2) * d
-            path = "#{path} #{@a2.x + dx} #{@a2.y + dy}"
-        else if diagram.linkstyle == 'rationalcurve'
-            path = "#{path} C"
-            if @source == @target
-                if (@o1 + @o2) % pi == 0
-                    @o1 -= pi / 4
-                    @o2 += pi / 4
-
-            dx =  Math.cos(@o1) * @source.width()
-            dy =  Math.sin(@o1) * @source.height()
-            if @source == @target
-                dx *= 4
-                dy *= 4
-            path = "#{path} #{@a1.x + dx} #{@a1.y + dy}"
-
-            dx =  Math.cos(@o2) * @target.width()
-            dy =  Math.sin(@o2) * @target.height()
-            if @source == @target
-                dx *= 4
-                dy *= 4
-            path = "#{path} #{@a2.x + dx} #{@a2.y + dy}"
-
-        "#{path} #{@a2.x} #{@a2.y}"
+        diagram.linkstyle.get(@source, @target, @a1, @a2, @o1, @o2)

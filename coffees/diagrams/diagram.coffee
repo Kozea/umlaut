@@ -22,7 +22,7 @@ class Diagram extends Base
     constructor: ->
         super
         @title = 'Untitled ' + @label
-        @linkstyle = 'rectangular'
+        @linkstyle = new LinkStyles.Rectangular()
         @zoom =
             scale: 1
             translate: [0, 0]
@@ -90,7 +90,7 @@ class Diagram extends Base
     objectify: ->
         name: @constructor.name
         title: @title
-        linkstyle: @linkstyle
+        linkstyle: @linkstyle.cls.name
         zoom: @zoom
         elements: @elements.map (elt) -> elt.objectify()
         groups: @groups.map (grp) -> grp.objectify()
@@ -104,7 +104,7 @@ class Diagram extends Base
         if obj.title
             @title = obj.title
         if obj.linkstyle
-            @linkstyle = obj.linkstyle
+            @linkstyle = new LinkStyles[obj.linkstyle]()
         if obj.zoom
             @zoom = obj.zoom
 

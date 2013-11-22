@@ -243,35 +243,16 @@ class NPNTransistor extends Transistor
 
 class Wire extends Link
 
-    path: ->
-        c1 = @source.pos()
-        c2 = @target.pos()
-        if undefined in [c1.x, c1.y, c2.x, c2.y]
-            return 'M 0 0'
-
-        @d1 = @source_anchor or @source.direction(c2.x, c2.y)
-        @a1 = @source.rotate(@source.anchors[@d1]())
-
-        @d2 = @target_anchor or @target.direction(c1.x, c1.y)
-        @a2 = @target.rotate(@target.anchors[@d2]())
-
-        path = "M #{@a1.x} #{@a1.y} L"
-
-        if angle_to_cardinal(@source._rotation) in ['E', 'W']
-            path = "#{path} #{@a2.x} #{@a1.y} L"
-        else
-            path = "#{path} #{@a1.x} #{@a2.y} L"
-
-        "#{path} #{@a2.x} #{@a2.y}"
-
 class ElectricDiagram extends Diagram
     label: 'Electric Diagram'
 
     constructor: ->
-       super
-       @types =
-           elements: [Diode, Resistor, Junction, Battery, NPNTransistor, PNPTransistor]
-           groups: []
-           links: [Wire]
+        super
+        @linkstyle = new LinkStyles.Rectangular()
+        @snap.a = 90
+        @types =
+            elements: [Diode, Resistor, Junction, Battery, NPNTransistor, PNPTransistor]
+            groups: []
+            links: [Wire]
 
 Diagram.diagrams['ElectricDiagram'] = ElectricDiagram

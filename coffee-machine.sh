@@ -3,6 +3,7 @@
 coffee -wcb -j umlaut.js -o javascripts/ \
     coffees/utils.coffee                 \
     coffees/diagrams/base.coffee         \
+    coffees/svg/linking.coffee           \
     coffees/diagrams/elements.coffee     \
     coffees/diagrams/links.coffee        \
     coffees/diagrams/diagram.coffee      \
@@ -14,7 +15,8 @@ coffee -wcb -j umlaut.js -o javascripts/ \
     coffees/diagrams/electric.coffee     \
     coffees/diagrams/class.coffee        \
     coffees/ui/*.coffee                  \
-    coffees/svg/*.coffee                 \
+    coffees/svg/behavior.coffee          \
+    coffees/svg/drawing.coffee           \
     coffees/svg.coffee                   \
     coffees/storage/*.coffee             \
     coffees/lang/*.coffee                \

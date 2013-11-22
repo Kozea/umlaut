@@ -159,12 +159,7 @@ commands =
 
     linkstyle:
         fun: ->
-            diagram.linkstyle = switch diagram.linkstyle
-                when 'curve' then 'diagonal'
-                when 'diagonal' then 'rectangular'
-                when 'rectangular' then 'rationalcurve'
-                when 'rationalcurve' then 'demicurve'
-                when 'demicurve' then 'curve'
+            diagram.linkstyle = new LinkStyles[next(LinkStyles, diagram.linkstyle.cls.name)]()
             svg.tick()
         label: 'Change link style'
         glyph: 'retweet'

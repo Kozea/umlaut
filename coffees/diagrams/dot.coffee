@@ -58,7 +58,8 @@ class DotDiagram extends Diagram
 
     constructor: ->
         super
-        @linkstyle = 'curve'
+
+        @linkstyle = new LinkStyles.Curve()
         @types =
             elements: [Box, Polygon, Ellipse, Oval, Diamond, Note]
             groups: []
