@@ -159,6 +159,11 @@ class Graph
         @statements = []
 
 class Statement
+    get_attrs: ->
+        attrs = {}
+        for attribute in @attributes
+            attrs[attribute.left] = attribute.right
+        attrs
 
 class SubGraph
     constructor: (@id) ->
@@ -300,10 +305,11 @@ dot_lex = (tokens) ->
             throw "Unexpected statement '#{tokens[pos].value}'"
 
         if tokens[pos] instanceof Id and tokens[pos+1] instanceof Assign
+            left = tokens[pos].value
             pos+=2
             if tokens[pos] not instanceof Id
                 throw "Invalid right hand side of attribute '#{tokens[pos].value}'"
-            statement = new Attribute(id, tokens[pos].value)
+            statement = new Attribute(left, tokens[pos].value)
             return statement
 
         statement = new Edge()
@@ -345,10 +351,6 @@ dot_lex = (tokens) ->
 
 
 dot = (src) ->
-    mknode = (l, type) ->
-        Type = window[capitalize(type)] or Ellipse
-        new Type(undefined, undefined, l.toString())
-
     tokens = dot_tokenize src
     graph = dot_lex tokens
 
@@ -356,52 +358,101 @@ dot = (src) ->
     window.svg = new Svg()
 
     nodes_by_id = {}
-    d.title = graph.id
-    link_type = if graph.type == 'directed' then blackarrow else bare_link
+    links_by_id = []
+    link_type = if graph.type == 'directed' then 'normal' else 'none'
+    attributes =
+        graph: {}
+        edge: {}
+        node: {}
+
+    copy_attributes = ->
+        graph: copy(attributes.graph)
+        edge: copy(attributes.edge)
+        node: copy(attributes.node)
+
+
     populate = (statements) ->
         for statement in statements
-            if statement not instanceof Edge
+
+            if statement instanceof Attributes
+                merge(attributes[statement.type], statement.get_attrs())
                 continue
+
+            if statement instanceof Attribute
+                attributes.graph[statement.left] = statement.right
+                continue
+
+            if statement not instanceof Edge
+                console.log("Unexpected #{statement}")
+                continue
+
+            current_attributes = copy_attributes()
+            if statement.nodes.length == 1
+                merge(current_attributes.node, statement.get_attrs())
+            else
+                merge(current_attributes.edge, statement.get_attrs())
 
             for node, i in statement.nodes
                 if node instanceof SubGraph
+                    old_attributes = copy_attributes()
                     populate node.statements
+                    attributes = old_attributes
                 else
-                    if node.id not of nodes_by_id
-                        label = node.id
-                        type = 'ellipse'
-                        for attr in statement.attributes
-                            if attr.left == 'label'
-                                label = attr.right
-                            else if attr.left == 'shape'
-                                type = attr.right
-                        elt = mknode label, type
-                        d.elements.push elt
-                        nodes_by_id[node.id] = elt
-                    node._elt = nodes_by_id[node.id]
+                    if node.id not of nodes_by_id or statements.length == 1
+                        label = current_attributes.node.label or node.id
+                        type = current_attributes.node.shape or 'ellipse'
+                        Type = window[capitalize(type)] or Ellipse
+                        nodes_by_id[node.id] =
+                            label: label
+                            type: Type
 
                 if i != 0
                     prev_node = statement.nodes[i - 1]
+                    ltype = window[capitalize(current_attributes.edge.arrowhead or link_type) + 'Link'] or NoneLink
                     if prev_node instanceof SubGraph
                         for sub_prev_statement in prev_node.statements
                             for sub_prev_node in sub_prev_statement.nodes
                                 if node instanceof SubGraph
                                     for sub_statement in node.statements
                                         for sub_node in sub_statement.nodes
-                                            d.links.push new link_type(sub_prev_node._elt, sub_node._elt)
+                                            links_by_id.push
+                                                type: ltype
+                                                id1: sub_prev_node.id
+                                                id2: sub_node.id
+                                                label: current_attributes.edge.label
                                 else
-                                    d.links.push new link_type(sub_prev_node._elt, node._elt)
+                                    links_by_id.push
+                                        type: ltype
+                                        id1: sub_prev_node.id
+                                        id2: node.id
+                                        label: current_attributes.edge.label
                     else
                         if node instanceof SubGraph
                             for sub_statement in node.statements
                                 for sub_node in sub_statement.nodes
-                                    d.links.push new link_type(prev_node._elt, sub_node._elt)
+                                    links_by_id.push
+                                        type: ltype
+                                        id1: prev_node.id
+                                        id2: sub_node.id
+                                        label: current_attributes.edge.label
                         else
-                            d.links.push new link_type(prev_node._elt, node._elt)
+                            links_by_id.push
+                                type: ltype
+                                id1: prev_node.id
+                                id2: node.id
+                                label: current_attributes.edge.label
 
     populate graph.statements
+    elements_by_id = {}
+    for id, elt of nodes_by_id
+        elements_by_id[id] = new elt.type(undefined, undefined, elt.label)
+        diagram.elements.push elements_by_id[id]
 
+    for lnk in links_by_id
+        l = new lnk.type(elements_by_id[lnk.id1], elements_by_id[lnk.id2])
+        l.text.source = lnk.label
+        diagram.links.push l
 
-
+    d.title = attributes.graph.label or graph.id
     d.force = true
     d.hash()

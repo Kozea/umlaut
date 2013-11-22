@@ -91,3 +91,23 @@ capitalize = (s) ->
 next = (o, k) ->
     keys = Object.keys(o)
     keys[(keys.indexOf(k) + 1) % keys.length]
+
+merge = (o1, o2) ->
+    for attr of o2
+        o1[attr] = o2[attr]
+    o1
+
+copy = (o) ->
+    c = {}
+    for attr of o
+        c[attr] = o[attr]
+    c
+
+merge_copy = (o1, o2) ->
+    o3 = {}
+    for attr of o1
+        o3[attr] = o2[attr]
+
+    for attr of o2
+        o3[attr] = o2[attr]
+    o3

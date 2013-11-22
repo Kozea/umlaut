@@ -32,26 +32,22 @@ class Diamond extends Lozenge
 class Note extends Note
     @rotationable: true
 
-class bare_link extends Link
+class NoneLink extends Link
 
-class arrow extends Link
+class CurveLink extends Link
     @marker: new Arrow()
 
-class blackarrow extends Link
+class NormalLink extends Link
     @marker: new BlackArrow()
 
-class whitearrow extends Link
+class OnormalLink extends Link
     @marker: new WhiteArrow()
 
-class blackdiamond extends Link
+class DiamondLink extends Link
     @marker: new BlackDiamond()
 
-class whitediamond extends Link
+class OdiamondLink extends Link
     @marker: new WhiteDiamond()
-
-class dotted extends Link
-    @marker: new Arrow()
-    @type: 'dashed'
 
 class DotDiagram extends Diagram
     label: 'Dot diagram'
@@ -63,6 +59,6 @@ class DotDiagram extends Diagram
         @types =
             elements: [Box, Polygon, Ellipse, Oval, Diamond, Note]
             groups: []
-            links: [bare_link, arrow, blackarrow, whitearrow, blackdiamond, whitediamond, dotted]
+            links: [NoneLink, CurveLink, NormalLink, OnormalLink, DiamondLink, OdiamondLink]
 
 Diagram.diagrams['DotDiagram'] = DotDiagram
