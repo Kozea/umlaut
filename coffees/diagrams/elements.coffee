@@ -107,7 +107,7 @@ class Element extends Base
 
     txt_y: ->
         lines = @text.split('\n').length
-        @margin.y - (@_txt_bbox.height * (lines - 1) / lines ) / 2
+        @margin.y - (@_txt_bbox.height * (lines - 1) / lines) / 2
 
     width: (w=null) ->
         if w != null

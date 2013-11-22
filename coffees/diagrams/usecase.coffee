@@ -31,7 +31,7 @@ class Actor extends Element
             y: @y
 
     txt_y: ->
-        @height() / 2 - @super('txt_height') + 2 + @margin.y
+        @height() / 2 - @super('txt_height') + 2 + 4 * @margin.y
 
     txt_height: ->
         super() + 50
@@ -42,7 +42,7 @@ class Actor extends Element
     path: ->
         wstick = (@width() - @super('txt_width')) / 2
         hstick = (@height() - @super('txt_height')) / 4
-        bottom = @txt_y() -  @margin.y
+        bottom = @txt_y() - 4 * @margin.y
 
         "M #{-wstick} #{bottom}
          L 0 #{bottom - hstick}

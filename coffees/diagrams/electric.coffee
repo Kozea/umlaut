@@ -36,7 +36,7 @@ class Electric extends Element
         10
 
     txt_y: ->
-        @height() / 2 + @margin.y
+        @height() / 2 + 3 * @margin.y
 
     txt_height: ->
         @base_height()
@@ -45,7 +45,7 @@ class Electric extends Element
         @base_width()
 
 
-class Node extends Electric
+class Junction extends Electric
     @fill: 'fg'
 
     constructor: ->
@@ -270,7 +270,7 @@ class ElectricDiagram extends Diagram
     constructor: ->
        super
        @types =
-           elements: [Diode, Resistor, Node, Battery, NPNTransistor, PNPTransistor]
+           elements: [Diode, Resistor, Junction, Battery, NPNTransistor, PNPTransistor]
            groups: []
            links: [Wire]
 
