@@ -84,14 +84,15 @@ commands =
     export:
         fun: (e) ->
             css = ''
-            for rule in $('#style').get(0).sheet.cssRules
+            for rule in d3.select('#style').node().sheet.cssRules
                 if rule.selectorText.match(/^svg\s/)
                     css += rule.cssText
-            svg = $('#diagram').clone()
-            svg.find('.background').remove()
-            svg.find('.handles,.anchors').remove()
-            svg.find('defs').append(
-                $('<style>').text(css))
+
+            svg = d3.select('#diagram')
+            svg.select('.background').remove()
+            svg.selectAll('.handles,.anchors').remove()
+            svg.selectAll('.node').classed('selected', false)
+            svg.select('defs').append('style').text(css)
             svg = btoa("<svg xmlns='http://www.w3.org/2000/svg'>#{svg.html()}</svg>")
             location.href = "data:image/svg+xml;base64,#{svg}"
 

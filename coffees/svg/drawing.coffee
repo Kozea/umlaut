@@ -57,7 +57,8 @@ update_node = (nodes) ->
         .select('text')
         .each((node) ->
             txt = d3.select @
-            return if node.text == txt.text()
+            current_text = txt.selectAll('tspan')[0].map((e) -> d3.select(e).text()).join('\n')
+            return if node.text == current_text
             txt.selectAll('tspan').remove()
             for line, i in node.text.split('\n')
                 tspan = txt.append('tspan')

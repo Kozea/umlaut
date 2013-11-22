@@ -34,8 +34,18 @@ history_pop = () ->
         # Compat
         try
             load(JSON.parse(decodeURIComponent(escape(atob(location.hash.slice(1))))))
-        catch
-            console.log('Nope')
+        catch e
+            window.diagram = new DotDiagram()
+            window.svg = new Svg()
+            diagram.title = 'There was an error loading your diagram :('
+            diagram.elements.push(e1 = new note(undefined, undefined, e.message))
+            diagram.elements.push(e2 = new note(undefined, undefined, e.stack))
+            diagram.elements.push(e3 = new note(undefined, undefined, 'You can try to reload\nyour browser without cache'))
+            diagram.elements.push(e4 = new note(undefined, undefined, 'Otherwise it may be that\n your diagram is not compatible\nwith this version'))
+            diagram.links.push(new dotted(e2, e1))
+            diagram.links.push(new dotted(e2, e3))
+            diagram.links.push(new dotted(e2, e4))
+            diagram.start_force()
 
     if diagram.cls.name != $('aside h3').attr('id')
         init_commands()

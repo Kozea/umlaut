@@ -2106,17 +2106,18 @@ commands = {
     fun: function(e) {
       var css, rule, svg, _i, _len, _ref47;
       css = '';
-      _ref47 = $('#style').get(0).sheet.cssRules;
+      _ref47 = d3.select('#style').node().sheet.cssRules;
       for (_i = 0, _len = _ref47.length; _i < _len; _i++) {
         rule = _ref47[_i];
         if (rule.selectorText.match(/^svg\s/)) {
           css += rule.cssText;
         }
       }
-      svg = $('#diagram').clone();
-      svg.find('.background').remove();
-      svg.find('.handles,.anchors').remove();
-      svg.find('defs').append($('<style>').text(css));
+      svg = d3.select('#diagram');
+      svg.select('.background').remove();
+      svg.selectAll('.handles,.anchors').remove();
+      svg.selectAll('.node').classed('selected', false);
+      svg.select('defs').append('style').text(css);
       svg = btoa("<svg xmlns='http://www.w3.org/2000/svg'>" + (svg.html()) + "</svg>");
       return location.href = "data:image/svg+xml;base64," + svg;
     },
@@ -2811,9 +2812,12 @@ enter_node = function(nodes, connect) {
 
 update_node = function(nodes) {
   nodes.select('text').each(function(node) {
-    var i, line, tspan, txt, _i, _len, _ref47, _results;
+    var current_text, i, line, tspan, txt, _i, _len, _ref47, _results;
     txt = d3.select(this);
-    if (node.text === txt.text()) {
+    current_text = txt.selectAll('tspan')[0].map(function(e) {
+      return d3.select(e).text();
+    }).join('\n');
+    if (node.text === current_text) {
       return;
     }
     txt.selectAll('tspan').remove();
@@ -3037,13 +3041,6 @@ Svg = (function(_super) {
     article = d3.select("article").node();
     this.width = article.clientWidth;
     this.height = article.clientHeight || 500;
-    this.title = d3.select('#editor h2').on('dblclick', function() {
-      return edit((function() {
-        return diagram.title;
-      }), (function(txt) {
-        return diagram.title = txt;
-      }));
-    });
     this.zoom = zoom.scale(diagram.zoom.scale).translate(diagram.zoom.translate).scaleExtent([.05, 5]).on("zoom", function() {
       var _ref47;
       if (!d3.event.sourceEvent || ((_ref47 = d3.event.sourceEvent.type) === 'wheel' || _ref47 === 'click') || d3.event.sourceEvent.ctrlKey || d3.event.sourceEvent.which === 2) {
@@ -3183,6 +3180,13 @@ Svg = (function(_super) {
     defs = svg.append('defs');
     background_g = svg.append('g').attr('id', 'bg');
     background = background_g.append('rect').attr('class', 'background').attr('width', this.width).attr('height', this.height).attr('fill', 'url(#grid)').call(this.zoom);
+    svg.append('text').attr('id', 'title').attr('x', this.width / 2).attr('y', 50).on('dblclick', function() {
+      return edit((function() {
+        return diagram.title;
+      }), (function(txt) {
+        return diagram.title = txt;
+      }));
+    });
     d3.select(window).on('resize', function() {
       return _this.resize();
     });
@@ -3204,7 +3208,7 @@ Svg = (function(_super) {
     this.zoom.scale(diagram.zoom.scale);
     this.zoom.translate(diagram.zoom.translate);
     this.zoom.event(d3.select('#bg'));
-    this.title.text(diagram.title);
+    this.svg.select('#title').text(diagram.title);
     group = this.svg.select('g.groups').selectAll('g.group').data(diagram.groups.sort(order));
     element = this.svg.select('g.elements').selectAll('g.element').data(diagram.elements.sort(order));
     link = this.svg.select('g.links').selectAll('g.link').data(diagram.links.concat(diagram.linking));
@@ -3240,7 +3244,8 @@ Svg = (function(_super) {
     this.width = article.clientWidth;
     this.height = article.clientHeight || 500;
     this.svg.attr("width", this.width).attr("height", this.height);
-    return d3.select('.background').attr("width", this.width).attr("height", this.height);
+    d3.select('.background').attr("width", this.width).attr("height", this.height);
+    return this.svg.select('#title').attr('x', this.width / 2);
   };
 
   return Svg;
@@ -3273,7 +3278,7 @@ generate_url = function() {
 };
 
 history_pop = function() {
-  var $diagrams, $editor;
+  var $diagrams, $editor, e, e1, e2, e3, e4;
   $diagrams = $('#diagrams');
   $editor = $('#editor');
   if (!location.hash) {
@@ -3290,7 +3295,18 @@ history_pop = function() {
     try {
       load(JSON.parse(decodeURIComponent(escape(atob(location.hash.slice(1))))));
     } catch (_error) {
-      console.log('Nope');
+      e = _error;
+      window.diagram = new DotDiagram();
+      window.svg = new Svg();
+      diagram.title = 'There was an error loading your diagram :(';
+      diagram.elements.push(e1 = new note(void 0, void 0, e.message));
+      diagram.elements.push(e2 = new note(void 0, void 0, e.stack));
+      diagram.elements.push(e3 = new note(void 0, void 0, 'You can try to reload\nyour browser without cache'));
+      diagram.elements.push(e4 = new note(void 0, void 0, 'Otherwise it may be that\n your diagram is not compatible\nwith this version'));
+      diagram.links.push(new dotted(e2, e1));
+      diagram.links.push(new dotted(e2, e3));
+      diagram.links.push(new dotted(e2, e4));
+      diagram.start_force();
     }
   }
   if (diagram.cls.name !== $('aside h3').attr('id')) {

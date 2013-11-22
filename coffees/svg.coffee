@@ -30,9 +30,6 @@ class Svg extends Base
         article = d3.select("article").node()
         @width = article.clientWidth
         @height = article.clientHeight or 500
-        @title = d3.select('#editor h2')
-            .on('dblclick', ->
-                edit((-> diagram.title), ((txt) -> diagram.title = txt)))
 
         @zoom = zoom
             .scale(diagram.zoom.scale)
@@ -199,6 +196,14 @@ class Svg extends Base
             .attr('fill', 'url(#grid)')
             .call(@zoom)
 
+        svg
+            .append('text')
+            .attr('id', 'title')
+            .attr('x', @width / 2)
+            .attr('y', 50)
+            .on('dblclick', ->
+                edit((-> diagram.title), ((txt) -> diagram.title = txt)))
+
         d3.select(window).on('resize', => @resize())
 
         pattern = defs
@@ -244,7 +249,7 @@ class Svg extends Base
         @zoom.scale(diagram.zoom.scale)
         @zoom.translate(diagram.zoom.translate)
         @zoom.event(d3.select('#bg'))
-        @title.text(diagram.title)
+        @svg.select('#title').text(diagram.title)
 
         group = @svg.select('g.groups').selectAll('g.group').data(diagram.groups.sort(order))
         element = @svg.select('g.elements').selectAll('g.element').data(diagram.elements.sort(order))
@@ -287,3 +292,4 @@ class Svg extends Base
         d3.select('.background')
             .attr("width", @width)
             .attr("height", @height)
+        @svg.select('#title').attr('x', @width / 2)
