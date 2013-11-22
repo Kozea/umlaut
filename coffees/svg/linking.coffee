@@ -23,6 +23,15 @@ class LinkStyles.Rectangular extends LinkStyle
                path = "#{path} #{a1.x} #{mid} L #{a2.x} #{mid}"
         "#{path} L #{a2.x} #{a2.y}"
 
+class LinkStyles.Arc extends LinkStyle
+    get: (source, target, a1, a2, o1, o2) ->
+        horizontal_1 = Math.abs(o1 % pi) < pi / 4
+        horizontal_2 = Math.abs(o2 % pi) < pi / 4
+        rx = Math.abs(a1.x - a2.x)
+        ry = Math.abs(a1.y - a2.y)
+
+        path = "M #{a1.x} #{a1.y} A #{rx} #{ry} 0 0 1 #{a2.x} #{a2.y}"
+
 class LinkStyles.Demicurve extends LinkStyle
     get: (source, target, a1, a2, o1, o2) ->
         horizontal_1 = Math.abs(o1 % pi) < pi / 4

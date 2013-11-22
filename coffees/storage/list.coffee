@@ -27,7 +27,11 @@ list_diagrams = ->
         $tr.addClass('local').append(
             $('<td>').text(title),
             $('<td>').text(Diagram.diagrams[type].label),
-            $('<td>').append($('<a>').attr('href', "##{b64_diagram}").text('⬈')))
+            $('<td>').append($('<a>').attr('href', "##{b64_diagram}").append($('<i>', class: 'glyphicon glyphicon-folder-open')))
+            $('<td>').append($('<a>').attr('href', "#").append($('<i>', class: 'glyphicon glyphicon-trash')).on('click', ((k) -> ->
+                localStorage.removeItem k
+                $(@).closest('tr').remove()
+                false)(key))))
 
     $ul = $('#diagrams ul')
     $ul.children().remove()
@@ -36,5 +40,5 @@ list_diagrams = ->
         b64_diagram = diagram.hash()
         $ul.append(
             $('<li>').append(
-                $('<a>').attr('href', "##{b64_diagram}").text("New #{diagram.label}")))
+                a = $('<a>').attr('href', "##{b64_diagram}").text(" New #{diagram.label}").prepend($('<i>', class: 'glyphicon glyphicon-file'))))
 

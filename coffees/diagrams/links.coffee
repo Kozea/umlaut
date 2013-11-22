@@ -45,6 +45,7 @@ class Link extends Base
         @text =
             source: text?.source or ''
             target: text?.target or ''
+        @color = null
 
     objectify: ->
         name: @constructor.name

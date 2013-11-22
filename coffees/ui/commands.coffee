@@ -197,6 +197,13 @@ commands =
         glyph: 'transfer'
         hotkey: 'w'
 
+    back_to_list:
+        fun: ->
+            location.href = '#'
+        label: 'Go back to diagram list'
+        glyph: 'list'
+        hotkey: 'esc'
+
 $ ->
    for name, command of commands
         button = d3.select('.btns')

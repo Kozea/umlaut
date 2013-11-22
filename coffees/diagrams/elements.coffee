@@ -31,6 +31,8 @@ class Element extends Base
         @_height = null
         @_rotation = 0
         @anchors = {}
+        @color = null
+        @bg_color = null
 
         @anchors[cardinal.N] = =>
             x: @x

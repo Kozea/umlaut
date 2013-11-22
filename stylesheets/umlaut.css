@@ -10,17 +10,17 @@
 /* GNU Affero General Public License for more details. */
 /* You should have received a copy of the GNU Affero General Public License */
 /* along with this program.  If not, see http://www.gnu.org/licenses/. */
-/* line 27, ../sass/umlaut.sass */
+/* line 28, ../sass/umlaut.sass */
 .hidden {
   display: none;
 }
 
-/* line 30, ../sass/umlaut.sass */
+/* line 31, ../sass/umlaut.sass */
 .draggable {
   cursor: move !important;
 }
 
-/* line 33, ../sass/umlaut.sass */
+/* line 34, ../sass/umlaut.sass */
 body, html {
   color: black;
   background-color: white;
@@ -32,13 +32,26 @@ body, html {
   -webkit-flex-direction: column;
   flex-direction: column;
 }
-/* line 44, ../sass/umlaut.sass */
+/* line 45, ../sass/umlaut.sass */
 body > header h1, html > header h1 {
   font-size: 2em;
   margin: 0.5em;
 }
 
-/* line 48, ../sass/umlaut.sass */
+/* line 50, ../sass/umlaut.sass */
+header h1 {
+  background: url("/umlaut.svg") center no-repeat;
+  margin: 0;
+  height: 131px;
+}
+/* line 55, ../sass/umlaut.sass */
+header h1 a {
+  font: 0/0 serif;
+  text-shadow: none;
+  color: transparent;
+}
+
+/* line 58, ../sass/umlaut.sass */
 body > section {
   -webkit-flex: 1;
   flex: 1;
@@ -46,8 +59,17 @@ body > section {
   display: flex;
   -webkit-flex-direction: column;
   flex-direction: column;
+  margin: 1em;
 }
-/* line 56, ../sass/umlaut.sass */
+/* line 67, ../sass/umlaut.sass */
+body > section#editor {
+  margin-right: 0;
+}
+/* line 71, ../sass/umlaut.sass */
+body > section#diagrams li {
+  list-style: none;
+}
+/* line 74, ../sass/umlaut.sass */
 body > section #main {
   -webkit-user-select: none;
   -moz-user-select: none;
@@ -58,43 +80,52 @@ body > section #main {
   -webkit-flex-direction: row;
   flex-direction: row;
 }
-/* line 66, ../sass/umlaut.sass */
+/* line 84, ../sass/umlaut.sass */
+body > section #main .waterlogo {
+  background: url("/umlaut.svg") center no-repeat;
+  opacity: 0.6;
+  position: absolute;
+  bottom: 10px;
+  height: 131px;
+  width: 333px;
+}
+/* line 92, ../sass/umlaut.sass */
 body > section #main article {
   -webkit-flex: 1;
   flex: 1;
   position: relative;
 }
-/* line 71, ../sass/umlaut.sass */
+/* line 97, ../sass/umlaut.sass */
 body > section #main article .btns {
   text-align: center;
   position: absolute;
   bottom: 0.5em;
   right: 0.5em;
 }
-/* line 77, ../sass/umlaut.sass */
+/* line 103, ../sass/umlaut.sass */
 body > section #main article .btns .btn {
   margin: 0 3px 6px 3px;
 }
-/* line 80, ../sass/umlaut.sass */
+/* line 106, ../sass/umlaut.sass */
 body > section #main article .btns .glyphicon {
   font-size: 20px;
 }
-/* line 83, ../sass/umlaut.sass */
+/* line 109, ../sass/umlaut.sass */
 body > section #main aside {
   margin: 0 0.5em;
   width: 100px;
 }
-/* line 87, ../sass/umlaut.sass */
+/* line 113, ../sass/umlaut.sass */
 body > section #main aside h3 {
   text-align: center;
   margin: 0 0 0.5em;
   font-size: 1.25em;
 }
-/* line 92, ../sass/umlaut.sass */
+/* line 118, ../sass/umlaut.sass */
 body > section #main aside .icons {
   overflow-y: auto;
 }
-/* line 95, ../sass/umlaut.sass */
+/* line 121, ../sass/umlaut.sass */
 body > section #main aside .icons .icon {
   min-width: 100%;
   max-width: 100%;
@@ -102,26 +133,26 @@ body > section #main aside .icons .icon {
   margin: 0 0 6px;
 }
 
-/* line 101, ../sass/umlaut.sass */
+/* line 127, ../sass/umlaut.sass */
 footer {
   display: -webkit-flex;
   display: flex;
 }
-/* line 105, ../sass/umlaut.sass */
+/* line 131, ../sass/umlaut.sass */
 footer h4 {
   -webkit-flex: 1;
   flex: 1;
   margin: 0;
   padding: 0;
 }
-/* line 111, ../sass/umlaut.sass */
+/* line 137, ../sass/umlaut.sass */
 footer h4:last-of-type {
   -webkit-flex: 2;
   flex: 2;
   text-align: right;
 }
 
-/* line 116, ../sass/umlaut.sass */
+/* line 142, ../sass/umlaut.sass */
 #overlay {
   visibility: hidden;
   position: absolute;
@@ -133,11 +164,11 @@ footer h4:last-of-type {
   z-index: 1000;
   background-color: rgba(0, 0, 0, 0.2);
 }
-/* line 127, ../sass/umlaut.sass */
+/* line 153, ../sass/umlaut.sass */
 #overlay.visible {
   visibility: visible;
 }
-/* line 130, ../sass/umlaut.sass */
+/* line 156, ../sass/umlaut.sass */
 #overlay div {
   width: 30%;
   margin: 100px auto;
@@ -146,89 +177,87 @@ footer h4:last-of-type {
   padding: 15px;
   text-align: center;
 }
-/* line 138, ../sass/umlaut.sass */
+/* line 164, ../sass/umlaut.sass */
 #overlay textarea {
   border: 1px solid #888888;
   width: 100%;
   height: 75px;
 }
 
-/* line 143, ../sass/umlaut.sass */
+/* line 169, ../sass/umlaut.sass */
 #diagram {
   box-shadow: 0 0 15px #aaaaaa inset;
 }
 
-/* line 147, ../sass/umlaut.sass */
+/* line 173, ../sass/umlaut.sass */
 svg #title {
   text-anchor: middle;
-  font-size: 21px;
+  font-size: 28px;
 }
-/* line 151, ../sass/umlaut.sass */
+/* line 177, ../sass/umlaut.sass */
 svg #Arrow {
   fill: transparent;
   stroke: black;
 }
-/* line 155, ../sass/umlaut.sass */
+/* line 181, ../sass/umlaut.sass */
 svg #BlackArrow {
   fill: black;
   stroke: black;
 }
-/* line 159, ../sass/umlaut.sass */
+/* line 185, ../sass/umlaut.sass */
 svg #WhiteArrow, svg #WhiteDiamond {
   fill: white;
   stroke: black;
 }
-/* line 164, ../sass/umlaut.sass */
+/* line 190, ../sass/umlaut.sass */
 svg #grid path {
   fill: transparent;
   stroke: rgba(0, 0, 255, 0.12);
 }
-/* line 168, ../sass/umlaut.sass */
+/* line 194, ../sass/umlaut.sass */
 svg .background.move {
   cursor: move;
 }
-/* line 171, ../sass/umlaut.sass */
+/* line 197, ../sass/umlaut.sass */
 svg text {
   text-anchor: middle;
   font-family: "sans";
   font-size: 14px;
-  /* tspan
-   * /* dominant-baseline: text-before-edge */
 }
-/* line 179, ../sass/umlaut.sass */
+/* line 202, ../sass/umlaut.sass */
 svg .ghost {
   -webkit-transition: stroke 500ms;
   -moz-transition: stroke 500ms;
   -o-transition: stroke 500ms;
   transition: stroke 500ms;
 }
-/* line 182, ../sass/umlaut.sass */
+/* line 205, ../sass/umlaut.sass */
 svg .ghost:hover {
   stroke: rgba(0, 0, 255, 0.1);
 }
-/* line 185, ../sass/umlaut.sass */
+/* line 208, ../sass/umlaut.sass */
 svg .ghost:active {
   stroke: rgba(0, 0, 255, 0.2);
 }
-/* line 189, ../sass/umlaut.sass */
+/* line 212, ../sass/umlaut.sass */
 svg .link .dashed {
   stroke-dasharray: 5 5;
 }
-/* line 192, ../sass/umlaut.sass */
+/* line 215, ../sass/umlaut.sass */
 svg .link .ghost {
   fill: none;
   stroke-width: 30;
   stroke: rgba(0, 0, 255, 0);
 }
-/* line 198, ../sass/umlaut.sass */
+/* line 221, ../sass/umlaut.sass */
 svg .group .ghost {
   cursor: crosshair;
 }
-/* line 202, ../sass/umlaut.sass */
+/* line 225, ../sass/umlaut.sass */
 svg .link:hover .shape, svg .element:hover .shape, svg .group:hover .shape {
   stroke-width: 2;
 }
-/* line 205, ../sass/umlaut.sass */
+/* line 228, ../sass/umlaut.sass */
 svg .shape {
   -webkit-transition: stroke-width 500ms;
   -moz-transition: stroke-width 500ms;
@@ -237,49 +266,49 @@ svg .shape {
   stroke: black;
   stroke-width: 1.3;
 }
-/* line 211, ../sass/umlaut.sass */
+/* line 234, ../sass/umlaut.sass */
 svg .selected .shape {
   stroke: blue;
 }
-/* line 215, ../sass/umlaut.sass */
+/* line 238, ../sass/umlaut.sass */
 svg .selected.moving .shape {
   stroke: magenta;
 }
-/* line 219, ../sass/umlaut.sass */
+/* line 242, ../sass/umlaut.sass */
 svg .moving .shape {
   stroke: red;
 }
-/* line 223, ../sass/umlaut.sass */
+/* line 246, ../sass/umlaut.sass */
 svg .link .shape {
   fill: none;
 }
-/* line 226, ../sass/umlaut.sass */
+/* line 249, ../sass/umlaut.sass */
 svg .link text {
   fill: black;
   stroke: none;
 }
-/* line 230, ../sass/umlaut.sass */
+/* line 253, ../sass/umlaut.sass */
 svg .element, svg .group {
   cursor: move;
 }
-/* line 234, ../sass/umlaut.sass */
+/* line 257, ../sass/umlaut.sass */
 svg .element .shape.fill-bg, svg .group .shape.fill-bg {
   fill: white;
 }
-/* line 237, ../sass/umlaut.sass */
+/* line 260, ../sass/umlaut.sass */
 svg .element .shape.fill-fg, svg .group .shape.fill-fg {
   fill: black;
 }
-/* line 240, ../sass/umlaut.sass */
+/* line 263, ../sass/umlaut.sass */
 svg .element .shape.fill-none, svg .group .shape.fill-none {
   fill: transparent;
 }
-/* line 243, ../sass/umlaut.sass */
+/* line 266, ../sass/umlaut.sass */
 svg .element .ghost, svg .group .ghost {
   fill: transparent;
   stroke: none;
 }
-/* line 247, ../sass/umlaut.sass */
+/* line 270, ../sass/umlaut.sass */
 svg .element .handle, svg .element .anchor, svg .group .handle, svg .group .anchor {
   -webkit-transition: fill 500ms, stroke 500ms;
   -moz-transition: fill 500ms, stroke 500ms;
@@ -288,80 +317,68 @@ svg .element .handle, svg .element .anchor, svg .group .handle, svg .group .anch
   fill: rgba(0, 0, 0, 0);
   stroke: rgba(0, 0, 0, 0);
 }
-/* line 253, ../sass/umlaut.sass */
+/* line 276, ../sass/umlaut.sass */
 svg .element .handle.NW, svg .group .handle.NW {
   cursor: nw-resize;
 }
-/* line 255, ../sass/umlaut.sass */
+/* line 278, ../sass/umlaut.sass */
 svg .element .handle.NE, svg .group .handle.NE {
   cursor: ne-resize;
 }
-/* line 257, ../sass/umlaut.sass */
+/* line 280, ../sass/umlaut.sass */
 svg .element .handle.SW, svg .group .handle.SW {
   cursor: sw-resize;
 }
-/* line 259, ../sass/umlaut.sass */
+/* line 282, ../sass/umlaut.sass */
 svg .element .handle.SE, svg .group .handle.SE {
   cursor: se-resize;
 }
-/* line 261, ../sass/umlaut.sass */
+/* line 284, ../sass/umlaut.sass */
 svg .element .handle.O, svg .group .handle.O {
   cursor: crosshair;
 }
-/* line 264, ../sass/umlaut.sass */
+/* line 287, ../sass/umlaut.sass */
 svg .element .anchor, svg .group .anchor {
   cursor: pointer;
 }
-/* line 268, ../sass/umlaut.sass */
+/* line 291, ../sass/umlaut.sass */
 svg .element.selected .handle, svg .group.selected .handle {
   fill: rgba(0, 0, 0, 0.025);
   stroke: rgba(0, 0, 0, 0.15);
 }
-/* line 272, ../sass/umlaut.sass */
+/* line 295, ../sass/umlaut.sass */
 svg .element.selected .anchor, svg .group.selected .anchor {
   fill: rgba(255, 0, 0, 0.025);
   stroke: rgba(255, 0, 0, 0.25);
 }
-/* line 277, ../sass/umlaut.sass */
+/* line 300, ../sass/umlaut.sass */
 svg .element:hover .handle, svg .group:hover .handle {
   fill: rgba(0, 0, 0, 0.05);
   stroke: rgba(0, 0, 0, 0.3);
 }
-/* line 281, ../sass/umlaut.sass */
+/* line 304, ../sass/umlaut.sass */
 svg .element:hover .anchor, svg .group:hover .anchor {
   fill: rgba(255, 0, 0, 0.05);
   stroke: rgba(255, 0, 0, 0.5);
 }
-/* line 286, ../sass/umlaut.sass */
+/* line 309, ../sass/umlaut.sass */
 svg.linking .anchor {
   fill: rgba(0, 255, 0, 0.05);
   stroke: rgba(0, 255, 0, 0.7);
 }
-/* line 290, ../sass/umlaut.sass */
+/* line 313, ../sass/umlaut.sass */
 svg.linking .anchor.active {
   fill: rgba(0, 255, 0, 0.5);
   stroke: lime;
 }
-/* line 295, ../sass/umlaut.sass */
+/* line 318, ../sass/umlaut.sass */
 svg .underlay .selection {
   fill: rgba(0, 255, 0, 0.05);
   stroke: rgba(0, 255, 0, 0.3);
 }
-/* line 300, ../sass/umlaut.sass */
+/* line 323, ../sass/umlaut.sass */
 svg .overlay .selection {
   fill: rgba(0, 0, 255, 0.05);
   stroke: rgba(0, 0, 255, 0.3);
   stroke-width: 2;
-}
-
-/* svg.icon
- * /* text
- *   /* dominant-baseline: text-before-edge */
-/* line 309, ../sass/umlaut.sass */
-textarea.dot {
-  float: left;
-  display: block;
-  width: 70%;
-  min-height: 400px;
-  margin: 0 1em 1em;
 }
