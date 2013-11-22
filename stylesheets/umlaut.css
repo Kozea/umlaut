@@ -192,10 +192,8 @@ svg text {
   text-anchor: middle;
   font-family: "sans";
   font-size: 14px;
-}
-/* line 176, ../sass/umlaut.sass */
-svg text tspan {
-  dominant-baseline: text-before-edge;
+  /* tspan
+   * /* dominant-baseline: text-before-edge */
 }
 /* line 179, ../sass/umlaut.sass */
 svg .ghost {
@@ -356,11 +354,9 @@ svg .overlay .selection {
   stroke-width: 2;
 }
 
-/* line 306, ../sass/umlaut.sass */
-svg.icon text {
-  dominant-baseline: text-before-edge;
-}
-
+/* svg.icon
+ * /* text
+ *   /* dominant-baseline: text-before-edge */
 /* line 309, ../sass/umlaut.sass */
 textarea.dot {
   float: left;

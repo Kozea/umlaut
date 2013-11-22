@@ -52,6 +52,18 @@ enter_node = (nodes, connect=true) ->
     g.call(move_drag)
     g.call(mouse_node)
 
+
+write_text = (txt, text) ->
+    txt.selectAll('tspan').remove()
+    for line, i in text.split('\n')
+        tspan = txt.append('tspan')
+            .text(line)
+            .attr('x', 0)
+        if i != 0
+            tspan
+                .attr('dy', '1.2em')
+
+
 update_node = (nodes) ->
     nodes
         .select('text')
@@ -59,14 +71,7 @@ update_node = (nodes) ->
             txt = d3.select @
             current_text = txt.selectAll('tspan')[0].map((e) -> d3.select(e).text()).join('\n')
             return if node.text == current_text
-            txt.selectAll('tspan').remove()
-            for line, i in node.text.split('\n')
-                tspan = txt.append('tspan')
-                    .text(line)
-                    .attr('x', 0)
-                if i != 0
-                    tspan
-                        .attr('dy', '1.2em'))
+            txt.call(write_text, node.text))
         .each((node) -> node.set_txt_bbox(@getBBox()))
         .attr('x', (node) -> node.txt_x())
         .attr('y', (node) -> node.txt_y())
@@ -80,16 +85,6 @@ update_node = (nodes) ->
 
     nodes.call(update_handles)
     nodes.call(update_anchors)
-
-write_text = (txt, text) ->
-    txt.selectAll('tspan').remove()
-    for line, i in text.split('\n')
-        tspan = txt.append('tspan')
-            .text(line)
-            .attr('x', 0)
-        if i != 0
-            tspan
-                .attr('dy', '1.2em')
 
 
 enter_link = (links, connect=true) ->

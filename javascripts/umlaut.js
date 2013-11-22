@@ -273,7 +273,9 @@ Element = (function(_super) {
   };
 
   Element.prototype.txt_y = function() {
-    return -this._txt_bbox.height / 2;
+    var lines;
+    lines = this.text.split('\n').length;
+    return this.margin.y - (this._txt_bbox.height * (lines - 1) / lines) / 2;
   };
 
   Element.prototype.width = function(w) {
@@ -2364,7 +2366,17 @@ edit = function(getter, setter) {
   textarea = overlay.select('textarea');
   textarea_node = textarea.node();
   textarea.on('input', function() {
-    setter(this.value);
+    var val;
+    setter(((function() {
+      var _i, _len, _ref47, _results;
+      _ref47 = this.value.split('\n');
+      _results = [];
+      for (_i = 0, _len = _ref47.length; _i < _len; _i++) {
+        val = _ref47[_i];
+        _results.push(val || ' ');
+      }
+      return _results;
+    }).call(this)).join('\n'));
     return svg.sync();
   }).on('keydown', function() {
     if (d3.event.keyCode === 27) {
@@ -2810,9 +2822,26 @@ enter_node = function(nodes, connect) {
   return g.call(mouse_node);
 };
 
+write_text = function(txt, text) {
+  var i, line, tspan, _i, _len, _ref47, _results;
+  txt.selectAll('tspan').remove();
+  _ref47 = text.split('\n');
+  _results = [];
+  for (i = _i = 0, _len = _ref47.length; _i < _len; i = ++_i) {
+    line = _ref47[i];
+    tspan = txt.append('tspan').text(line).attr('x', 0);
+    if (i !== 0) {
+      _results.push(tspan.attr('dy', '1.2em'));
+    } else {
+      _results.push(void 0);
+    }
+  }
+  return _results;
+};
+
 update_node = function(nodes) {
   nodes.select('text').each(function(node) {
-    var current_text, i, line, tspan, txt, _i, _len, _ref47, _results;
+    var current_text, txt;
     txt = d3.select(this);
     current_text = txt.selectAll('tspan')[0].map(function(e) {
       return d3.select(e).text();
@@ -2820,19 +2849,7 @@ update_node = function(nodes) {
     if (node.text === current_text) {
       return;
     }
-    txt.selectAll('tspan').remove();
-    _ref47 = node.text.split('\n');
-    _results = [];
-    for (i = _i = 0, _len = _ref47.length; _i < _len; i = ++_i) {
-      line = _ref47[i];
-      tspan = txt.append('tspan').text(line).attr('x', 0);
-      if (i !== 0) {
-        _results.push(tspan.attr('dy', '1.2em'));
-      } else {
-        _results.push(void 0);
-      }
-    }
-    return _results;
+    return txt.call(write_text, node.text);
   }).each(function(node) {
     return node.set_txt_bbox(this.getBBox());
   }).attr('x', function(node) {
@@ -2852,23 +2869,6 @@ update_node = function(nodes) {
   });
   nodes.call(update_handles);
   return nodes.call(update_anchors);
-};
-
-write_text = function(txt, text) {
-  var i, line, tspan, _i, _len, _ref47, _results;
-  txt.selectAll('tspan').remove();
-  _ref47 = text.split('\n');
-  _results = [];
-  for (i = _i = 0, _len = _ref47.length; _i < _len; i = ++_i) {
-    line = _ref47[i];
-    tspan = txt.append('tspan').text(line).attr('x', 0);
-    if (i !== 0) {
-      _results.push(tspan.attr('dy', '1.2em'));
-    } else {
-      _results.push(void 0);
-    }
-  }
-  return _results;
 };
 
 enter_link = function(links, connect) {

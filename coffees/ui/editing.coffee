@@ -26,7 +26,7 @@ edit = (getter, setter) ->
     textarea_node = textarea.node()
     textarea
         .on('input', ->
-            setter(@value)
+            setter((val or ' ' for val in @value.split('\n')).join('\n'))
             svg.sync()
         )
         .on('keydown', ->
