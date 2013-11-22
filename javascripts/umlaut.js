@@ -2108,7 +2108,7 @@ commands = {
   },
   "export": {
     fun: function(e) {
-      var css, rule, svg, _i, _len, _ref47;
+      var content, css, d, rule, svg, _i, _len, _ref47;
       css = '';
       _ref47 = d3.select('#style').node().sheet.cssRules;
       for (_i = 0, _len = _ref47.length; _i < _len; _i++) {
@@ -2122,7 +2122,12 @@ commands = {
       svg.selectAll('.handles,.anchors').remove();
       svg.selectAll('.node').classed('selected', false);
       svg.select('defs').append('style').text(css);
-      svg = btoa("<svg xmlns='http://www.w3.org/2000/svg'>" + (svg.html()) + "</svg>");
+      content = svg.html();
+      if (content == null) {
+        d = $(svg.node()).wrap('<div>');
+        content = d.parent().html();
+      }
+      svg = btoa("<svg xmlns='http://www.w3.org/2000/svg'>" + content + "</svg>");
       return location.href = "data:image/svg+xml;base64," + svg;
     },
     label: 'Export to svg',

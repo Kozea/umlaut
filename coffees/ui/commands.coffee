@@ -93,7 +93,11 @@ commands =
             svg.selectAll('.handles,.anchors').remove()
             svg.selectAll('.node').classed('selected', false)
             svg.select('defs').append('style').text(css)
-            svg = btoa("<svg xmlns='http://www.w3.org/2000/svg'>#{svg.html()}</svg>")
+            content = svg.html()
+            if not content?
+                d = $(svg.node()).wrap('<div>')
+                content = d.parent().html()
+            svg = btoa("<svg xmlns='http://www.w3.org/2000/svg'>#{content}</svg>")
             location.href = "data:image/svg+xml;base64,#{svg}"
 
         label: 'Export to svg'
