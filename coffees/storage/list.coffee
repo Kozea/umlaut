@@ -26,19 +26,21 @@ list_diagrams = ->
         $tbody.append($tr = $('<tr>'))
         $tr.addClass('local').append(
             $('<td>').text(title),
-            $('<td>').text(Diagram.diagrams[type].label),
-            $('<td>').append($('<a>').attr('href', "##{b64_diagram}").append($('<i>', class: 'glyphicon glyphicon-folder-open')))
-            $('<td>').append($('<a>').attr('href', "#").append($('<i>', class: 'glyphicon glyphicon-trash')).on('click', ((k) -> ->
-                localStorage.removeItem k
-                $(@).closest('tr').remove()
-                false)(key))))
+            $('<td>').text((new Diagram.diagrams[type]()).label),
+            $('<td>')
+                .append($('<a>').attr('href', "##{b64_diagram}").append($('<i>', class: 'glyphicon glyphicon-folder-open')))
+                .append($('<a>').attr('href', "#").append($('<i>', class: 'glyphicon glyphicon-trash')).on('click', ((k) -> ->
+                    localStorage.removeItem k
+                    $(@).closest('tr').remove()
+                    false)(key))))
 
-    $ul = $('#diagrams ul')
-    $ul.children().remove()
+    $('#diagrams tr.new').remove()
     for name, type of Diagram.diagrams
         diagram = new type()
         b64_diagram = diagram.hash()
-        $ul.append(
-            $('<li>').append(
-                a = $('<a>').attr('href', "##{b64_diagram}").text(" New #{diagram.label}").prepend($('<i>', class: 'glyphicon glyphicon-file'))))
+        $tbody.append($tr = $('<tr>'))
+        $tr.addClass('new').append(
+            $('<td>').text('Create a new'),
+            $('<td>').text(diagram.label),
+            $('<td>').append($('<a>').attr('href', "##{b64_diagram}").append($('<i>', class: 'glyphicon glyphicon-file'))))
 

@@ -3484,7 +3484,7 @@ history_pop = function() {
 };
 
 list_diagrams = function() {
-  var $tbody, $tr, $ul, a, b64_diagram, diagram, key, name, title, type, _ref56, _ref57, _results;
+  var $tbody, $tr, b64_diagram, diagram, key, name, title, type, _ref56, _ref57, _results;
   $tbody = $('#diagrams tbody');
   $tbody.find('.local').remove();
   for (key in localStorage) {
@@ -3494,9 +3494,9 @@ list_diagrams = function() {
       continue;
     }
     $tbody.append($tr = $('<tr>'));
-    $tr.addClass('local').append($('<td>').text(title), $('<td>').text(Diagram.diagrams[type].label), $('<td>').append($('<a>').attr('href', "#" + b64_diagram).append($('<i>', {
+    $tr.addClass('local').append($('<td>').text(title), $('<td>').text((new Diagram.diagrams[type]()).label), $('<td>').append($('<a>').attr('href', "#" + b64_diagram).append($('<i>', {
       "class": 'glyphicon glyphicon-folder-open'
-    }))), $('<td>').append($('<a>').attr('href', "#").append($('<i>', {
+    }))).append($('<a>').attr('href', "#").append($('<i>', {
       "class": 'glyphicon glyphicon-trash'
     })).on('click', (function(k) {
       return function() {
@@ -3506,15 +3506,15 @@ list_diagrams = function() {
       };
     })(key))));
   }
-  $ul = $('#diagrams ul');
-  $ul.children().remove();
+  $('#diagrams tr.new').remove();
   _ref57 = Diagram.diagrams;
   _results = [];
   for (name in _ref57) {
     type = _ref57[name];
     diagram = new type();
     b64_diagram = diagram.hash();
-    _results.push($ul.append($('<li>').append(a = $('<a>').attr('href', "#" + b64_diagram).text(" New " + diagram.label).prepend($('<i>', {
+    $tbody.append($tr = $('<tr>'));
+    _results.push($tr.addClass('new').append($('<td>').text('Create a new'), $('<td>').text(diagram.label), $('<td>').append($('<a>').attr('href', "#" + b64_diagram).append($('<i>', {
       "class": 'glyphicon glyphicon-file'
     })))));
   }
