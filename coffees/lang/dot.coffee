@@ -345,8 +345,9 @@ dot_lex = (tokens) ->
 
 
 dot = (src) ->
-    mknode = (l) ->
-        new rectangle(undefined, undefined, l.toString())
+    mknode = (l, type) ->
+        Type = window[capitalize(type)] or Ellipse
+        new Type(undefined, undefined, l.toString())
 
     tokens = dot_tokenize src
     graph = dot_lex tokens
@@ -368,10 +369,13 @@ dot = (src) ->
                 else
                     if node.id not of nodes_by_id
                         label = node.id
+                        type = 'ellipse'
                         for attr in statement.attributes
                             if attr.left == 'label'
                                 label = attr.right
-                        elt = mknode label
+                            else if attr.left == 'shape'
+                                type = attr.right
+                        elt = mknode label, type
                         d.elements.push elt
                         nodes_by_id[node.id] = elt
                     node._elt = nodes_by_id[node.id]

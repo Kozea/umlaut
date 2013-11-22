@@ -94,9 +94,9 @@ commands =
             svg.selectAll('.node').classed('selected', false)
             svg.select('defs').append('style').text(css)
             content = svg.html()
+            # Some browser doesn't like innerHTML on <svg>
             if not content?
-                d = $(svg.node()).wrap('<div>')
-                content = d.parent().html()
+                content = $(svg.node()).wrap('<div>').parent().html()
             svg = btoa("<svg xmlns='http://www.w3.org/2000/svg'>#{content}</svg>")
             location.href = "data:image/svg+xml;base64,#{svg}"
 
@@ -162,7 +162,8 @@ commands =
             diagram.linkstyle = switch diagram.linkstyle
                 when 'curve' then 'diagonal'
                 when 'diagonal' then 'rectangular'
-                when 'rectangular' then 'demicurve'
+                when 'rectangular' then 'rationalcurve'
+                when 'rationalcurve' then 'demicurve'
                 when 'demicurve' then 'curve'
             svg.tick()
         label: 'Change link style'

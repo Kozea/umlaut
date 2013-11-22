@@ -84,3 +84,6 @@ cardinal_to_direction = (c) ->
 
 timestamp = ->
     new Date().getTime()
+
+capitalize = (s) ->
+    s.charAt(0).toUpperCase() + s.substr(1).toLowerCase()

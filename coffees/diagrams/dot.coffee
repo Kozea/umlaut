@@ -16,18 +16,21 @@
 # along with this program.  If not, see http://www.gnu.org/licenses/.
 
 
-class rectangle extends Rect
+class Box extends Rect
     @rotationable: true
 
-class ellipsis extends Ellipsis
+class Polygon extends Rect
+
+class Ellipse extends Ellipsis
     @rotationable: true
 
-class lozenge extends Lozenge
+class Oval extends Ellipse
+
+class Diamond extends Lozenge
     @rotationable: true
 
-class note extends Note
+class Note extends Note
     @rotationable: true
-
 
 class bare_link extends Link
 
@@ -41,7 +44,7 @@ class whitearrow extends Link
     @marker: new WhiteArrow()
 
 class blackdiamond extends Link
-    @marker: new Diamond()
+    @marker: new BlackDiamond()
 
 class whitediamond extends Link
     @marker: new WhiteDiamond()
@@ -57,7 +60,7 @@ class DotDiagram extends Diagram
         super
         @linkstyle = 'curve'
         @types =
-            elements: [rectangle, ellipsis, lozenge, note]
+            elements: [Box, Polygon, Ellipse, Oval, Diamond, Note]
             groups: []
             links: [bare_link, arrow, blackarrow, whitearrow, blackdiamond, whitediamond, dotted]
 

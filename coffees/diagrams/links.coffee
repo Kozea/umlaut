@@ -67,8 +67,11 @@ class Link extends Base
         @a1 = @source.rotate(@source.anchors[d1]())
 
         d2 = +if @target_anchor? then @target_anchor else @target.direction(@a1.x, @a1.y)
-        @a2 = @target.rotate(@target.anchors[d2]())
 
+        if @source == @target and d1 == d2
+            anchors = Object.keys(@target.anchors)
+            d2 = +anchors[(anchors.indexOf(d1.toString()) + 1) % anchors.length]
+        @a2 = @target.rotate(@target.anchors[d2]())
         @o1 = d1 + @source._rotation
         @o2 = d2 + @target._rotation
 
@@ -109,6 +112,11 @@ class Link extends Base
         else if diagram.linkstyle == 'curve'
             path = "#{path} C"
             d = dist(@a1, @a2) / 2
+            if @source == @target
+                d *= 4
+                if (@o1 + @o2) % pi == 0
+                    @o1 -= pi / 4
+                    @o2 += pi / 4
 
             dx =  Math.cos(@o1) * d
             dy =  Math.sin(@o1) * d
@@ -116,6 +124,26 @@ class Link extends Base
 
             dx =  Math.cos(@o2) * d
             dy =  Math.sin(@o2) * d
+            path = "#{path} #{@a2.x + dx} #{@a2.y + dy}"
+        else if diagram.linkstyle == 'rationalcurve'
+            path = "#{path} C"
+            if @source == @target
+                if (@o1 + @o2) % pi == 0
+                    @o1 -= pi / 4
+                    @o2 += pi / 4
+
+            dx =  Math.cos(@o1) * @source.width()
+            dy =  Math.sin(@o1) * @source.height()
+            if @source == @target
+                dx *= 4
+                dy *= 4
+            path = "#{path} #{@a1.x + dx} #{@a1.y + dy}"
+
+            dx =  Math.cos(@o2) * @target.width()
+            dy =  Math.sin(@o2) * @target.height()
+            if @source == @target
+                dx *= 4
+                dy *= 4
             path = "#{path} #{@a2.x + dx} #{@a2.y + dy}"
 
         "#{path} #{@a2.x} #{@a2.y}"

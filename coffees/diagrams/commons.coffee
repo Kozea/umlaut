@@ -91,11 +91,11 @@ class Lozenge extends Element
 
 class WhiteArrow extends BlackArrow
 
-class Diamond extends Marker
+class BlackDiamond extends Marker
     path: ->
         'M 0 5 L 10 0 L 20 5 L 10 10 z'
 
-class WhiteDiamond extends Diamond
+class WhiteDiamond extends BlackDiamond
 
 class Association extends Link
     @marker: new BlackArrow()
@@ -104,7 +104,7 @@ class Inheritance extends Link
     @marker: new WhiteArrow()
 
 class Composition extends Link
-    @marker: new Diamond()
+    @marker: new BlackDiamond()
 
 class Comment extends Link
     @marker: new Arrow()

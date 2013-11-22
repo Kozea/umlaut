@@ -182,7 +182,7 @@ mouse_anchor = (anchor) ->
             node = d3.select($(@).closest('.node').get(0)).data()[0]
             if diagram.linking.length
                 for lnk in diagram.linking
-                    if lnk.source != lnk.target and diagram.mouse not in [lnk.source, lnk.target]
+                    if diagram.mouse not in [lnk.source, lnk.target]
                         diagram.links.push(lnk)
                 diagram.linking = []
                 svg.sync(true)
@@ -222,7 +222,7 @@ mouse_node = (node) ->
             return if d3.event.ctrlKey
             if diagram.linking.length
                 for lnk in diagram.linking
-                    if lnk.source != lnk.target and diagram.mouse not in [lnk.source, lnk.target]
+                    if diagram.mouse not in [lnk.source, lnk.target]
                         diagram.links.push(lnk)
                 diagram.linking = []
                 svg.sync(true)

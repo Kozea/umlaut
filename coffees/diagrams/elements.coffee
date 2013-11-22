@@ -36,13 +36,13 @@ class Element extends Base
             x: @x
             y: @y - @height() / 2
 
-        @anchors[cardinal.S] = =>
-            x: @x
-            y: @y + @height() / 2
-
         @anchors[cardinal.E] = =>
             x: @x + @width() / 2
             y: @y
+
+        @anchors[cardinal.S] = =>
+            x: @x
+            y: @y + @height() / 2
 
         @anchors[cardinal.W] = =>
             x: @x - @width() / 2
