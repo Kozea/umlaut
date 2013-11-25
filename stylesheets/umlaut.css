@@ -40,7 +40,7 @@ body > header h1, html > header h1 {
 
 /* line 50, ../sass/umlaut.sass */
 header h1 {
-  background: url('/images/umlaut.svg?1385134363') center no-repeat;
+  background: url("../images/umlaut.svg") center no-repeat;
   margin: 0;
   height: 131px;
 }
@@ -90,7 +90,7 @@ body > section #main {
 }
 /* line 90, ../sass/umlaut.sass */
 body > section #main .waterlogo {
-  background: url('/images/umlaut.svg?1385134363') center no-repeat;
+  background: url("../images/umlaut.svg") center no-repeat;
   opacity: 0.6;
   position: absolute;
   bottom: 10px;
