@@ -35,13 +35,13 @@ class Svg extends Base
             .scale(diagram.zoom.scale)
             .translate(diagram.zoom.translate)
             .scaleExtent([.05, 5])
-            .on("zoom", =>
-                if not d3.event.sourceEvent or d3.event.sourceEvent.type in ['wheel', 'click'] or d3.event.sourceEvent.ctrlKey or d3.event.sourceEvent.which is 2
+            .on("zoom", ->
+                if d3.event.sourceEvent.type in ['wheel', 'click'] or d3.event.sourceEvent.ctrlKey or d3.event.sourceEvent.which is 2
                     diagram.zoom.translate = d3.event.translate
                     diagram.zoom.scale = d3.event.scale
-                    d3.select('.root').attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")")
-                    d3.select('#grid').attr("patternTransform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")")
-            )
+                    svg.sync_transform()
+            ).on("zoomend", ->
+                svg.sync(true))
 
         d3.select("article")
             .selectAll('svg')
@@ -180,6 +180,10 @@ class Svg extends Base
             d3.select('.background').classed('move', false)
         )
 
+    sync_transform: ->
+        d3.select('.root').attr("transform", "translate(" + diagram.zoom.translate + ")scale(" + diagram.zoom.scale + ")")
+        d3.select('#grid').attr("patternTransform", "translate(" + diagram.zoom.translate + ")scale(" + diagram.zoom.scale + ")")
+
     create: (svg) =>
         defs = svg
             .append('defs')
@@ -248,7 +252,7 @@ class Svg extends Base
     sync: (persist=false) ->
         @zoom.scale(diagram.zoom.scale)
         @zoom.translate(diagram.zoom.translate)
-        @zoom.event(d3.select('#bg'))
+        @sync_transform()
         @svg.select('#title').text(diagram.title)
 
         group = @svg.select('g.groups').selectAll('g.group').data(diagram.groups.sort(order))

@@ -51,6 +51,17 @@ node_add = (type) =>
             d3.event.button, d3.event.relatedTarget)
         dom_node.dispatchEvent(mouse_evt)
 
+last_command =
+    fun: null
+    args: null
+
+wrap = (fun) ->
+    ->
+        last_command =
+            fun: fun
+            args: arguments
+        fun.apply(arguments)
+
 
 commands =
     undo:
@@ -83,26 +94,15 @@ commands =
 
     export:
         fun: (e) ->
-            css = ''
-            for rule in d3.select('#style').node().sheet.cssRules
-                if rule.selectorText.match(/^svg\s/)
-                    css += rule.cssText
-
-            svg = d3.select('#diagram')
-            svg.select('.background').remove()
-            svg.selectAll('.handles,.anchors').remove()
-            svg.selectAll('.node').classed('selected', false)
-            svg.select('defs').append('style').text(css)
-            content = svg.html()
-            # Some browser doesn't like innerHTML on <svg>
-            if not content?
-                content = $(svg.node()).wrap('<div>').parent().html()
-            svg = btoa("<svg xmlns='http://www.w3.org/2000/svg'>#{content}</svg>")
-            location.href = "data:image/svg+xml;base64,#{svg}"
-
+            location.href = "data:image/svg+xml;base64,#{btoa(diagram.to_svg())}"
         label: 'Export to svg'
         glyph: 'export'
         hotkey: 'ctrl+enter'
+
+    export_to_textile:
+        fun: (e) ->
+            edit((-> "!data:image/svg+xml;base64,#{btoa(diagram.to_svg())}!:http://kozea.github.io/umlaut/#" + location.hash), (-> null))
+        hotkey: 'ctrl+b'
 
     edit:
         fun: ->
@@ -167,9 +167,9 @@ commands =
 
     defaultscale:
         fun: ->
-            svg.zoom.scale(1)
-            svg.zoom.translate([0, 0])
-            svg.zoom.event(d3.select('.background'))
+            diagram.zoom.scale = 1
+            diagram.zoom.translate = [0, 0]
+            svg.sync(true)
         label: 'Reset view'
         glyph: 'screenshot'
         hotkey: 'ctrl+backspace'
@@ -204,22 +204,30 @@ commands =
         glyph: 'list'
         hotkey: 'esc'
 
+
 $ ->
    for name, command of commands
-        button = d3.select('.btns')
-            .append('button')
-            .attr('title', "#{command.label} [#{command.hotkey}]")
-            .attr('class', 'btn btn-default btn-sm')
-            # .text(command.label)
-            .on('click', command.fun)
         if command.glyph
-            button
+            button = d3.select('.btns')
+                .append('button')
+                .attr('title', "#{command.label} [#{command.hotkey}]")
+                .attr('class', 'btn btn-default btn-sm')
+                .on('click', command.fun)
                 .append('span')
                 .attr('class', "glyphicon glyphicon-#{command.glyph}")
-        Mousetrap.bind command.hotkey, command.fun
+        Mousetrap.bind command.hotkey, wrap(command.fun)
+    Mousetrap.bind 'z', -> last_command.fun.apply(last_command.args)
 
 
 init_commands = ->
+    for conf, val of diagram.force_conf
+        for way, inc of {increase: 1.1, decrease: 0.9}
+            Mousetrap.bind "f #{conf[0]} #{if way == 'increase' then '+' else '-'}", ((c, i) ->
+                wrap((e) ->
+                    if diagram.force
+                        diagram.force_conf[c] *= i
+                    diagram.start_force()))(conf, inc)
+
     taken_hotkeys = []
     $('aside .icons .specific').each(-> Mousetrap.unbind $(@).attr('data-hotkey'))
     $('aside .icons svg').remove()
@@ -268,7 +276,7 @@ init_commands = ->
             .attr('width', icon.width())
             .attr('height', icon.height())
             .attr('preserveAspectRatio', 'xMidYMid meet')
-        Mousetrap.bind hotkey, fun
+        Mousetrap.bind hotkey, wrap(fun)
 
     taken_hotkeys = []
     for l, n in diagram.types.links
@@ -309,4 +317,4 @@ init_commands = ->
             .attr('height', 20)
             .attr('viewBox', "0 -10 100 20")
             .attr('preserveAspectRatio', 'none')
-        Mousetrap.bind hotkey, fun
+        Mousetrap.bind hotkey, wrap(fun)

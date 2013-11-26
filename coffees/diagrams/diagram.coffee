@@ -47,15 +47,22 @@ class Diagram extends Base
         @mouse = new Mouse(0, 0, '')
         @dragging = false
         @groupping = false
+        @force_conf =
+            gravity: .1
+            distance: 20
+            strengh: 1
+            friction: .9
+            theta: .8
+            charge_base: 2000
 
     start_force: ->
         @force = d3.layout.force()
-            .gravity(.1)
-            .linkDistance(20)
-            .linkStrength(1)
-            .friction(.9)
-            # .theta(.9)
-            .charge((node) -> - 2000 - node.width() * node.height() / 4)
+            .gravity(@force_conf.gravity)
+            .linkDistance(@force_conf.distance)
+            .linkStrength(@force_conf.strengh)
+            .friction(@force_conf.friction)
+            .theta(@force_conf.theta)
+            .charge((node) => - @force_conf.charge_base - node.width() * node.height() / 4)
             .size([svg.width, svg.height])
 
         @force.on('tick', => svg.tick())
@@ -68,6 +75,29 @@ class Diagram extends Base
         for type in @types.links
             markers[type.marker.id] = type.marker
         val for key, val of markers
+
+    to_svg: ->
+        css = ''
+        for rule in d3.select('#style').node().sheet.cssRules
+            if rule.selectorText.match(/^svg\s/)
+                if not rule.cssText.match(/:hover/) and not rule.cssText.match(/:active/) and not rule.cssText.match(/transition/)
+                    css += rule.cssText.replace(/svg\s/g, '')
+
+        svg_clone = d3.select(svg.svg.node().cloneNode(true))
+        svg_clone.select('.background').remove()
+        svg_clone.selectAll('.handles,.anchors').remove()
+        svg_clone.selectAll('.node').classed('selected', false)
+        svg_clone.selectAll('.ghost').remove()
+        svg_clone.select('defs').append('style').text(css)
+        margin = 50
+        rect = svg.svg.select('.root').node().getBoundingClientRect()
+        svg_clone.select('.root').attr('transform', "translate(#{diagram.zoom.translate[0] - rect.left + margin},#{diagram.zoom.translate[1] - rect.top + margin})scale(#{diagram.zoom.scale})")
+        svg_clone.select('#title').attr('x', rect.width / 2 + margin)
+        content = svg_clone.html()
+        # Some browser doesn't like innerHTML on <svg>
+        if not content?
+            content = $(svg_clone.node()).wrap('<div>').parent().html()
+        "<svg xmlns='http://www.w3.org/2000/svg' width='#{rect.width + 2 * margin}' height='#{rect.height + 2 * margin}'>#{content}</svg>"
 
     group: (name) ->
         for grp in @types.groups
@@ -104,7 +134,7 @@ class Diagram extends Base
         if obj.title
             @title = obj.title
         if obj.linkstyle
-            @linkstyle = new LinkStyles[obj.linkstyle]()
+            @linkstyle = new LinkStyles[capitalize(obj.linkstyle)]()
         if obj.zoom
             @zoom = obj.zoom
 

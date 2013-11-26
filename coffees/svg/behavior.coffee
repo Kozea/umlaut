@@ -73,7 +73,7 @@ move_drag = d3.behavior.drag()
 
 nsweo_resize_drag = d3.behavior.drag()
     .on("dragstart", (handle) ->
-        return if d3.event.ctrlKey
+        return if d3.event.sourceEvent.ctrlKey
         svg.svg.classed('dragging', true)
         svg.svg.classed('resizing', true)
         node = d3.select($(@).closest('.node').get(0)).data()[0]
@@ -131,7 +131,7 @@ nsweo_resize_drag = d3.behavior.drag()
 
 anchor_link_drag = d3.behavior.drag()
     .on("dragstart", (anchor) ->
-        return if d3.event.ctrlKey
+        return if d3.event.sourceEvent.ctrlKey
         svg.svg.classed('dragging', true)
         svg.svg.classed('linking', true)
         node = d3.select($(@).closest('.node').get(0)).data()[0]
@@ -249,8 +249,8 @@ mouse_link = (link) ->
 
 link_drag = d3.behavior.drag()
     .on("dragstart", (link) ->
-        return if d3.event.ctrlKey
-        if Math.min(dist(diagram.mouse, link.a1), dist(diagram.mouse, link.a2)) > 20
+        return if d3.event.sourceEvent.ctrlKey
+        if not d3.event.sourceEvent.shiftKey and Math.min(dist(diagram.mouse, link.a1), dist(diagram.mouse, link.a2)) > 20
             return
         svg.svg.classed('dragging', true)
         svg.svg.classed('linking', true)
