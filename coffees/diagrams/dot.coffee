@@ -35,9 +35,60 @@ class E.Ellipse extends Ellipsis
     @rotationable: true
 
 class E.Oval extends E.Ellipse
+    @alias: true
 
-class E.Diamond extends Lozenge
-    @rotationable: true
+class E.Circle extends E.Ellipse
+    txt_height: ->
+        Math.max(super(), @super('txt_width'))
+
+    txt_width: ->
+        Math.max(super(), @super('txt_height'))
+
+class E.Point extends Element
+    @fill: 'fg'
+
+    constructor: ->
+        super
+        @margin.x = 0
+        @margin.y = 0
+        @text = ''
+
+    txt_width: ->
+        5
+
+    txt_height: ->
+        5
+
+    path: ->
+        w2 = @width() / 2
+        h2 = @height() / 2
+        "M 0 #{-h2}
+         A #{w2} #{h2} 0 0 1 0 #{h2}
+         A #{w2} #{h2} 0 0 1 0 #{-h2}
+            "
+
+class E.Egg extends E.Ellipse
+    shift: 1.5
+
+    constructor: ->
+        super
+
+        @anchors[cardinal.E] = =>
+            x: @x + @width() / (4 - @shift)
+            y: @y
+
+        @anchors[cardinal.W] = =>
+            x: @x - @width() / (4 - @shift)
+            y: @y
+    path: ->
+        w2 = @width() / 2
+        h2 = @height() / 2
+
+        "M 0 #{-h2}
+         C #{w2 / @shift} #{-h2} #{w2 * @shift} #{h2} 0 #{h2}
+         C #{-w2 * @shift} #{h2} #{-w2 / @shift} #{-h2} 0 #{-h2}
+        "
+
 
 class E.Triangle extends Triangle
     @rotationable: true
@@ -48,11 +99,49 @@ class E.Plaintext extends Element
     path: ->
         "M 0 0"
 
+class E.Diamond extends Lozenge
+    @rotationable: true
+
+# class E.Trapezium extends Rect
+#     @rotationable: true
+
+# class E.Parallelogram extends Rect
+#     @rotationable: true
+
+
 class E.House extends House
     @rotationable: true
 
+class E.Rect extends E.Box
+    @alias: true
+
+class E.Rectangle extends E.Box
+    @alias: true
+
+class E.Square extends E.Box
+    txt_height: ->
+        Math.max(super(), @super('txt_width'))
+
+    txt_width: ->
+        Math.max(super(), @super('txt_height'))
+
+class E.None extends E.Plaintext
+    @alias: true
+
+class E.Underline extends Element
+    @rotationable: true
+
+    path: ->
+        w2 = @width() / 2
+        h2 = @height() / 2
+
+        "M #{-w2} #{h2}
+         L #{w2} #{h2}
+        "
+
 class E.Note extends Note
     @rotationable: true
+
 
 class L.None extends Link
 

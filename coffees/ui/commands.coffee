@@ -237,6 +237,8 @@ init_commands = ->
         .text(diagram.label)
 
     for name, cls of merge_copy(diagram.types.elements, diagram.types.groups)
+        if cls.alias
+            continue
         i = 1
         key = name[0].toLowerCase()
         while i < name.length and key in taken_hotkeys

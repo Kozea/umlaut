@@ -145,7 +145,6 @@ class House extends Element
           L #{-w2} #{h2}
           z"
 
-
 class Association extends Link
     @marker: new BlackArrow()
 

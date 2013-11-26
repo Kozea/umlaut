@@ -52,7 +52,7 @@ class WhiteDiamond extends BlackDiamond
 
 class BlackDot extends Marker
     path: ->
-        'M 10 5 A 5 5 0 1 1 20 5 A 5 5 0 1 1 10 5'
+        'M 9 5 A 5 5 0 1 1 19 5 A 5 5 0 1 1 9 5'
 
 class WhiteDot extends BlackDot
     @fill: 'bg'
