@@ -4,13 +4,14 @@ coffee -wcb -j umlaut.js -o javascripts/ \
     coffees/utils.coffee                 \
     coffees/diagrams/base.coffee         \
     coffees/svg/linking.coffee           \
+    coffees/diagrams/markers.coffee     \
     coffees/diagrams/elements.coffee     \
     coffees/diagrams/links.coffee        \
     coffees/diagrams/diagram.coffee      \
     coffees/diagrams/commons.coffee      \
     coffees/diagrams/groups.coffee       \
-    coffees/diagrams/dot.coffee          \
     coffees/diagrams/flowchart.coffee    \
+    coffees/diagrams/dot.coffee          \
     coffees/diagrams/usecase.coffee      \
     coffees/diagrams/electric.coffee     \
     coffees/diagrams/class.coffee        \

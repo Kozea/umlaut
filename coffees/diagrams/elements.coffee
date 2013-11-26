@@ -150,6 +150,7 @@ class Element extends Base
         rotation: @_rotation
         text: @text
         fixed: @fixed
+        attrs: @attrs
 
 
 class Mouse extends Element

@@ -354,7 +354,7 @@ dot = (src) ->
     tokens = dot_tokenize src
     graph = dot_lex tokens
 
-    d = window.diagram = new DotDiagram()
+    d = window.diagram = new Diagrams.Dot()
     window.svg = new Svg()
 
     nodes_by_id = {}
@@ -401,14 +401,15 @@ dot = (src) ->
                     if node.id not of nodes_by_id or statements.length == 1
                         label = current_attributes.node.label or node.id
                         type = current_attributes.node.shape or 'ellipse'
-                        Type = window[capitalize(type)] or Ellipse
+                        Type = d.types.elements[capitalize(type)] or d.types.elements.Ellipse
                         nodes_by_id[node.id] =
                             label: label
                             type: Type
+                            attrs: current_attributes.node
 
                 if i != 0
                     prev_node = statement.nodes[i - 1]
-                    ltype = window[capitalize(current_attributes.edge.arrowhead or link_type) + 'Link'] or NoneLink
+                    ltype = d.types.links[capitalize(current_attributes.edge.arrowhead or link_type)] or d.types.links.None
                     if prev_node instanceof SubGraph
                         for sub_prev_statement in prev_node.statements
                             for sub_prev_node in sub_prev_statement.nodes
@@ -445,12 +446,14 @@ dot = (src) ->
     populate graph.statements
     elements_by_id = {}
     for id, elt of nodes_by_id
-        elements_by_id[id] = new elt.type(undefined, undefined, elt.label)
-        diagram.elements.push elements_by_id[id]
+        elements_by_id[id] = e = new elt.type(undefined, undefined, elt.label)
+        e.attrs = elt.attrs
+        diagram.elements.push e
 
     for lnk in links_by_id
         l = new lnk.type(elements_by_id[lnk.id1], elements_by_id[lnk.id2])
         l.text.source = lnk.label
+        l.attrs = lnk.attrs
         diagram.links.push l
 
     d.title = attributes.graph.label or graph.id

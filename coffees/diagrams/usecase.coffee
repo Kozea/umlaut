@@ -15,10 +15,18 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see http://www.gnu.org/licenses/.
 
+class Diagrams.UseCase extends Diagram
+    label: 'UML Use Case Diagram'
+    types: @init_types()
 
-class Case extends Ellipsis
+    constructor: ->
+        super
+        @linkstyle = new LinkStyles.Diagonal()
 
-class Actor extends Element
+
+class Diagrams.UseCase::types.elements.Case extends Ellipsis
+
+class Diagrams.UseCase::types.elements.Actor extends Element
     constructor: ->
         super
 
@@ -59,19 +67,10 @@ class Actor extends Element
          "
 
 
-class System extends Group
+class Diagrams.UseCase::types.groups.System extends Group
 
-class UseCase extends Diagram
-    label: 'UML Use Case Diagram'
-
-    constructor: ->
-        super
-
-        @linkstyle = new LinkStyles.Diagonal()
-        @types =
-            elements: [Actor, Case]
-            groups: [System]
-            links: uml_links
-
-
-Diagram.diagrams['UseCase'] = UseCase
+class Diagrams.UseCase::types.links.Association extends Association
+class Diagrams.UseCase::types.links.Inheritance extends Inheritance
+class Diagrams.UseCase::types.links.Aggregation extends Aggregation
+class Diagrams.UseCase::types.links.Composition extends Composition
+class Diagrams.UseCase::types.links.Comment extends Comment

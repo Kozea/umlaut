@@ -89,13 +89,62 @@ class Lozenge extends Element
          L 0 #{h2}
          z"
 
-class WhiteArrow extends BlackArrow
+class Triangle extends Element
+    txt_width: ->
+        super() * 2
 
-class BlackDiamond extends Marker
+    txt_height: ->
+        super() * 2
+
+    txt_y: ->
+        super() + @txt_height() / 4
+
     path: ->
-        'M 0 5 L 10 0 L 20 5 L 10 10 z'
+        w2 = @width() / 2
+        h2 = @height() / 2
+        "M 0 #{-h2}
+         L #{w2} #{h2}
+         L #{-w2} #{h2}
+         z"
 
-class WhiteDiamond extends BlackDiamond
+
+class House extends Element
+    shift: 1.5
+    constructor: ->
+        super
+        @anchors[cardinal.N] = =>
+            x: @x
+            y: @y - 3 * @shift_height() / 2
+
+        @anchors[cardinal.W] = =>
+            x: @x - @width() / 2
+            y: @y + @shift_height() / 2
+
+        @anchors[cardinal.E] = =>
+            x: @x + @width() / 2
+            y: @y + @shift_height() / 2
+
+    shift_height: ->
+        @height() * (@shift - 1) / @shift
+
+    txt_height: ->
+        super() * @shift
+
+    txt_y: ->
+        super() + @shift_height() / 2
+
+    path: ->
+        w2 = @width() / 2
+        h2 = @height() / 2
+        th2 = h2 - @shift_height()
+
+        "M #{-w2} #{-th2}
+          L 0 #{-h2}
+          L #{w2} #{-th2}
+          L #{w2} #{h2}
+          L #{-w2} #{h2}
+          z"
+
 
 class Association extends Link
     @marker: new BlackArrow()
@@ -112,7 +161,3 @@ class Comment extends Link
 
 class Aggregation extends Link
     @marker: new WhiteDiamond()
-
-
-uml_links = [Association, Inheritance, Aggregation, Composition, Comment]
-uml_elements = [Note]

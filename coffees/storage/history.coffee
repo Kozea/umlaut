@@ -28,29 +28,34 @@ history_pop = () ->
 
     $editor.removeClass('hidden')
     $diagrams.addClass('hidden')
-    try
+    if location.search == '?nocatch/'
         load(JSON.parse(LZString.decompressFromBase64(location.hash.slice(1))))
-    catch ex1
-        # Compat
+    else
         try
-            load(JSON.parse(decodeURIComponent(escape(atob(location.hash.slice(1))))))
-        catch ex2
-            window.diagram = new DotDiagram()
-            window.svg = new Svg()
-            diagram.title = 'There was an error loading your diagram :('
-            diagram.elements.push(e1 = new Note(undefined, undefined, ex1.message))
-            diagram.elements.push(e2 = new Note(undefined, undefined, ex1.stack))
-            diagram.elements.push(e21 = new Note(undefined, undefined, ex2.message))
-            diagram.elements.push(e22 = new Note(undefined, undefined, ex2.stack))
-            diagram.elements.push(e3 = new Note(undefined, undefined, 'You can try to reload\nyour browser without cache'))
-            diagram.elements.push(e4 = new Note(undefined, undefined, 'Otherwise it may be that\n your diagram is not compatible\nwith this version'))
-            diagram.links.push(new NormalLink(e2, e1))
-            diagram.links.push(new NormalLink(e2, e3))
-            diagram.links.push(new NormalLink(e2, e4))
-            diagram.links.push(new NormalLink(e21, e1))
-            diagram.links.push(new NormalLink(e22, e2))
-            diagram.links.push(new NormalLink(e21, e22))
-            diagram.start_force()
+            load(JSON.parse(LZString.decompressFromBase64(location.hash.slice(1))))
+        catch ex1
+            # Compat
+            try
+                load(JSON.parse(decodeURIComponent(escape(atob(location.hash.slice(1))))))
+            catch ex2
+                window.diagram = new Diagrams.Dot()
+                note = Diagrams.Dot::types.elements.Note
+                link = Diagrams.Dot::types.links.Normal
+                window.svg = new Svg()
+                diagram.title = 'There was an error loading your diagram :('
+                diagram.elements.push(e1 = new note(undefined, undefined, ex1.message))
+                diagram.elements.push(e2 = new note(undefined, undefined, ex1.stack))
+                diagram.elements.push(e21 = new note(undefined, undefined, ex2.message))
+                diagram.elements.push(e22 = new note(undefined, undefined, ex2.stack))
+                diagram.elements.push(e3 = new note(undefined, undefined, 'You can try to reload\nyour browser without cache'))
+                diagram.elements.push(e4 = new note(undefined, undefined, 'Otherwise it may be that\n your diagram is not compatible\nwith this version'))
+                diagram.links.push(new link(e2, e1))
+                diagram.links.push(new link(e2, e3))
+                diagram.links.push(new link(e2, e4))
+                diagram.links.push(new link(e21, e1))
+                diagram.links.push(new link(e22, e2))
+                diagram.links.push(new link(e21, e22))
+                diagram.start_force()
 
     if diagram.cls.name != $('aside h3').attr('id')
         init_commands()

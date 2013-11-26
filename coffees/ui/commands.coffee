@@ -236,24 +236,24 @@ init_commands = ->
         .addClass('specific')
         .text(diagram.label)
 
-    for e in diagram.types.elements.concat(diagram.types.groups)
+    for name, cls of merge_copy(diagram.types.elements, diagram.types.groups)
         i = 1
-        key = e.name[0].toLowerCase()
-        while i < e.length and key in taken_hotkeys
-            key = e[i++].toLowerCase()
+        key = name[0].toLowerCase()
+        while i < name.length and key in taken_hotkeys
+            key = name[i++].toLowerCase()
 
         taken_hotkeys.push(key)
 
-        fun = ((node) -> -> node_add(node))(e)
+        fun = ((node) -> -> node_add(node))(cls)
         hotkey = "a #{key}"
-        icon = new e(0, 0, e.name)
+        icon = new cls(0, 0, name)
         if icon instanceof Group
             icon._height = 70
             icon._width = 90
         svgicon = d3.select('aside .icons')
             .append('svg')
             .attr('class', 'icon specific draggable btn btn-default')
-            .attr('title', "#{e.name} [#{hotkey}]")
+            .attr('title', "#{name} [#{hotkey}]")
             .attr('data-hotkey', hotkey)
             .on('mousedown', fun)
 
@@ -262,7 +262,7 @@ init_commands = ->
             .data([icon])
 
         element.enter()
-            .call(enter_node)
+            .call(enter_node, false)
         element
             .call(update_node)
 
@@ -277,33 +277,36 @@ init_commands = ->
             .attr('height', icon.height())
             .attr('preserveAspectRatio', 'xMidYMid meet')
         Mousetrap.bind hotkey, wrap(fun)
+        if name of diagram.types.groups and not diagram.last_types.group
+            diagram.last_types.group = cls
 
     taken_hotkeys = []
-    for l, n in diagram.types.links
+    first = true
+    for name, cls of diagram.types.links
         i = 1
-        key = l.name[0].toLowerCase()
-        while i < l.length and key in taken_hotkeys
-            key = l[i++].toLowerCase()
+        key = name[0].toLowerCase()
+        while i < name.length and key in taken_hotkeys
+            key = name[i++].toLowerCase()
 
         taken_hotkeys.push(key)
 
         hotkey = "l #{key}"
-        icon = new l(e1 = new Element(0, 0), e2 = new Element(100, 0))
+        icon = new cls(e1 = new Element(0, 0), e2 = new Element(100, 0))
         e1.set_txt_bbox(width: 10, height: 10)
         e2.set_txt_bbox(width: 10, height: 10)
 
         svgicon = d3.select('aside .icons')
             .append('svg')
-            .attr('class', "icon specific btn btn-default link #{l.name}")
-            .attr('title', "#{l.name} [#{hotkey}]")
+            .attr('class', "icon specific btn btn-default link #{name}")
+            .attr('title', "#{name} [#{hotkey}]")
             .attr('data-hotkey', hotkey)
-            .classed('active', n == 0)
+            .classed('active', first)
             .on('mousedown', ((lnk) ->
                 ->
                     diagram.last_types.link = lnk
                     d3.selectAll('aside .icons .link').classed('active', false)
                     d3.select(@).classed('active', true)
-                    )(l))
+                    )(cls))
 
         link = svgicon
             .selectAll('g.link')
@@ -318,3 +321,6 @@ init_commands = ->
             .attr('viewBox', "0 -10 100 20")
             .attr('preserveAspectRatio', 'none')
         Mousetrap.bind hotkey, wrap(fun)
+        if first
+            diagram.last_types.link = cls
+            first = false

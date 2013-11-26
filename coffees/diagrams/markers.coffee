@@ -16,18 +16,43 @@
 # along with this program.  If not, see http://www.gnu.org/licenses/.
 
 
-load = (data) =>
-    Type = Diagrams._get(data.name)
-    window.diagram = new Type()
-    window.svg = new Svg()
-    diagram.loads data
+class Marker extends Base
+    @fill: 'fg'
+    @stroke: 'fg'
 
-save = =>
-    localStorage.setItem("#{diagram.cls.name}|#{diagram.title}", diagram.hash())
+    constructor: ->
+        super
+        @id = @constructor.name
 
+class Void extends Marker
+    path: ->
+        'M 0 0'
 
-generate_url = ->
-    hash = '#' + diagram.hash()
-    if location.hash != hash
-        history.pushState(null, null, hash)
+class Arrow extends Marker
+    @fill: 'none'
 
+    path: ->
+        'M 10 0 L 20 5 L 10 10'
+
+class BlackArrow extends Arrow
+    @fill: 'fg'
+
+    path: ->
+        "#{super()} z"
+
+class WhiteArrow extends BlackArrow
+    @fill: 'bg'
+
+class BlackDiamond extends Marker
+    path: ->
+        'M 0 5 L 10 0 L 20 5 L 10 10 z'
+
+class WhiteDiamond extends BlackDiamond
+    @fill: 'bg'
+
+class BlackDot extends Marker
+    path: ->
+        'M 10 5 A 5 5 0 1 1 20 5 A 5 5 0 1 1 10 5'
+
+class WhiteDot extends BlackDot
+    @fill: 'bg'

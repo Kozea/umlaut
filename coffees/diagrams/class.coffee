@@ -15,8 +15,17 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see http://www.gnu.org/licenses/.
 
+class Diagrams.Class extends Diagram
+    label: 'UML Class Diagram'
+    types: @init_types()
 
-class Class extends Rect
+    constructor: ->
+        super
+
+        @linkstyle = new LinkStyles.Diagonal()
+
+class Diagrams.Class::types.elements.Note extends Note
+class Diagrams.Class::types.elements.Class extends Rect
     shift: 10
 
     height: ->
@@ -35,18 +44,12 @@ class Class extends Rect
          M #{-w2} #{h2 - 2 * @shift}
          L #{w2} #{h2 - 2 * @shift}
         "
+class Diagrams.Class::types.groups.System extends Group
 
-class ClassDiagram extends Diagram
-    label: 'UML Class Diagram'
+L = Diagrams.Class::types.links
+class L.Association extends Association
+class L.Inheritance extends Inheritance
+class L.Aggregation extends Aggregation
+class L.Composition extends Composition
+class L.Comment extends Comment
 
-    constructor: ->
-        super
-
-        @linkstyle = new LinkStyles.Diagonal()
-        @types =
-            elements: [Class].concat(uml_elements)
-            groups: [System]
-            links: uml_links
-
-
-Diagram.diagrams['ClassDiagram'] = ClassDiagram

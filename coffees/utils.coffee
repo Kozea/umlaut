@@ -106,8 +106,28 @@ copy = (o) ->
 merge_copy = (o1, o2) ->
     o3 = {}
     for attr of o1
-        o3[attr] = o2[attr]
+        o3[attr] = o1[attr]
 
     for attr of o2
         o3[attr] = o2[attr]
     o3
+
+
+color = (attrs) ->
+    if not attrs
+        return undefined
+    style = attrs.style?.split(',') or []
+    if 'filled' in style
+        fillcolor = attrs.color
+    fillcolor = fillcolor or attrs.fillcolor
+    stroke = attrs?.color? and "stroke: #{attrs.color};"
+    fill = fillcolor? and "fill: #{fillcolor};"
+    if fill or stroke
+        if fill and stroke
+            fill + stroke
+        else if fill
+            fill
+        else if stroke
+            stroke
+    else
+        undefined

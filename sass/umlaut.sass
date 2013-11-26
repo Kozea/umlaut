@@ -115,6 +115,7 @@ body > section
     aside
       margin: 0 .5em
       width: 100px
+      overflow-y: auto
 
       h3
         text-align: center
@@ -176,21 +177,27 @@ footer
   box-shadow: 0 0 15px #aaa inset
 
 svg
+  .fill-bg
+    fill: $bg
+
+  .fill-fg
+    fill: $fg
+
+  .fill-none
+    fill: transparent
+
+  .stroke-bg
+    stroke: $bg
+
+  .stroke-fg
+    stroke: $fg
+
+  .stroke-none
+    stroke: transparent
+
   #title
     text-anchor: middle
     font-size: 28px
-
-  #Arrow
-    fill: transparent
-    stroke: $fg
-
-  #BlackArrow
-    fill: $fg
-    stroke: $fg
-
-  #WhiteArrow, #WhiteDiamond
-    fill: $bg
-    stroke: $fg
 
   #grid
     path
@@ -260,16 +267,6 @@ svg
 
   .element, .group
     cursor: move
-
-    .shape
-      &.fill-bg
-        fill: $bg
-
-      &.fill-fg
-        fill: $fg
-
-      &.fill-none
-        fill: transparent
 
     .ghost
       fill: transparent

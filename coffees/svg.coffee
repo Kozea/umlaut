@@ -63,6 +63,7 @@ class Svg extends Base
             .enter()
                 .append('marker')
                 .attr('id', (m) -> m.id)
+                .attr('class', (m) -> "marker fill-#{m.cls.fill} stroke-#{m.cls.stroke}")
                 .attr('viewBox', '-10 -10 30 30')
                 .attr('refX', 20)
                 .attr('refY', 5)

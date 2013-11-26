@@ -17,7 +17,10 @@
 
 
 class Diagram extends Base
-    @diagrams: {}
+    @init_types: ->
+        elements: {}
+        groups: {}
+        links: {}
 
     constructor: ->
         super
@@ -36,7 +39,6 @@ class Diagram extends Base
             y: 25
             a: 22.5
 
-        @types = {}
         @selection = []
         @linking = []
         @last_types =
@@ -72,7 +74,7 @@ class Diagram extends Base
 
     markers: ->
         markers = {}
-        for type in @types.links
+        for name, type of @types.links
             markers[type.marker.id] = type.marker
         val for key, val of markers
 
@@ -99,21 +101,6 @@ class Diagram extends Base
             content = $(svg_clone.node()).wrap('<div>').parent().html()
         "<svg xmlns='http://www.w3.org/2000/svg' width='#{rect.width + 2 * margin}' height='#{rect.height + 2 * margin}'>#{content}</svg>"
 
-    group: (name) ->
-        for grp in @types.groups
-            if grp.name == name
-                return grp
-
-    element: (name) ->
-        for elt in @types.elements
-            if elt.name == name
-                return elt
-
-    link: (name) ->
-        for lnk in @types.links
-            if lnk.name == name
-                return lnk
-
     nodes: ->
         @elements.concat(@groups)
 
@@ -139,27 +126,35 @@ class Diagram extends Base
             @zoom = obj.zoom
 
         for grp in (obj.groups or [])
-            group_type = @group(grp.name)
+            group_type = @types.groups[grp.name]
             group = new group_type(grp.x, grp.y, grp.text, false)
             group._width = grp.width or null
             group._height = grp.height or null
             group._rotation = grp.rotation or 0
+            group.attrs = grp.attrs
             @groups.push(group)
 
         for elt in obj.elements
-            element_type = @element(elt.name)
+            element_type = @types.elements[elt.name]
             element = new element_type(elt.x, elt.y, elt.text, false)
             element._width = elt.width or null
             element._height = elt.height or null
             element._rotation = elt.rotation or 0
+            element.attrs = elt.attrs
             @elements.push(element)
 
         for lnk in obj.links
-            link_type = @link(lnk.name)
+            link_type = @types.links[lnk.name] or @types.links[lnk.name.replace('Link', '')]
             link = new link_type(@nodes()[lnk.source], @nodes()[lnk.target], lnk.text)
             link.source_anchor = lnk.source_anchor
             link.target_anchor = lnk.target_anchor
+            link.attrs = lnk.attrs
             @links.push(link)
 
         if obj.force
             @start_force()
+
+Diagrams =
+    _get: (type) ->
+        # Compat
+            @[type] or @[type.replace('Diagram', '')]

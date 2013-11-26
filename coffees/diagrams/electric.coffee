@@ -16,6 +16,18 @@
 # along with this program.  If not, see http://www.gnu.org/licenses/.
 
 
+
+class Diagrams.Electric extends Diagram
+    label: 'Electric Diagram'
+    types: @init_types()
+
+    constructor: ->
+        super
+        @linkstyle = new LinkStyles.Rectangular()
+        @snap.a = 90
+
+E = Diagrams.Electric::types.elements
+
 class Electric extends Element
     @resizeable: false
     @rotationable: true
@@ -45,7 +57,7 @@ class Electric extends Element
         @base_width()
 
 
-class Junction extends Electric
+class E.Junction extends Electric
     @fill: 'fg'
 
     constructor: ->
@@ -71,7 +83,7 @@ class Junction extends Electric
          A #{w2} #{h2} 0 0 1 0 #{-h2}
             "
 
-class Resistor extends Electric
+class E.Resistor extends Electric
     @fill: 'none'
 
     _base_width: ->
@@ -90,7 +102,7 @@ class Resistor extends Electric
          L #{w2} 0"
 
 
-class Diode extends Electric
+class E.Diode extends Electric
     path: ->
         w2 = @width() / 2
         h2 = @height() / 2
@@ -108,7 +120,7 @@ class Diode extends Electric
          L #{w2} 0
         "
 
-class Battery extends Electric
+class E.Battery extends Electric
     @fill: 'fg'
 
     _base_width: ->
@@ -193,7 +205,7 @@ class Transistor extends Electric
          L #{ww} #{h2}
         "
 
-class PNPTransistor extends Transistor
+class E.PNPTransistor extends Transistor
     path: ->
         w2 = @width() / 2
         h2 = @height() / 2
@@ -217,7 +229,7 @@ class PNPTransistor extends Transistor
         L #{wb} #{-hb}
         "
 
-class NPNTransistor extends Transistor
+class E.NPNTransistor extends Transistor
     path: ->
         w2 = @width() / 2
         h2 = @height() / 2
@@ -241,18 +253,4 @@ class NPNTransistor extends Transistor
         L #{wb} #{hb}
         "
 
-class Wire extends Link
-
-class ElectricDiagram extends Diagram
-    label: 'Electric Diagram'
-
-    constructor: ->
-        super
-        @linkstyle = new LinkStyles.Rectangular()
-        @snap.a = 90
-        @types =
-            elements: [Diode, Resistor, Junction, Battery, NPNTransistor, PNPTransistor]
-            groups: []
-            links: [Wire]
-
-Diagram.diagrams['ElectricDiagram'] = ElectricDiagram
+class Diagrams.Electric::types.links.Wire extends Link

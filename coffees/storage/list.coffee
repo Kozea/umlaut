@@ -26,7 +26,7 @@ list_diagrams = ->
         $tbody.append($tr = $('<tr>'))
         $tr.addClass('local').append(
             $('<td>').text(title),
-            $('<td>').text((new Diagram.diagrams[type]()).label),
+            $('<td>').text((new (Diagrams._get(type))()).label),
             $('<td>')
                 .append($('<a>').attr('href', "##{b64_diagram}").append($('<i>', class: 'glyphicon glyphicon-folder-open')))
                 .append($('<a>').attr('href', "#").append($('<i>', class: 'glyphicon glyphicon-trash')).on('click', ((k) -> ->
@@ -35,7 +35,9 @@ list_diagrams = ->
                     false)(key))))
 
     $('#diagrams tr.new').remove()
-    for name, type of Diagram.diagrams
+    for name, type of Diagrams
+        if name.match(/^_/)
+            continue
         diagram = new type()
         b64_diagram = diagram.hash()
         $tbody.append($tr = $('<tr>'))

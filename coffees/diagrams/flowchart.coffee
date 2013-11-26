@@ -16,9 +16,15 @@
 # along with this program.  If not, see http://www.gnu.org/licenses/.
 
 
-class Process extends Rect
+class Diagrams.FlowChart extends Diagram
+    label: 'Flow Chart'
+    types: @init_types()
 
-class IO extends Element
+E = Diagrams.FlowChart::types.elements
+
+class E.Process extends Rect
+
+class E.IO extends Element
     constructor: ->
         super
 
@@ -52,7 +58,7 @@ class IO extends Element
          L #{-w2} #{h2}
          z"
 
-class Terminator extends Element
+class E.Terminator extends Element
     path: ->
         w2 = @width() / 2
         h2 = @height() / 2
@@ -68,13 +74,13 @@ class Terminator extends Element
          L #{-w2} #{-h2 + shift}
          Q #{-w2} #{-h2} #{-w2 + shift} #{-h2}"
 
-class Decision extends Lozenge
+class E.Decision extends Lozenge
     constructor: ->
         super
         @margin.x = 0
         @margin.y = 2
 
-class Delay extends Element
+class E.Delay extends Element
     constructor: ->
         super
 
@@ -103,7 +109,7 @@ class Delay extends Element
          z"
 
 
-class SubProcess extends Process
+class E.SubProcess extends E.Process
     shift: 1.2
 
     txt_width: ->
@@ -124,7 +130,7 @@ class SubProcess extends Process
          L #{lw2} #{h2}
         "
 
-class Document extends Element
+class E.Document extends Element
     txt_height: ->
         super() * 1.25
 
@@ -143,7 +149,7 @@ class Document extends Element
          z"
 
 
-class Database extends Element
+class E.Database extends Element
     txt_y: ->
         super() + @radius() / 2
 
@@ -167,7 +173,7 @@ class Database extends Element
          L #{-w2} #{-h2 + r}"
 
 
-class HardDisk extends Element
+class E.HardDisk extends Element
     txt_x: ->
         super() - @radius() / 2
 
@@ -191,7 +197,7 @@ class HardDisk extends Element
         "
 
 
-class ManualInput extends Element
+class E.ManualInput extends Element
     shift: 2
 
     constructor: ->
@@ -224,7 +230,7 @@ class ManualInput extends Element
           L #{-w2} #{h2}
           z"
 
-class Preparation extends Element
+class E.Preparation extends Element
     shift: 1.25
 
     txt_width: ->
@@ -246,7 +252,7 @@ class Preparation extends Element
          L #{-lw2} #{h2}
          z"
 
-class InternalStorage extends Process
+class E.InternalStorage extends E.Process
     hshift: 1.5
     wshift: 1.1
 
@@ -281,19 +287,7 @@ class InternalStorage extends Process
          L #{w2} #{-lh2}
         "
 
-class Flow extends Link
+class Diagrams.FlowChart::types.links.Flow extends Link
     @marker: new BlackArrow()
 
-class Container extends Group
-
-class FlowChart extends Diagram
-    label: 'Flow Chart'
-
-    constructor: ->
-       super()
-       @types =
-           elements: [Process, IO, Terminator, Decision, Delay, SubProcess, Document, Database, HardDisk, ManualInput, Preparation, InternalStorage]
-           groups: [Container]
-           links: [Flow]
-
-Diagram.diagrams['FlowChart'] = FlowChart
+class Diagrams.FlowChart::types.groups.Container extends Group

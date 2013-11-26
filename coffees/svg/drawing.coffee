@@ -80,6 +80,7 @@ update_node = (nodes) ->
 
     nodes.select('.shape')
         .attr('class', (node) -> "shape fill-#{node.cls.fill} stroke-#{node.cls.stroke}")
+        .attr('style', (node) -> color(node.attrs))
         .attr('d', (node) -> node.path())
     nodes.select('.ghost').attr('d', (node) -> Rect::path.apply(node))
 
@@ -134,8 +135,9 @@ update_link = (links) ->
             txt = g.select('text.end').node()
             if link.text.target and not txt
                 g.append('text')
-                .attr('class', 'end'))
-
+                .attr('class', 'end')
+            g.select('.shape')
+                .attr('style', color(link.attrs)))
     links
         .select('text.start')
         .each((link) ->
@@ -193,7 +195,7 @@ update_anchors = (nodes) ->
                 "rotate(#{to_svg_angle(anchor)}, #{a.x - node.x}, #{a.y - node.y})")
             .attr('d', (anchor) ->
                 a = node.anchors[anchor]()
-                if undefined in [a.x, a.y]
+                if undefined in [a.x, a.y, node.x, node.y]
                     return 'M 0 0'
                 a.x -= node.x
                 a.y -= node.y

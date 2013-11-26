@@ -16,23 +16,6 @@
 # along with this program.  If not, see http://www.gnu.org/licenses/.
 
 
-class Marker extends Base
-    constructor: ->
-        super
-        @id = @constructor.name
-
-class Void extends Marker
-    path: ->
-        'M 0 0'
-
-class Arrow extends Marker
-    path: ->
-        'M 10 0 L 20 5 L 10 10'
-
-class BlackArrow extends Arrow
-    path: ->
-        "#{super()} z"
-
 class Link extends Base
     @marker: new Void()
     @type: 'full'
@@ -54,6 +37,7 @@ class Link extends Base
         source_anchor: @source_anchor
         target_anchor: @target_anchor
         text: @text
+        attrs: @attrs
 
     nearest: (pos) ->
         if dist(pos, @a1) < dist(pos, @a2) then @source else @target
