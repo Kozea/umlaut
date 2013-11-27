@@ -108,6 +108,52 @@ class Triangle extends Element
          z"
 
 
+class Parallelogram extends Element
+    constructor: ->
+        super
+
+        @anchors[cardinal.N] = =>
+            x: @x - @height() / 4
+            y: @y - @height() / 2
+
+        @anchors[cardinal.S] = =>
+            x: @x + @height() / 4
+            y: @y + @height() / 2
+
+        @anchors[cardinal.E] = =>
+            x: @x + @width() / 2 - @height() / 4
+            y: @y
+
+        @anchors[cardinal.W] = =>
+            x: @x - @width() / 2 + @height() / 4
+            y: @y
+
+    txt_width: ->
+        super() + @height()
+
+    path: ->
+        w2 = (@width() - @height()) / 2
+        h2 = @height() / 2
+        lw2 = @width() / 2
+
+        "M #{-lw2} #{-h2}
+         L #{w2} #{-h2}
+         L #{lw2} #{h2}
+         L #{-w2} #{h2}
+         z"
+
+class Trapezium extends Parallelogram
+    path: ->
+        w2 = (@width() - @height()) / 2
+        h2 = @height() / 2
+        lw2 = @width() / 2
+
+        "M #{-w2} #{-h2}
+         L #{w2} #{-h2}
+         L #{lw2} #{h2}
+         L #{-lw2} #{h2}
+         z"
+
 class House extends Element
     shift: 1.5
     constructor: ->
@@ -144,6 +190,59 @@ class House extends Element
           L #{w2} #{h2}
           L #{-w2} #{h2}
           z"
+
+class Polygon extends Element
+    n: 4
+
+    txt_width: ->
+        super() * 1.25
+
+    txt_height: ->
+        super() * 1.25
+
+    path: ->
+        angle = 2 * pi / @n
+        w2 = @width() / 2
+        h2 = @height() / 2
+
+        path = "M 0 #{-h2}"
+        for i in [1..@n]
+            path = "#{path} L #{w2 * Math.sin(i * angle)} #{-h2 * Math.cos(i * angle)}"
+        "#{path} z"
+
+class Pentagon extends Polygon
+    n: 5
+
+class Hexagon extends Polygon
+    n: 6
+
+class Septagon extends Polygon
+    n: 7
+
+class Octogon extends Polygon
+    n: 8
+
+class Star extends Pentagon
+
+    txt_width: ->
+        super() * 5 * pi / (6 * 1.25)
+
+    txt_height: ->
+        super() * 5 * pi / (6 * 1.25)
+
+    path: ->
+        angle = 2 * pi / @n
+        w2 = @width() / 2
+        h2 = @height() / 2
+        magic = 5 * pi / 6
+        lw2 = w2 / magic
+        lh2 = h2 / magic
+
+        path = "M 0 #{-h2}"
+        for i in [0..@n]
+            path = "#{path} L #{w2 * Math.sin(i * angle)} #{-h2 * Math.cos(i * angle)} L #{lw2 * Math.sin((i + .5) * angle)} #{-lh2 * Math.cos((i + .5) * angle)}"
+        "#{path} z"
+
 
 class Association extends Link
     @marker: new BlackArrow()

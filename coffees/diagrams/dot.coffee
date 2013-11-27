@@ -104,14 +104,25 @@ class E.Plaintext extends Element
 class E.Diamond extends Lozenge
     @rotationable: true
 
-# class E.Trapezium extends Rect
-#     @rotationable: true
+class E.Trapezium extends Trapezium
+    @rotationable: true
 
-# class E.Parallelogram extends Rect
-#     @rotationable: true
-
+class E.Parallelogram extends Parallelogram
+    @rotationable: true
 
 class E.House extends House
+    @rotationable: true
+
+class E.Pentagon extends Pentagon
+    @rotationable: true
+
+class E.Hexagon extends Hexagon
+    @rotationable: true
+
+class E.Septagon extends Septagon
+    @rotationable: true
+
+class E.Octogon extends Octogon
     @rotationable: true
 
 class E.Rect extends E.Box
@@ -126,6 +137,9 @@ class E.Square extends E.Box
 
     txt_width: ->
         Math.max(super(), @super('txt_height'))
+
+class E.Star extends Star
+    @rotationable: true
 
 class E.None extends E.Plaintext
     @alias: true

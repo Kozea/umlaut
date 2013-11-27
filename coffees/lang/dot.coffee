@@ -344,8 +344,8 @@ dot_lex = (tokens) ->
 
     graph = new Graph(type, id, strict)
     graph.statements = parse_statement_list()
-    # if pos != tokens.length
-        # throw "Error in dot file, parsed #{pos} elements out of #{tokens.length}"
+    if pos + 1 != tokens.length
+        throw "Error in dot file, parsed #{pos} elements out of #{tokens.length}"
 
     window.g = graph
 

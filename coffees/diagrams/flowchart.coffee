@@ -24,39 +24,7 @@ E = Diagrams.FlowChart::types.elements
 
 class E.Process extends Rect
 
-class E.IO extends Element
-    constructor: ->
-        super
-
-        @anchors[cardinal.N] = =>
-            x: @x - @height() / 4
-            y: @y - @height() / 2
-
-        @anchors[cardinal.S] = =>
-            x: @x + @height() / 4
-            y: @y + @height() / 2
-
-        @anchors[cardinal.E] = =>
-            x: @x + @width() / 2 - @height() / 4
-            y: @y
-
-        @anchors[cardinal.W] = =>
-            x: @x - @width() / 2 + @height() / 4
-            y: @y
-
-    txt_width: ->
-        super() + @height()
-
-    path: ->
-        w2 = (@width() - @height()) / 2
-        h2 = @height() / 2
-        lw2 = @width() / 2
-
-        "M #{-lw2} #{-h2}
-         L #{w2} #{-h2}
-         L #{lw2} #{h2}
-         L #{-w2} #{h2}
-         z"
+class E.IO extends Parallelogram
 
 class E.Terminator extends Element
     path: ->
@@ -230,27 +198,8 @@ class E.ManualInput extends Element
           L #{-w2} #{h2}
           z"
 
-class E.Preparation extends Element
+class E.Preparation extends Hexagon
     shift: 1.25
-
-    txt_width: ->
-        super() * @shift
-
-    shift_width: ->
-        @width() * (@shift - 1) / @shift
-
-    path: ->
-        w2 = @width() / 2
-        lw2 = w2 - @shift_width() / 2
-        h2 = @height() / 2
-
-        "M #{-w2} 0
-         L #{-lw2} #{-h2}
-         L #{lw2} #{-h2}
-         L #{w2} 0
-         L #{lw2} #{h2}
-         L #{-lw2} #{h2}
-         z"
 
 class E.InternalStorage extends E.Process
     hshift: 1.5
