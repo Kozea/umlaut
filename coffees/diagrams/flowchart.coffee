@@ -237,6 +237,6 @@ class E.InternalStorage extends E.Process
         "
 
 class Diagrams.FlowChart::types.links.Flow extends Link
-    @marker: new BlackArrow()
+    @marker_end: new Markers.Normal()
 
 class Diagrams.FlowChart::types.groups.Container extends Group

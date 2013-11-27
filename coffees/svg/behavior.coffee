@@ -136,7 +136,7 @@ anchor_link_drag = d3.behavior.drag()
         svg.svg.classed('dragging', true)
         svg.svg.classed('linking', true)
         node = d3.select($(@).closest('.node').get(0)).data()[0]
-        type = diagram.last_types.link or diagram.types.links[0]
+        type = diagram.last_types.link
         link = new type(node, diagram.mouse)
         link.source_anchor = anchor
         diagram.linking.push(link)

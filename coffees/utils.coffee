@@ -113,21 +113,31 @@ merge_copy = (o1, o2) ->
     o3
 
 
-color = (attrs) ->
-    if not attrs
+node_style = (node) ->
+    if not node.attrs
         return undefined
+    styles = []
+
+    attrs = node.attrs
     style = attrs.style?.split(',') or []
+    if 'invisible' in style
+        styles.push 'display: none'
+    if 'dashed' in style
+        styles.push 'stroke-dasharray: 10, 5'
+    if 'dotted' in style
+        styles.push 'stroke-dasharray: 2, 6'
+    if 'bold' in style
+        styles.push 'stroke-width: 2.5'
     if 'filled' in style
-        fillcolor = attrs.color
-    fillcolor = fillcolor or attrs.fillcolor
-    stroke = attrs?.color? and "stroke: #{attrs.color};"
-    fill = fillcolor? and "fill: #{fillcolor};"
-    if fill or stroke
-        if fill and stroke
-            fill + stroke
-        else if fill
-            fill
-        else if stroke
-            stroke
+        fillcolor = attrs.fillcolor or attrs.color
     else
-        undefined
+        fillcolor = attrs.fillcolor
+    if fillcolor
+        styles.push "fill: #{fillcolor};"
+    if attrs.color?
+        styles.push "stroke: #{attrs.color};"
+
+    styles.join('; ') or undefined
+
+text_style = () ->
+    1

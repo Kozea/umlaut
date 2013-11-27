@@ -55,28 +55,6 @@ class Svg extends Base
 
         @svg = d3.select('#diagram')
 
-        markers = @svg.select('defs')
-            .selectAll('marker')
-            .data(diagram.markers())
-
-        markers
-            .enter()
-                .append('marker')
-                .attr('id', (m) -> m.id)
-                .attr('class', (m) -> "marker fill-#{m.cls.fill} stroke-#{m.cls.stroke}")
-                .attr('viewBox', '-10 -10 30 30')
-                .attr('refX', 20)
-                .attr('refY', 5)
-                .attr('markerUnits', 'userSpaceOnUse')
-                .attr('markerWidth', 40)
-                .attr('markerHeight', 40)
-                .attr('orient', 'auto')
-                .append('path')
-                    .attr('d', (m) -> m.path())
-        markers
-            .exit()
-            .remove()
-
         @svg.on("mousedown", (event) =>
             return if not d3.select(d3.event.target).classed('background') or d3.event.ctrlKey or d3.event.which is 2
             # return if diagram.dragging or d3.event.ctrlKey or d3.event.which is 2
@@ -162,7 +140,7 @@ class Svg extends Base
                 y = + sel.attr("y")
                 width = + sel.attr("width")
                 height = + sel.attr("height")
-                type = diagram.last_types.group or diagram.types.groups[0]
+                type = diagram.last_types.group
                 if type
                     nth = diagram.groups.filter((grp) -> grp instanceof type).length + 1
                     grp = new type(x + width / 2, y + height / 2, "#{type.name} ##{nth}", not diagram.force)
@@ -255,6 +233,11 @@ class Svg extends Base
         @zoom.translate(diagram.zoom.translate)
         @sync_transform()
         @svg.select('#title').text(diagram.title)
+
+        markers = @svg.select('defs').selectAll('marker').data(diagram.markers())
+        markers.enter().call(enter_marker)
+        markers.call(update_marker)
+        markers.exit().remove()
 
         group = @svg.select('g.groups').selectAll('g.group').data(diagram.groups.sort(order))
         element = @svg.select('g.elements').selectAll('g.element').data(diagram.elements.sort(order))

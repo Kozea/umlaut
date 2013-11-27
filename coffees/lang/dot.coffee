@@ -23,10 +23,10 @@ OPERATORS = ['--', '->']
 COMPASS_PTS = ['n', 'ne', 'e', 'se', 's', 'sw', 'w', 'nw', 'c', '_']
 
 RE_SPACE = /\s/
-RE_ALPHA = /\w/
-RE_DIGIT = /[\d|.]/
-RE_ALPHADIGIT = /[\d|\w]/
-
+RE_ALPHA = /[a-zA-Z_\u00C0-\u017F]/
+RE_DIGIT = /\d|./
+RE_ALPHADIGIT = /[a-zA-Z0-9_\u00C0-\u017F]/
+RE_COMMENT = /\/|\#/
 PANIC_THRESHOLD = 9999
 
 class Token
@@ -57,7 +57,7 @@ dot_tokenize = (s) ->
         chr = s[pos++]
 
         # Space
-        if chr.match(/\s/)
+        if chr.match(RE_SPACE)
             if chr == '\n'
                 row++
                 col = 0
@@ -81,10 +81,10 @@ dot_tokenize = (s) ->
             token = new Delimiter(chr)
 
         # Identifier
-        else if chr.match(/[A-Za-z_]/)
+        else if chr.match(RE_ALPHA)
             id = chr
 
-            while (chr = s[pos++])?.match(/\w/)
+            while (chr = s[pos++])?.match(RE_ALPHADIGIT)
                 id += chr
             pos--
             if id in KEYWORDS
@@ -121,15 +121,15 @@ dot_tokenize = (s) ->
             token = new QuotedId(id)
 
         # Number
-        else if chr.match(/\d|\./)
+        else if chr.match(RE_DIGIT)
             id = chr
-            while (chr = s[pos++])?.match(/\d|\./)
+            while (chr = s[pos++])?.match(RE_DIGIT)
                 id += chr
             pos--
             token = new Number(parseFloat(id))
 
         # Comment
-        else if chr.match(/\/|\#/)
+        else if chr.match(RE_COMMENT)
             if chr == '/' and s[pos] == '*'
                 # Multiline comment
                 pos+=2
@@ -409,7 +409,7 @@ dot = (src) ->
 
                 if i != 0
                     prev_node = statement.nodes[i - 1]
-                    ltype = d.types.links[capitalize(current_attributes.edge.arrowhead or link_type)] or d.types.links.None
+                    ltype = d.types.links.Link
                     if prev_node instanceof SubGraph
                         for sub_prev_statement in prev_node.statements
                             for sub_prev_node in sub_prev_statement.nodes
@@ -421,12 +421,14 @@ dot = (src) ->
                                                 id1: sub_prev_node.id
                                                 id2: sub_node.id
                                                 label: current_attributes.edge.label
+                                                attrs: current_attributes.edge
                                 else
                                     links_by_id.push
                                         type: ltype
                                         id1: sub_prev_node.id
                                         id2: node.id
                                         label: current_attributes.edge.label
+                                        attrs: current_attributes.edge
                     else
                         if node instanceof SubGraph
                             for sub_statement in node.statements
@@ -436,12 +438,14 @@ dot = (src) ->
                                         id1: prev_node.id
                                         id2: sub_node.id
                                         label: current_attributes.edge.label
+                                        attrs: current_attributes.edge
                         else
                             links_by_id.push
                                 type: ltype
                                 id1: prev_node.id
                                 id2: node.id
                                 label: current_attributes.edge.label
+                                attrs: current_attributes.edge
 
     populate graph.statements
     elements_by_id = {}
@@ -454,6 +458,10 @@ dot = (src) ->
         l = new lnk.type(elements_by_id[lnk.id1], elements_by_id[lnk.id2])
         l.text.source = lnk.label
         l.attrs = lnk.attrs
+        if l.attrs.arrowhead
+            l.marker_end = Markers._get(lnk.attrs.arrowhead)
+        if l.attrs.arrowtail
+            l.marker_start = Markers._get(lnk.attrs.arrowtail)
         diagram.links.push l
 
     d.title = attributes.graph.label or graph.id

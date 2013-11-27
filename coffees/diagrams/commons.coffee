@@ -245,17 +245,17 @@ class Star extends Pentagon
 
 
 class Association extends Link
-    @marker: new BlackArrow()
+    @marker_end: new Markers.Normal()
 
 class Inheritance extends Link
-    @marker: new WhiteArrow()
+    @marker_end: new Markers.Normal(true)
 
 class Composition extends Link
-    @marker: new BlackDiamond()
+    @marker_end: new Markers.Diamond()
 
 class Comment extends Link
-    @marker: new Arrow()
+    @marker_end: new Markers.Vee()
     @type: 'dashed'
 
 class Aggregation extends Link
-    @marker: new WhiteDiamond()
+    @marker_end: new Markers.Diamond(true)

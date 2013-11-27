@@ -23,6 +23,7 @@ history_pop = () ->
     if not location.hash
         $diagrams.removeClass('hidden')
         $editor.addClass('hidden')
+        $('aside h3').attr('id' ,'')
         list_diagrams()
         return
 
@@ -40,7 +41,7 @@ history_pop = () ->
             catch ex2
                 window.diagram = new Diagrams.Dot()
                 note = Diagrams.Dot::types.elements.Note
-                link = Diagrams.Dot::types.links.Normal
+                link = Diagrams.Dot::types.links.Link
                 window.svg = new Svg()
                 diagram.title = 'There was an error loading your diagram :('
                 diagram.elements.push(e1 = new note(undefined, undefined, ex1.message))
@@ -60,5 +61,8 @@ history_pop = () ->
     if diagram.cls.name != $('aside h3').attr('id')
         init_commands()
         svg.resize()
+        if 'webkitRequestAnimationFrame' of window
+            # Webkit workaround
+            setTimeout((-> svg.sync()), 50)
 
     svg.sync()

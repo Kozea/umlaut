@@ -37,5 +37,5 @@ print('Lauching coffee for tests')
 CoffeeScriptTest().start()
 
 print('Lauching http server')
-server = ThreadedHTTPServer(('localhost', 1212), SimpleHTTPRequestHandler)
+server = ThreadedHTTPServer(('0.0.0.0', 1212), SimpleHTTPRequestHandler)
 server.serve_forever()

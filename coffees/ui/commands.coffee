@@ -226,6 +226,7 @@ init_commands = ->
                 wrap((e) ->
                     if diagram.force
                         diagram.force_conf[c] *= i
+                        diagram.force.stop()
                     diagram.start_force()))(conf, inc)
 
     taken_hotkeys = []

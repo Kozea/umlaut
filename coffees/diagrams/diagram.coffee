@@ -75,7 +75,8 @@ class Diagram extends Base
     markers: ->
         markers = {}
         for name, type of @types.links
-            markers[type.marker.id] = type.marker
+            markers[type.marker_start.id] = type.marker_start
+            markers[type.marker_end.id] = type.marker_end
         val for key, val of markers
 
     to_svg: ->
@@ -144,11 +145,15 @@ class Diagram extends Base
             @elements.push(element)
 
         for lnk in obj.links
-            link_type = @types.links[lnk.name] or @types.links[lnk.name.replace('Link', '')]
+            link_type = @types.links[lnk.name] or @types.links['Link']
             link = new link_type(@nodes()[lnk.source], @nodes()[lnk.target], lnk.text)
             link.source_anchor = lnk.source_anchor
             link.target_anchor = lnk.target_anchor
             link.attrs = lnk.attrs
+            if link.attrs?.arrowhead
+                link.marker_end = Markers._get(link.attrs.arrowhead)
+            if link.attrs?.arrowtail
+                link.marker_start = Markers._get(link.attrs.arrowtail)
             @links.push(link)
 
         if obj.force

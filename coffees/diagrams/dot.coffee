@@ -23,16 +23,22 @@ class Diagrams.Dot extends Diagram
         super
         @linkstyle = new LinkStyles.Curve()
 
+    markers: ->
+        markers = []
+        for name, marker of Markers
+            if name.indexOf('_') != 0
+                markers.push(new marker())
+                markers.push(new marker(true))
+        markers
+
 E = Diagrams.Dot::types.elements
 L = Diagrams.Dot::types.links
 
 class E.Box extends Rect
-    @rotationable: true
 
 class E.Polygon extends Rect
 
 class E.Ellipse extends Ellipsis
-    @rotationable: true
 
 class E.Oval extends E.Ellipse
     @alias: true
@@ -93,37 +99,27 @@ class E.Egg extends E.Ellipse
 
 
 class E.Triangle extends Triangle
-    @rotationable: true
 
 class E.Plaintext extends Element
-    @rotationable: true
 
     path: ->
         "M 0 0"
 
 class E.Diamond extends Lozenge
-    @rotationable: true
 
 class E.Trapezium extends Trapezium
-    @rotationable: true
 
 class E.Parallelogram extends Parallelogram
-    @rotationable: true
 
 class E.House extends House
-    @rotationable: true
 
 class E.Pentagon extends Pentagon
-    @rotationable: true
 
 class E.Hexagon extends Hexagon
-    @rotationable: true
 
 class E.Septagon extends Septagon
-    @rotationable: true
 
 class E.Octogon extends Octogon
-    @rotationable: true
 
 class E.Rect extends E.Box
     @alias: true
@@ -139,13 +135,11 @@ class E.Square extends E.Box
         Math.max(super(), @super('txt_height'))
 
 class E.Star extends Star
-    @rotationable: true
 
 class E.None extends E.Plaintext
     @alias: true
 
 class E.Underline extends Element
-    @rotationable: true
 
     path: ->
         w2 = @width() / 2
@@ -156,28 +150,8 @@ class E.Underline extends Element
         "
 
 class E.Note extends Note
-    @rotationable: true
 
+for n, t of E
+    t.rotationable = true
 
-class L.None extends Link
-
-class L.Curve extends Link
-    @marker: new Arrow()
-
-class L.Normal extends Link
-    @marker: new BlackArrow()
-
-class L.Onormal extends Link
-    @marker: new WhiteArrow()
-
-class L.Diamond extends Link
-    @marker: new BlackDiamond()
-
-class L.Odiamond extends Link
-    @marker: new WhiteDiamond()
-
-class L.Dot extends Link
-    @marker: new BlackDot()
-
-class L.Odot extends Link
-    @marker: new WhiteDot()
+class L.Link extends Link

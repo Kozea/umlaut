@@ -80,7 +80,7 @@ update_node = (nodes) ->
 
     nodes.select('.shape')
         .attr('class', (node) -> "shape fill-#{node.cls.fill} stroke-#{node.cls.stroke}")
-        .attr('style', (node) -> color(node.attrs))
+        .attr('style', node_style)
         .attr('d', (node) -> node.path())
     nodes.select('.ghost').attr('d', (node) -> Rect::path.apply(node))
 
@@ -100,7 +100,8 @@ enter_link = (links, connect=true) ->
     g
         .append("path")
         .attr('class', (link) -> "shape #{link.cls.type}")
-        .attr("marker-end", (link) -> "url(##{link.cls.marker.id})")
+        .attr("marker-start", (link) -> "url(##{link.marker_start?.id or link.cls.marker_start.id})")
+        .attr("marker-end", (link) -> "url(##{link.marker_end?.id or link.cls.marker_end.id})")
 
     g
         .each((link) ->
@@ -127,6 +128,12 @@ enter_link = (links, connect=true) ->
 update_link = (links) ->
     links
         .each((link) ->
+            d3.select(@).selectAll('path').attr('d', link.path())
+                .attr("marker-start", "url(##{link.marker_start?.id or link.cls.marker_start.id})")
+                .attr("marker-end", "url(##{link.marker_end?.id or link.cls.marker_end.id})"))
+
+    links
+        .each((link) ->
             g = d3.select(@)
             txt = g.select('text.start').node()
             if link.text.source and not txt
@@ -137,7 +144,7 @@ update_link = (links) ->
                 g.append('text')
                 .attr('class', 'end')
             g.select('.shape')
-                .attr('style', color(link.attrs)))
+                .attr('style', node_style))
     links
         .select('text.start')
         .each((link) ->
@@ -237,3 +244,22 @@ tick_link = (links) ->
                 y: - link.text_margin - bb.height / 2
             delta = rotate(pos, link.o2)
             "translate(#{link.a2.x + delta.x}, #{link.a2.y + delta.y})")
+
+enter_marker = (markers, open=false) ->
+    markers
+        .append('marker')
+            .append('path')
+
+update_marker = (markers) ->
+    markers
+        .attr('id', (m) -> m.id)
+        .attr('class', (m) -> "marker fill-#{if m.open then 'bg' else 'fg'} stroke-fg")
+        .attr('viewBox', (m) -> m.viewbox())
+        .attr('markerUnits', 'userSpaceOnUse')
+        .attr('markerWidth', (m) -> m.width())
+        .attr('markerHeight', (m) -> m.height())
+        .attr('orient', 'auto')
+        .each((m) ->
+            d3.select(@)
+                .select('path')
+                    .attr('d', m.path()))
