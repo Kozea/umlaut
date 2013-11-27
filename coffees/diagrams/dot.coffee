@@ -72,14 +72,16 @@ class E.Egg extends E.Ellipse
 
     constructor: ->
         super
-
+        # Empiric magic number to fix later maybe
+        magic = 1.051
         @anchors[cardinal.E] = =>
-            x: @x + @width() / (4 - @shift)
-            y: @y
+            x: @x + magic * @width() / (4 - @shift)
+            y: @y + @height() / 8
 
         @anchors[cardinal.W] = =>
-            x: @x - @width() / (4 - @shift)
-            y: @y
+            x: @x - magic * @width() / (4 - @shift)
+            y: @y + @height() / 8
+
     path: ->
         w2 = @width() / 2
         h2 = @height() / 2

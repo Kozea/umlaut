@@ -17,6 +17,7 @@
 
 
 move_drag = d3.behavior.drag()
+    .origin((i) -> i)
     .on('dragstart', (node) ->
         return if d3.event.sourceEvent.which is not 1 or d3.event.sourceEvent.ctrlKey
         svg.svg.classed('dragging', true)
@@ -31,8 +32,8 @@ move_drag = d3.behavior.drag()
         if not node in diagram.selection
             diagram.selection.push node
 
-        for node in diagram.selection
-            node.fixed = true
+        for nod in diagram.selection
+            nod.fixed = true
 
         if d3.event.sourceEvent.shiftKey
             delta =
@@ -43,9 +44,9 @@ move_drag = d3.behavior.drag()
                 x: node[x] - diagram.snap.x * Math.floor(d3.event.x / diagram.snap.x)
                 y: node[y] - diagram.snap.y * Math.floor(d3.event.y / diagram.snap.y)
 
-        for node in diagram.selection
-            node[x] -= delta.x
-            node[y] -= delta.y
+        for nod in diagram.selection
+            nod[x] -= delta.x
+            nod[y] -= delta.y
 
         if diagram.force
             diagram.force.resume()

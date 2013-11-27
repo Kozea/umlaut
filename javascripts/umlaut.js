@@ -1882,18 +1882,20 @@ E.Egg = (function(_super) {
   Egg.prototype.shift = 1.5;
 
   function Egg() {
-    var _this = this;
+    var magic,
+      _this = this;
     Egg.__super__.constructor.apply(this, arguments);
+    magic = 1.051;
     this.anchors[cardinal.E] = function() {
       return {
-        x: _this.x + _this.width() / (4 - _this.shift),
-        y: _this.y
+        x: _this.x + magic * _this.width() / (4 - _this.shift),
+        y: _this.y + _this.height() / 8
       };
     };
     this.anchors[cardinal.W] = function() {
       return {
-        x: _this.x - _this.width() / (4 - _this.shift),
-        y: _this.y
+        x: _this.x - magic * _this.width() / (4 - _this.shift),
+        y: _this.y + _this.height() / 8
       };
     };
   }
@@ -3156,7 +3158,9 @@ edit = function(getter, setter) {
   });
 };
 
-move_drag = d3.behavior.drag().on('dragstart', function(node) {
+move_drag = d3.behavior.drag().origin(function(i) {
+  return i;
+}).on('dragstart', function(node) {
   if (d3.event.sourceEvent.which === !1 || d3.event.sourceEvent.ctrlKey) {
     return;
   }
@@ -3164,7 +3168,7 @@ move_drag = d3.behavior.drag().on('dragstart', function(node) {
   svg.svg.classed('translating', true);
   return diagram.dragging = true;
 }).on("drag", function(node) {
-  var delta, x, y, _i, _j, _len, _len1, _ref82, _ref83, _ref84;
+  var delta, nod, x, y, _i, _j, _len, _len1, _ref82, _ref83, _ref84;
   if (!diagram.dragging || d3.event.sourceEvent.ctrlKey) {
     return;
   }
@@ -3175,8 +3179,8 @@ move_drag = d3.behavior.drag().on('dragstart', function(node) {
   }
   _ref83 = diagram.selection;
   for (_i = 0, _len = _ref83.length; _i < _len; _i++) {
-    node = _ref83[_i];
-    node.fixed = true;
+    nod = _ref83[_i];
+    nod.fixed = true;
   }
   if (d3.event.sourceEvent.shiftKey) {
     delta = {
@@ -3191,9 +3195,9 @@ move_drag = d3.behavior.drag().on('dragstart', function(node) {
   }
   _ref84 = diagram.selection;
   for (_j = 0, _len1 = _ref84.length; _j < _len1; _j++) {
-    node = _ref84[_j];
-    node[x] -= delta.x;
-    node[y] -= delta.y;
+    nod = _ref84[_j];
+    nod[x] -= delta.x;
+    nod[y] -= delta.y;
   }
   if (diagram.force) {
     return diagram.force.resume();
