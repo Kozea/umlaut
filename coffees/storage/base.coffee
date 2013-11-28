@@ -16,18 +16,38 @@
 # along with this program.  If not, see http://www.gnu.org/licenses/.
 
 
-# class RemoteStorage
-#     getItem: (k, callback) ->
-#         $.ajax
-#           url: "http://api.openkeyval.org/#{k}",
-#           dataType: "jsonp",
-#           success: (v) -> callback(v, k)
+class RemoteStorage
+    getItem: (k, callback) ->
+        key = btoa(k).replace(/\=/g, '_')
+        $.ajax
+          url: "http://api.openkeyval.org/#{key}",
+          dataType: "jsonp",
+          success: (v) -> callback(v, k)
 
-#     setItem: (k, v) ->
-#         im = new Image()
-#         im.src = "http://api.openkeyval.org/store/?#{k}=#{v}"
+    setItem: (k, v, callback) ->
+        key = btoa(k).replace(/\=/g, '_')
+        # Hardcore cross domain post iframe hack
+        iframe = document.createElement("iframe")
+        document.body.appendChild(iframe)
+        iframe.style.display = "none"
+        iframe.contentWindow.name = key
+        form = document.createElement("form")
+        form.target = key
+        form.action = "http://api.openkeyval.org/#{key}"
+        form.method = "POST"
+        input = document.createElement("input")
+        input.type = "hidden"
+        input.name = 'data'
+        input.value = v
+        form.appendChild(input)
+        document.body.appendChild(form)
+        iframe.onload = ->
+            form.remove()
+            iframe.remove()
+            callback and callback(k, v)
+        form.submit()
 
-# remoteStorage = new RemoteStorage()
+remoteStorage = new RemoteStorage()
 
 load = (data) =>
     Type = Diagrams._get(data.name)
@@ -38,14 +58,14 @@ load = (data) =>
 save = =>
     localStorage.setItem("#{diagram.cls.name}|#{diagram.title}", diagram.hash())
 
-# publish = (k, b64)=>
-#     key = "umlaut_#{k.replace('|', '-_-')}"
-#     remoteStorage.getItem('umlaut_key_list', (list) ->
-#         list = JSON.parse(list)
-#         if key not in list
-#             list.push key
-#         remoteStorage.setItem(key, b64)
-#         remoteStorage.setItem('umlaut_key_list', JSON.stringify(list)))
+publish = (k, b64, callback)=>
+    key = "umlaut_#{k.replace('|', '-_-')}"
+    remoteStorage.getItem('umlaut_key_list', (list) ->
+        list = JSON.parse(list) or []
+        if key not in list
+            list.push key
+        remoteStorage.setItem(key, b64, ->
+            remoteStorage.setItem('umlaut_key_list', JSON.stringify(list), callback)))
 
 generate_url = ->
     return unless location.hash
