@@ -17,32 +17,55 @@
 
 
 list_diagrams = ->
-    $tbody = $('#diagrams tbody')
-    $tbody.find('.local').remove()
+    $tbody = $('.table.local tbody')
+    $tbody.find('tr').remove()
+    $('.local').show()
     for key, b64_diagram of localStorage
         [type, title] = key.split('|')
         if not title?
             continue
         $tbody.append($tr = $('<tr>'))
-        $tr.addClass('local').append(
+        $tr.append(
             $('<td>').text(title),
             $('<td>').text((new (Diagrams._get(type))()).label),
             $('<td>')
                 .append($('<a>').attr('href', "##{b64_diagram}").append($('<i>', class: 'glyphicon glyphicon-folder-open')))
+                # .append($('<a>').attr('href', "#").append($('<i>', class: 'glyphicon glyphicon-cloud-upload')).on('click', ((k, b64) -> ->
+                #     publish(k, b64)
+                #     false)(key, b64_diagram)))
                 .append($('<a>').attr('href', "#").append($('<i>', class: 'glyphicon glyphicon-trash')).on('click', ((k) -> ->
                     localStorage.removeItem k
                     $(@).closest('tr').remove()
                     false)(key))))
+    if not $tbody.find('tr').size()
+        $('.local').hide()
 
-    $('#diagrams tr.new').remove()
+    $tbody = $('.table.new tbody')
+    $tbody.find('tr').remove()
     for name, type of Diagrams
         if name.match(/^_/)
             continue
         diagram = new type()
         b64_diagram = diagram.hash()
         $tbody.append($tr = $('<tr>'))
-        $tr.addClass('new').append(
-            $('<td>').text('Create a new'),
+        $tr.append(
             $('<td>').text(diagram.label),
             $('<td>').append($('<a>').attr('href', "##{b64_diagram}").append($('<i>', class: 'glyphicon glyphicon-file'))))
 
+
+    $tbody = $('.table.server tbody')
+    # $tbody.find('tr').remove()
+
+    # remoteStorage.getItem('umlaut_key_list', (list) ->
+    #     list = JSON.parse(list)
+    #     for key in list
+    #         remoteStorage.getItem(key, (b64_diagram, key_) ->
+    #             [type, title] = key_.slice(7).split('-_-')
+    #             if not title?
+    #                 return
+    #             $tbody.append($tr = $('<tr>'))
+    #             $tr.append(
+    #                 $('<td>').text(title),
+    #                 $('<td>').text((new (Diagrams._get(type))()).label),
+    #                 $('<td>')
+    #                     .append($('<a>').attr('href', "##{b64_diagram}").append($('<i>', class: 'glyphicon glyphicon-cloud-download'))))))

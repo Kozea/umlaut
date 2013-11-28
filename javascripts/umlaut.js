@@ -4549,9 +4549,10 @@ history_pop = function() {
 };
 
 list_diagrams = function() {
-  var $tbody, $tr, b64_diagram, diagram, key, name, title, type, _ref91, _results;
-  $tbody = $('#diagrams tbody');
-  $tbody.find('.local').remove();
+  var $tbody, $tr, b64_diagram, diagram, key, name, title, type, _ref91;
+  $tbody = $('.table.local tbody');
+  $tbody.find('tr').remove();
+  $('.local').show();
   for (key in localStorage) {
     b64_diagram = localStorage[key];
     _ref91 = key.split('|'), type = _ref91[0], title = _ref91[1];
@@ -4559,7 +4560,7 @@ list_diagrams = function() {
       continue;
     }
     $tbody.append($tr = $('<tr>'));
-    $tr.addClass('local').append($('<td>').text(title), $('<td>').text((new (Diagrams._get(type))()).label), $('<td>').append($('<a>').attr('href', "#" + b64_diagram).append($('<i>', {
+    $tr.append($('<td>').text(title), $('<td>').text((new (Diagrams._get(type))()).label), $('<td>').append($('<a>').attr('href', "#" + b64_diagram).append($('<i>', {
       "class": 'glyphicon glyphicon-folder-open'
     }))).append($('<a>').attr('href', "#").append($('<i>', {
       "class": 'glyphicon glyphicon-trash'
@@ -4571,8 +4572,11 @@ list_diagrams = function() {
       };
     })(key))));
   }
-  $('#diagrams tr.new').remove();
-  _results = [];
+  if (!$tbody.find('tr').size()) {
+    $('.local').hide();
+  }
+  $tbody = $('.table.new tbody');
+  $tbody.find('tr').remove();
   for (name in Diagrams) {
     type = Diagrams[name];
     if (name.match(/^_/)) {
@@ -4581,11 +4585,11 @@ list_diagrams = function() {
     diagram = new type();
     b64_diagram = diagram.hash();
     $tbody.append($tr = $('<tr>'));
-    _results.push($tr.addClass('new').append($('<td>').text('Create a new'), $('<td>').text(diagram.label), $('<td>').append($('<a>').attr('href', "#" + b64_diagram).append($('<i>', {
+    $tr.append($('<td>').text(diagram.label), $('<td>').append($('<a>').attr('href', "#" + b64_diagram).append($('<i>', {
       "class": 'glyphicon glyphicon-file'
-    })))));
+    }))));
   }
-  return _results;
+  return $tbody = $('.table.server tbody');
 };
 
 KEYWORDS = ['node', 'edge', 'graph', 'digraph', 'subgraph', 'strict'];

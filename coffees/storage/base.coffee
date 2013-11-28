@@ -16,6 +16,19 @@
 # along with this program.  If not, see http://www.gnu.org/licenses/.
 
 
+# class RemoteStorage
+#     getItem: (k, callback) ->
+#         $.ajax
+#           url: "http://api.openkeyval.org/#{k}",
+#           dataType: "jsonp",
+#           success: (v) -> callback(v, k)
+
+#     setItem: (k, v) ->
+#         im = new Image()
+#         im.src = "http://api.openkeyval.org/store/?#{k}=#{v}"
+
+# remoteStorage = new RemoteStorage()
+
 load = (data) =>
     Type = Diagrams._get(data.name)
     window.diagram = new Type()
@@ -25,6 +38,14 @@ load = (data) =>
 save = =>
     localStorage.setItem("#{diagram.cls.name}|#{diagram.title}", diagram.hash())
 
+# publish = (k, b64)=>
+#     key = "umlaut_#{k.replace('|', '-_-')}"
+#     remoteStorage.getItem('umlaut_key_list', (list) ->
+#         list = JSON.parse(list)
+#         if key not in list
+#             list.push key
+#         remoteStorage.setItem(key, b64)
+#         remoteStorage.setItem('umlaut_key_list', JSON.stringify(list)))
 
 generate_url = ->
     return unless location.hash
