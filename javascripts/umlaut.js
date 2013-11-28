@@ -787,21 +787,31 @@ Element = (function(_super) {
   };
 
   Element.prototype.width = function(w) {
+    var _ref16;
     if (w == null) {
       w = null;
     }
     if (w !== null) {
-      this._width = w;
+      return this._width = w;
+    }
+    if ((_ref16 = this.attrs) != null ? _ref16.width : void 0) {
+      this._width = this.attrs.width * this.txt_width();
+      delete this.attrs.width;
     }
     return Math.max(this._width || 0, this.txt_width());
   };
 
   Element.prototype.height = function(h) {
+    var _ref16;
     if (h == null) {
       h = null;
     }
     if (h !== null) {
-      this._height = h;
+      return this._height = h;
+    }
+    if ((_ref16 = this.attrs) != null ? _ref16.height : void 0) {
+      this._height = this.attrs.height * this.txt_height();
+      delete this.attrs.height;
     }
     return Math.max(this._height || 0, this.txt_height());
   };
@@ -2119,6 +2129,15 @@ Diagrams.Dot = (function(_super) {
       shape = element.cls.name.toLowerCase();
       if (shape !== 'ellipse') {
         attrs.push("shape=" + shape);
+      }
+      if (element.width() !== element.txt_width()) {
+        attrs.push("width=" + (element.width() / element.txt_width()));
+      }
+      if (element.height() !== element.txt_height()) {
+        attrs.push("height=" + (element.height() / element.txt_height()));
+      }
+      if (!diagram.force) {
+        attrs.push("pos=\"" + (element.x.toFixed()) + "," + (element.y.toFixed()) + (element.fixed ? '!' : '') + "\"");
       }
       _ref47 = element.attrs;
       for (key in _ref47) {
@@ -5087,7 +5106,7 @@ dot_lex = function(tokens) {
 };
 
 dot = function(src) {
-  var attributes, copy_attributes, d, e, elements_by_id, elt, graph, id, l, links_by_id, lnk, nodes_by_id, populate, tokens, _i, _len;
+  var attributes, copy_attributes, d, e, elements_by_id, elt, fixed, graph, id, l, links_by_id, lnk, nodes_by_id, populate, tokens, x, y, _i, _len, _ref99;
   tokens = dot_tokenize(src);
   graph = dot_lex(tokens);
   d = window.diagram = new Diagrams.Dot();
@@ -5256,9 +5275,22 @@ dot = function(src) {
   };
   populate(graph.statements);
   elements_by_id = {};
+  fixed = true;
   for (id in nodes_by_id) {
     elt = nodes_by_id[id];
     elements_by_id[id] = e = new elt.type(void 0, void 0, elt.label);
+    if (elt.attrs.pos) {
+      if (elt.attrs.pos.indexOf('!') === elt.attrs.pos.length - 1) {
+        e.fixed = true;
+        elt.attrs.pos = elt.attrs.pos.slice(0, -1);
+      }
+      _ref99 = elt.attrs.pos.split(','), x = _ref99[0], y = _ref99[1];
+      e.x = +x;
+      e.y = +y;
+      delete elt.attrs.pos;
+    } else {
+      fixed = false;
+    }
     e.attrs = elt.attrs;
     diagram.elements.push(e);
   }
@@ -5266,26 +5298,30 @@ dot = function(src) {
     lnk = links_by_id[_i];
     l = new lnk.type(elements_by_id[lnk.id1], elements_by_id[lnk.id2]);
     l.text.source = lnk.label;
-    l.attrs = lnk.attrs;
     if (graph.type === 'directed' && !lnk.attrs.arrowhead) {
       lnk.attrs.arrowhead = 'normal';
     }
-    if (l.attrs.arrowhead) {
+    if (lnk.attrs.arrowhead) {
       l.marker_end = Markers._get(lnk.attrs.arrowhead);
+      delete lnk.attrs.arrowhead;
     }
-    if (l.attrs.arrowtail) {
+    if (lnk.attrs.arrowtail) {
       l.marker_start = Markers._get(lnk.attrs.arrowtail, true);
+      delete lnk.attrs.arrowtail;
     }
-    if (l.attrs.headlabel) {
-      l.text.target = l.attrs.headlabel;
+    if (lnk.attrs.headlabel) {
+      l.text.target = lnk.attrs.headlabel;
+      delete lnk.attrs.headlabel;
     }
-    if (l.attrs.taillabel) {
-      l.text.source = l.attrs.taillabel;
+    if (lnk.attrs.taillabel) {
+      l.text.source = lnk.attrs.taillabel;
+      delete lnk.attrs.taillabel;
     }
+    l.attrs = lnk.attrs;
     diagram.links.push(l);
   }
   d.title = attributes.graph.label || graph.id;
-  d.force = true;
+  d.force = !fixed;
   return d.hash();
 };
 

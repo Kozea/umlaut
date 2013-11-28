@@ -42,6 +42,14 @@ class Diagrams.Dot extends Diagram
             shape = element.cls.name.toLowerCase()
             if shape != 'ellipse'
                 attrs.push "shape=#{shape}"
+            if element.width() != element.txt_width()
+                attrs.push "width=#{element.width() / element.txt_width()}"
+            if element.height() != element.txt_height()
+                attrs.push "height=#{element.height() / element.txt_height()}"
+
+            if not diagram.force
+                attrs.push "pos=\"#{element.x.toFixed()},#{element.y.toFixed()}#{if element.fixed then '!' else ''}\""
+
             for key, val of element.attrs
                 if key not in ['shape', 'label']
                     attrs.push "#{key}=#{val}"

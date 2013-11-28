@@ -113,12 +113,22 @@ class Element extends Base
 
     width: (w=null) ->
         if w != null
-            @_width = w
+            return @_width = w
+
+        if @attrs?.width
+            @_width = @attrs.width * @txt_width()
+            delete @attrs.width
+
         Math.max(@_width or 0, @txt_width())
 
     height: (h=null) ->
         if h != null
-            @_height = h
+            return @_height = h
+
+        if @attrs?.height
+            @_height = @attrs.height * @txt_height()
+            delete @attrs.height
+
         Math.max(@_height or 0, @txt_height())
 
     direction: (x, y) ->

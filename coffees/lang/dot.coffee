@@ -448,28 +448,44 @@ dot = (src) ->
 
     populate graph.statements
     elements_by_id = {}
+
+    fixed = true
     for id, elt of nodes_by_id
         elements_by_id[id] = e = new elt.type(undefined, undefined, elt.label)
+        if elt.attrs.pos
+            if elt.attrs.pos.indexOf('!') == elt.attrs.pos.length - 1
+                e.fixed = true
+                elt.attrs.pos = elt.attrs.pos.slice(0, -1)
+            [x, y] = elt.attrs.pos.split(',')
+            e.x = +x
+            e.y = +y
+            delete elt.attrs.pos
+        else
+            fixed = false
         e.attrs = elt.attrs
         diagram.elements.push e
 
     for lnk in links_by_id
         l = new lnk.type(elements_by_id[lnk.id1], elements_by_id[lnk.id2])
         l.text.source = lnk.label
-        l.attrs = lnk.attrs
         if graph.type == 'directed' and not lnk.attrs.arrowhead
             lnk.attrs.arrowhead = 'normal'
-        if l.attrs.arrowhead
+        if lnk.attrs.arrowhead
             l.marker_end = Markers._get(lnk.attrs.arrowhead)
-        if l.attrs.arrowtail
+            delete lnk.attrs.arrowhead
+        if lnk.attrs.arrowtail
             l.marker_start = Markers._get(lnk.attrs.arrowtail, true)
-        if l.attrs.headlabel
-            l.text.target = l.attrs.headlabel
-        if l.attrs.taillabel
-            l.text.source = l.attrs.taillabel
+            delete lnk.attrs.arrowtail
+        if lnk.attrs.headlabel
+            l.text.target = lnk.attrs.headlabel
+            delete lnk.attrs.headlabel
+        if lnk.attrs.taillabel
+            l.text.source = lnk.attrs.taillabel
+            delete lnk.attrs.taillabel
 
+        l.attrs = lnk.attrs
         diagram.links.push l
 
     d.title = attributes.graph.label or graph.id
-    d.force = true
+    d.force = not fixed
     d.hash()
