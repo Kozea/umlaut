@@ -395,7 +395,7 @@ Marker = (function(_super) {
   __extends(Marker, _super);
 
   Marker.prototype.margin = function() {
-    return 2;
+    return 6;
   };
 
   Marker.prototype.width = function() {
@@ -407,16 +407,24 @@ Marker = (function(_super) {
   };
 
   Marker.prototype.viewbox = function() {
-    var h, w;
+    var h, lw, w;
     w = this.width() + this.margin();
+    if (this.start) {
+      lw = 0;
+    } else {
+      lw = this.margin() / 2 - w;
+    }
     h = this.height() + this.margin();
-    return "" + (-w) + " " + (-h / 2) + " " + w + " " + h;
+    return "" + lw + " " + (-h / 2) + " " + w + " " + h;
   };
 
-  function Marker(open) {
+  function Marker(open, start) {
     this.open = open != null ? open : false;
+    this.start = start != null ? start : false;
     Marker.__super__.constructor.apply(this, arguments);
-    this.id = this.cls.name + (this.open ? 'Open' : '');
+    this.id = this.cls.name;
+    this.open && (this.id += 'Open');
+    this.start && (this.id += 'Start');
   }
 
   return Marker;
@@ -449,7 +457,10 @@ Markers.Vee = (function(_super) {
 
   Vee.prototype.path = function() {
     var h, h2, lw, w;
-    w = -this.width();
+    w = this.width();
+    if (!this.start) {
+      w = -w;
+    }
     h = this.height();
     lw = w / 3;
     h2 = h / 2;
@@ -543,8 +554,11 @@ Markers.Box = (function(_super) {
 
 })(Marker);
 
-Markers._get = function(type) {
+Markers._get = function(type, start) {
   var m, open;
+  if (start == null) {
+    start = false;
+  }
   open = false;
   if (type.indexOf('o') === 0) {
     type = type.slice(1);
@@ -552,9 +566,9 @@ Markers._get = function(type) {
   }
   type = capitalize(type.replace(/^Black/, ''));
   if (type && type in Markers) {
-    return m = new Markers[type](open);
+    return m = new Markers[type](open, start);
   } else {
-    return m = new Markers.None();
+    return m = new Markers.None(open, start);
   }
 };
 
@@ -820,7 +834,7 @@ Mouse = (function(_super) {
 Link = (function(_super) {
   __extends(Link, _super);
 
-  Link.marker_start = new Markers.None();
+  Link.marker_start = new Markers.None(false, true);
 
   Link.marker_end = new Markers.None();
 
@@ -1061,7 +1075,7 @@ Diagram = (function(_super) {
         link.marker_end = Markers._get(link.attrs.arrowhead);
       }
       if ((_ref17 = link.attrs) != null ? _ref17.arrowtail : void 0) {
-        link.marker_start = Markers._get(link.attrs.arrowtail);
+        link.marker_start = Markers._get(link.attrs.arrowtail, true);
       }
       this.links.push(link);
     }
@@ -1961,6 +1975,8 @@ Diagrams.Dot = (function(_super) {
       if (name.indexOf('_') !== 0) {
         markers.push(new marker());
         markers.push(new marker(true));
+        markers.push(new marker(false, true));
+        markers.push(new marker(true, true));
       }
     }
     return markers;
@@ -5046,7 +5062,7 @@ dot = function(src) {
       l.marker_end = Markers._get(lnk.attrs.arrowhead);
     }
     if (l.attrs.arrowtail) {
-      l.marker_start = Markers._get(lnk.attrs.arrowtail);
+      l.marker_start = Markers._get(lnk.attrs.arrowtail, true);
     }
     diagram.links.push(l);
   }

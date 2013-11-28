@@ -17,7 +17,7 @@
 
 
 class Link extends Base
-    @marker_start: new Markers.None()
+    @marker_start: new Markers.None(false, true)
     @marker_end: new Markers.None()
     @type: 'full'
 

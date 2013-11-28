@@ -20,7 +20,7 @@ Markers = {}
 class Marker extends Base
     # 0, 0 is the connect point, everything is drawn in x negative
     margin: ->
-        2
+        6
 
     width: ->
         20
@@ -30,12 +30,18 @@ class Marker extends Base
 
     viewbox: ->
         w = @width() + @margin()
+        if @start
+            lw = 0
+        else
+            lw = @margin() / 2 - w
         h = @height() + @margin()
-        "#{-w} #{-h/2} #{w} #{h}"
+        "#{lw} #{-h/2} #{w} #{h}"
 
-    constructor: (@open=false)->
+    constructor: (@open=false, @start=false)->
         super
-        @id = @cls.name + if @open then 'Open' else ''
+        @id = @cls.name
+        @open and @id += 'Open'
+        @start and @id += 'Start'
 
 class Markers.None extends Marker
     path: ->
@@ -43,7 +49,9 @@ class Markers.None extends Marker
 
 class Markers.Vee extends Marker
     path: ->
-        w = -@width()
+        w = @width()
+        if not @start
+            w = -w
         h = @height()
         lw = w / 3
         h2 = h / 2
@@ -87,7 +95,7 @@ class Markers.Box extends Marker
          L #{w} #{-h2}
         z"
 
-Markers._get = (type) ->
+Markers._get = (type, start=false) ->
     open = false
     if type.indexOf('o') == 0
         type = type.slice(1)
@@ -95,6 +103,6 @@ Markers._get = (type) ->
 
     type = capitalize(type.replace(/^Black/, ''))
     if type and type of Markers
-        m = new Markers[type](open)
+        m = new Markers[type](open, start)
     else
-        m = new Markers.None()
+        m = new Markers.None(open, start)

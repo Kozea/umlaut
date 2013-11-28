@@ -461,7 +461,7 @@ dot = (src) ->
         if l.attrs.arrowhead
             l.marker_end = Markers._get(lnk.attrs.arrowhead)
         if l.attrs.arrowtail
-            l.marker_start = Markers._get(lnk.attrs.arrowtail)
+            l.marker_start = Markers._get(lnk.attrs.arrowtail, true)
         diagram.links.push l
 
     d.title = attributes.graph.label or graph.id

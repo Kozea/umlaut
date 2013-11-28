@@ -29,6 +29,8 @@ class Diagrams.Dot extends Diagram
             if name.indexOf('_') != 0
                 markers.push(new marker())
                 markers.push(new marker(true))
+                markers.push(new marker(false, true))
+                markers.push(new marker(true, true))
         markers
 
 E = Diagrams.Dot::types.elements

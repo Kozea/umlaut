@@ -153,7 +153,7 @@ class Diagram extends Base
             if link.attrs?.arrowhead
                 link.marker_end = Markers._get(link.attrs.arrowhead)
             if link.attrs?.arrowtail
-                link.marker_start = Markers._get(link.attrs.arrowtail)
+                link.marker_start = Markers._get(link.attrs.arrowtail, true)
             @links.push(link)
 
         if obj.force
