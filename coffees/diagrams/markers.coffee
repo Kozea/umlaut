@@ -28,6 +28,11 @@ class Marker extends Base
     height: ->
         20
 
+    w: ->
+        if @start
+            @width()
+        else
+            -@width()
     viewbox: ->
         w = @width() + @margin()
         if @start
@@ -49,33 +54,45 @@ class Markers.None extends Marker
 
 class Markers.Vee extends Marker
     path: ->
-        w = @width()
-        if not @start
-            w = -w
+        w = @w()
         h = @height()
         lw = w / 3
         h2 = h / 2
         "M 0 0 L #{w} #{-h2} L #{lw} 0 L #{w} #{h2} z"
 
+class Markers.Crow extends Marker
+    path: ->
+        w = @w()
+        h = @height()
+        lw = 2 * w / 3
+        h2 = h / 2
+        "M 0 #{-h2} L #{w} 0 L 0 #{h2} L #{lw} 0 z"
+
 class Markers.Normal extends Marker
     path: ->
-        w = -@width()
+        w = @w()
         h2 = @height() / 2
         "M 0 0 L #{w} #{-h2} L #{w} #{h2} z"
+
+class Markers.Inv extends Marker
+    path: ->
+        w = @w()
+        h2 = @height() / 2
+        "M 0 #{-h2} L #{w} 0 L 0 #{h2} z"
 
 class Markers.Diamond extends Marker
     width: ->
         40
 
     path: ->
-        w = -@width()
+        w = @w()
         w2 = w / 2
         h2 = @height() / 2
         "M 0 0 L #{w2} #{-h2} L #{w} 0 L #{w2} #{h2} z"
 
 class Markers.Dot extends Marker
     path: ->
-        w = -@width()
+        w = @w()
         w2 = w / 2
         h2 = @height() / 2
 
@@ -85,7 +102,7 @@ class Markers.Dot extends Marker
 
 class Markers.Box extends Marker
     path: ->
-        w = -@width()
+        w = @w()
         w2 = w / 2
         h2 = @height() / 2
 
@@ -94,6 +111,10 @@ class Markers.Box extends Marker
          L #{w} #{h2}
          L #{w} #{-h2}
         z"
+
+class Markers.Tee extends Markers.Box
+    width: ->
+        7.5
 
 Markers._get = (type, start=false) ->
     open = false

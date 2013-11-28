@@ -24,7 +24,7 @@ COMPASS_PTS = ['n', 'ne', 'e', 'se', 's', 'sw', 'w', 'nw', 'c', '_']
 
 RE_SPACE = /\s/
 RE_ALPHA = /[a-zA-Z_\u00C0-\u017F]/
-RE_DIGIT = /\d|./
+RE_DIGIT = /\d|\./
 RE_ALPHADIGIT = /[a-zA-Z0-9_\u00C0-\u017F]/
 RE_COMMENT = /\/|\#/
 PANIC_THRESHOLD = 9999
