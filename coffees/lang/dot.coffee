@@ -359,7 +359,6 @@ dot = (src) ->
 
     nodes_by_id = {}
     links_by_id = []
-    link_type = if graph.type == 'directed' then 'normal' else 'none'
     attributes =
         graph: {}
         edge: {}
@@ -458,10 +457,17 @@ dot = (src) ->
         l = new lnk.type(elements_by_id[lnk.id1], elements_by_id[lnk.id2])
         l.text.source = lnk.label
         l.attrs = lnk.attrs
+        if graph.type == 'directed' and not lnk.attrs.arrowhead
+            lnk.attrs.arrowhead = 'normal'
         if l.attrs.arrowhead
             l.marker_end = Markers._get(lnk.attrs.arrowhead)
         if l.attrs.arrowtail
             l.marker_start = Markers._get(lnk.attrs.arrowtail, true)
+        if l.attrs.headlabel
+            l.text.target = l.attrs.headlabel
+        if l.attrs.taillabel
+            l.text.source = l.attrs.taillabel
+
         diagram.links.push l
 
     d.title = attributes.graph.label or graph.id

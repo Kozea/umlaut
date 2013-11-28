@@ -199,6 +199,10 @@ commands =
 
     back_to_list:
         fun: ->
+            if diagram.force
+                diagram.force.stop()
+            if diagram instanceof Diagrams.Dot
+                $('textarea.dot').val(diagram.to_dot())
             location.href = '#'
         label: 'Go back to diagram list'
         glyph: 'list'

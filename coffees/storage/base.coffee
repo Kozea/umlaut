@@ -27,6 +27,8 @@ save = =>
 
 
 generate_url = ->
+    return unless location.hash
+
     hash = '#' + diagram.hash()
     if location.hash != hash
         history.pushState(null, null, hash)

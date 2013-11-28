@@ -193,34 +193,70 @@ class House extends Element
 
 class Polygon extends Element
     n: 4
+    shift: pi / 4
+
+    _x: (a) ->
+        o = pi / @n
+        w2 = @width() / 2
+        r = w2 * (Math.cos(o) / (Math.cos((a + @shift) % (2 * o) - o) )) * Math.cos(a - pi / 2)
+
+    _y: (a) ->
+        o = pi / @n
+        h2 = @height() / 2
+        r = h2 * (Math.cos(o) / (Math.cos((a + @shift) % (2 * o) - o) )) * Math.sin(a - pi / 2)
+
+    constructor: ->
+        super
+        @anchors[cardinal.N] = =>
+            x: @x + @_x(0)
+            y: @y + @_y(0)
+
+        @anchors[cardinal.E] = =>
+            x: @x + @_x(pi / 2)
+            y: @y + @_y(pi / 2)
+
+        @anchors[cardinal.S] = =>
+            x: @x + @_x(pi)
+            y: @y + @_y(pi)
+
+        @anchors[cardinal.W] = =>
+            x: @x + @_x(3 * pi / 2)
+            y: @y + @_y(3 * pi / 2)
 
     txt_width: ->
-        super() * 1.25
+        super() * 2
 
     txt_height: ->
-        super() * 1.25
+        super() * 2
 
     path: ->
-        angle = 2 * pi / @n
         w2 = @width() / 2
         h2 = @height() / 2
-
-        path = "M 0 #{-h2}"
-        for i in [1..@n]
-            path = "#{path} L #{w2 * Math.sin(i * angle)} #{-h2 * Math.cos(i * angle)}"
+        angle = 2 * pi / @n
+        path = ''
+        for i in [0..@n]
+            path = "#{path} #{if i == 0 then 'M' else 'L'}  #{w2 * Math.sin(i * angle + @shift)} #{-h2 * Math.cos(i * angle + @shift)}"
         "#{path} z"
+
+class Triangle extends Polygon
+    n: 3
+    shift: 0
 
 class Pentagon extends Polygon
     n: 5
+    shift: 0
 
 class Hexagon extends Polygon
     n: 6
+    shift: pi / 6
 
 class Septagon extends Polygon
     n: 7
+    shift: 0
 
 class Octogon extends Polygon
     n: 8
+    shift: pi  / 8
 
 class Star extends Pentagon
 

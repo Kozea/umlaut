@@ -1419,29 +1419,69 @@ House = (function(_super) {
 Polygon = (function(_super) {
   __extends(Polygon, _super);
 
-  function Polygon() {
-    _ref22 = Polygon.__super__.constructor.apply(this, arguments);
-    return _ref22;
-  }
-
   Polygon.prototype.n = 4;
 
+  Polygon.prototype.shift = pi / 4;
+
+  Polygon.prototype._x = function(a) {
+    var o, r, w2;
+    o = pi / this.n;
+    w2 = this.width() / 2;
+    return r = w2 * (Math.cos(o) / (Math.cos((a + this.shift) % (2 * o) - o))) * Math.cos(a - pi / 2);
+  };
+
+  Polygon.prototype._y = function(a) {
+    var h2, o, r;
+    o = pi / this.n;
+    h2 = this.height() / 2;
+    return r = h2 * (Math.cos(o) / (Math.cos((a + this.shift) % (2 * o) - o))) * Math.sin(a - pi / 2);
+  };
+
+  function Polygon() {
+    var _this = this;
+    Polygon.__super__.constructor.apply(this, arguments);
+    this.anchors[cardinal.N] = function() {
+      return {
+        x: _this.x + _this._x(0),
+        y: _this.y + _this._y(0)
+      };
+    };
+    this.anchors[cardinal.E] = function() {
+      return {
+        x: _this.x + _this._x(pi / 2),
+        y: _this.y + _this._y(pi / 2)
+      };
+    };
+    this.anchors[cardinal.S] = function() {
+      return {
+        x: _this.x + _this._x(pi),
+        y: _this.y + _this._y(pi)
+      };
+    };
+    this.anchors[cardinal.W] = function() {
+      return {
+        x: _this.x + _this._x(3 * pi / 2),
+        y: _this.y + _this._y(3 * pi / 2)
+      };
+    };
+  }
+
   Polygon.prototype.txt_width = function() {
-    return Polygon.__super__.txt_width.call(this) * 1.25;
+    return Polygon.__super__.txt_width.call(this) * 2;
   };
 
   Polygon.prototype.txt_height = function() {
-    return Polygon.__super__.txt_height.call(this) * 1.25;
+    return Polygon.__super__.txt_height.call(this) * 2;
   };
 
   Polygon.prototype.path = function() {
-    var angle, h2, i, path, w2, _i, _ref23;
-    angle = 2 * pi / this.n;
+    var angle, h2, i, path, w2, _i, _ref22;
     w2 = this.width() / 2;
     h2 = this.height() / 2;
-    path = "M 0 " + (-h2);
-    for (i = _i = 1, _ref23 = this.n; 1 <= _ref23 ? _i <= _ref23 : _i >= _ref23; i = 1 <= _ref23 ? ++_i : --_i) {
-      path = "" + path + " L " + (w2 * Math.sin(i * angle)) + " " + (-h2 * Math.cos(i * angle));
+    angle = 2 * pi / this.n;
+    path = '';
+    for (i = _i = 0, _ref22 = this.n; 0 <= _ref22 ? _i <= _ref22 : _i >= _ref22; i = 0 <= _ref22 ? ++_i : --_i) {
+      path = "" + path + " " + (i === 0 ? 'M' : 'L') + "  " + (w2 * Math.sin(i * angle + this.shift)) + " " + (-h2 * Math.cos(i * angle + this.shift));
     }
     return "" + path + " z";
   };
@@ -1449,6 +1489,22 @@ Polygon = (function(_super) {
   return Polygon;
 
 })(Element);
+
+Triangle = (function(_super) {
+  __extends(Triangle, _super);
+
+  function Triangle() {
+    _ref22 = Triangle.__super__.constructor.apply(this, arguments);
+    return _ref22;
+  }
+
+  Triangle.prototype.n = 3;
+
+  Triangle.prototype.shift = 0;
+
+  return Triangle;
+
+})(Polygon);
 
 Pentagon = (function(_super) {
   __extends(Pentagon, _super);
@@ -1459,6 +1515,8 @@ Pentagon = (function(_super) {
   }
 
   Pentagon.prototype.n = 5;
+
+  Pentagon.prototype.shift = 0;
 
   return Pentagon;
 
@@ -1474,6 +1532,8 @@ Hexagon = (function(_super) {
 
   Hexagon.prototype.n = 6;
 
+  Hexagon.prototype.shift = pi / 6;
+
   return Hexagon;
 
 })(Polygon);
@@ -1488,6 +1548,8 @@ Septagon = (function(_super) {
 
   Septagon.prototype.n = 7;
 
+  Septagon.prototype.shift = 0;
+
   return Septagon;
 
 })(Polygon);
@@ -1501,6 +1563,8 @@ Octogon = (function(_super) {
   }
 
   Octogon.prototype.n = 8;
+
+  Octogon.prototype.shift = pi / 8;
 
   return Octogon;
 
@@ -2043,6 +2107,82 @@ Diagrams.Dot = (function(_super) {
     return markers;
   };
 
+  Dot.prototype.to_dot = function() {
+    var attrs, directed, dot, element, key, link, marker_to_dot, op, shape, val, _i, _j, _len, _len1, _ref46, _ref47, _ref48, _ref49;
+    directed = false;
+    dot = "graph umlaut {\n";
+    _ref46 = diagram.elements;
+    for (_i = 0, _len = _ref46.length; _i < _len; _i++) {
+      element = _ref46[_i];
+      dot = "" + dot + "  \"" + element.text + "\"";
+      attrs = [];
+      shape = element.cls.name.toLowerCase();
+      if (shape !== 'ellipse') {
+        attrs.push("shape=" + shape);
+      }
+      _ref47 = element.attrs;
+      for (key in _ref47) {
+        val = _ref47[key];
+        if (key !== 'shape' && key !== 'label') {
+          attrs.push("" + key + "=" + val);
+        }
+      }
+      if (attrs.length) {
+        dot = "" + dot + "[" + (attrs.join(',')) + "]";
+      }
+      dot = "" + dot + ";\n";
+    }
+    marker_to_dot = function(m) {
+      var name;
+      name = m.cls.name.toLowerCase();
+      if (m.open) {
+        return "o" + name;
+      } else {
+        return name;
+      }
+    };
+    _ref48 = diagram.links;
+    for (_j = 0, _len1 = _ref48.length; _j < _len1; _j++) {
+      link = _ref48[_j];
+      if (!link.marker_end) {
+        op = '--';
+      } else {
+        op = '->';
+        directed = true;
+      }
+      dot = "" + dot + "  \"" + link.source.text + "\" " + op + " \"" + link.target.text + "\"";
+      attrs = [];
+      if (link.marker_start) {
+        attrs.push("arrowhead=" + (marker_to_dot(link.marker_start)));
+      }
+      if (link.marker_end) {
+        attrs.push("arrowtail=" + (marker_to_dot(link.marker_end)));
+      }
+      if (link.text.source) {
+        attrs.push("taillabel=\"" + link.text.source + "\"");
+      }
+      if (link.text.target) {
+        attrs.push("headlabel=\"" + link.text.target + "\"");
+      }
+      _ref49 = link.attrs;
+      for (key in _ref49) {
+        val = _ref49[key];
+        if (key !== 'arrowhead' && key !== 'arrowtail' && key !== 'headlabel' && key !== 'taillabel') {
+          attrs.push("" + key + "=" + val);
+        }
+      }
+      if (attrs.length) {
+        dot = "" + dot + "[" + (attrs.join(',')) + "]";
+      }
+      dot = "" + dot + ";\n";
+    }
+    dot = "" + dot + "}";
+    if (directed) {
+      dot = "di" + dot;
+    }
+    return dot;
+  };
+
   return Dot;
 
 })(Diagram);
@@ -2073,7 +2213,7 @@ E.Polygon = (function(_super) {
 
   return Polygon;
 
-})(Rect);
+})(Polygon);
 
 E.Ellipse = (function(_super) {
   __extends(Ellipse, _super);
@@ -3245,6 +3385,12 @@ commands = {
   },
   back_to_list: {
     fun: function() {
+      if (diagram.force) {
+        diagram.force.stop();
+      }
+      if (diagram instanceof Diagrams.Dot) {
+        $('textarea.dot').val(diagram.to_dot());
+      }
       return location.href = '#';
     },
     label: 'Go back to diagram list',
@@ -4317,6 +4463,9 @@ save = function() {
 
 generate_url = function() {
   var hash;
+  if (!location.hash) {
+    return;
+  }
   hash = '#' + diagram.hash();
   if (location.hash !== hash) {
     return history.pushState(null, null, hash);
@@ -4938,14 +5087,13 @@ dot_lex = function(tokens) {
 };
 
 dot = function(src) {
-  var attributes, copy_attributes, d, e, elements_by_id, elt, graph, id, l, link_type, links_by_id, lnk, nodes_by_id, populate, tokens, _i, _len;
+  var attributes, copy_attributes, d, e, elements_by_id, elt, graph, id, l, links_by_id, lnk, nodes_by_id, populate, tokens, _i, _len;
   tokens = dot_tokenize(src);
   graph = dot_lex(tokens);
   d = window.diagram = new Diagrams.Dot();
   window.svg = new Svg();
   nodes_by_id = {};
   links_by_id = [];
-  link_type = graph.type === 'directed' ? 'normal' : 'none';
   attributes = {
     graph: {},
     edge: {},
@@ -5119,11 +5267,20 @@ dot = function(src) {
     l = new lnk.type(elements_by_id[lnk.id1], elements_by_id[lnk.id2]);
     l.text.source = lnk.label;
     l.attrs = lnk.attrs;
+    if (graph.type === 'directed' && !lnk.attrs.arrowhead) {
+      lnk.attrs.arrowhead = 'normal';
+    }
     if (l.attrs.arrowhead) {
       l.marker_end = Markers._get(lnk.attrs.arrowhead);
     }
     if (l.attrs.arrowtail) {
       l.marker_start = Markers._get(lnk.attrs.arrowtail, true);
+    }
+    if (l.attrs.headlabel) {
+      l.text.target = l.attrs.headlabel;
+    }
+    if (l.attrs.taillabel) {
+      l.text.source = l.attrs.taillabel;
     }
     diagram.links.push(l);
   }

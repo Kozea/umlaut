@@ -33,12 +33,66 @@ class Diagrams.Dot extends Diagram
                 markers.push(new marker(true, true))
         markers
 
+    to_dot: ->
+        directed = false
+        dot = "graph umlaut {\n"
+        for element in diagram.elements
+            dot = "#{dot}  \"#{element.text}\""
+            attrs = []
+            shape = element.cls.name.toLowerCase()
+            if shape != 'ellipse'
+                attrs.push "shape=#{shape}"
+            for key, val of element.attrs
+                if key not in ['shape', 'label']
+                    attrs.push "#{key}=#{val}"
+            if attrs.length
+                dot = "#{dot}[#{attrs.join(',')}]"
+            dot = "#{dot};\n"
+
+        marker_to_dot = (m) ->
+            name = m.cls.name.toLowerCase()
+            if m.open
+                "o#{name}"
+            else
+                name
+
+        for link in diagram.links
+            if not link.marker_end
+                op = '--'  # Graph not directed
+            else
+                op = '->'  # Graph directed
+                directed = true
+
+            dot = "#{dot}  \"#{link.source.text}\" #{op} \"#{link.target.text}\""
+            attrs = []
+            if link.marker_start
+                attrs.push "arrowhead=#{marker_to_dot(link.marker_start)}"
+            if link.marker_end
+                attrs.push "arrowtail=#{marker_to_dot(link.marker_end)}"
+
+            if link.text.source
+                attrs.push "taillabel=\"#{link.text.source}\""
+            if link.text.target
+                attrs.push "headlabel=\"#{link.text.target}\""
+
+            for key, val of link.attrs
+                if key not in ['arrowhead', 'arrowtail', 'headlabel', 'taillabel']
+                    attrs.push "#{key}=#{val}"
+            if attrs.length
+                dot = "#{dot}[#{attrs.join(',')}]"
+            dot = "#{dot};\n"
+
+        dot = "#{dot}}"
+        if directed
+            dot = "di#{dot}"
+        dot
+
 E = Diagrams.Dot::types.elements
 L = Diagrams.Dot::types.links
 
 class E.Box extends Rect
 
-class E.Polygon extends Rect
+class E.Polygon extends Polygon
 
 class E.Ellipse extends Ellipsis
 
