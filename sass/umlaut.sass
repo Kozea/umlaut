@@ -54,16 +54,16 @@ header
     a
       +squish-text
 
-body > section
-  +flex(1)
-  +display-flex
-  +flex-direction(column)
-  margin: 1em
-
-  &#editor
+body
+  #editor
+    +flex(1)
+    +display-flex
+    +flex-direction(column)
+    margin: 1em
     margin-right: 0
 
-  &#diagrams
+  #diagrams
+    margin: 1em
     li
       list-style: none
 
@@ -113,7 +113,8 @@ body > section
         +flex(1)
 
     aside
-      margin: 0 .5em
+      padding: 0 0.5em 0 0
+      margin: 0 0 0 0.5em
       width: 100px
       overflow-y: auto
 
@@ -340,7 +341,7 @@ svg
       +flex-direction(column)
 
       > .outside
-        flex: 3
+        flex: 4
 
       > .sidebar
         +flex(1)
@@ -351,11 +352,15 @@ svg
           +flex-wrap(wrap)
           .icon
             width: 20%
+            height: 40px
 
 
 @-moz-document url-prefix()
   @media screen and (max-width: 480px)
     body > section
+      &#editor
+        margin: 1em
+
       #main
         > .sidebar
           .icons
