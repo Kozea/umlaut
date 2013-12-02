@@ -342,3 +342,37 @@ link_drag = d3.behavior.drag()
             else
                 diagram.links.push link
                 svg.sync(true))
+
+floating = null
+
+extern_drag = d3.behavior.drag()
+    .on('dragstart.extern', ->
+        return if floating
+        $elt = $ @
+        floating =
+            $elt: $(@.cloneNode(true))
+            offset:
+                top: $elt.parent().offset().top - $elt.outerHeight() / 2
+                left: $elt.parent().offset().left - $elt.outerWidth() / 2
+        $('body').append(
+            floating.$elt
+                .css(
+                    position: 'fixed'
+                    top: floating.offset.top
+                    left: floating.offset.left))
+        d3.event.sourceEvent.stopPropagation()
+    ).on("drag.extern", ->
+        floating.$elt.css(top: floating.offset.top + d3.event.y, left: floating.offset.left + d3.event.x)
+    ).on('dragend.extern', ->
+        return if not floating
+        x = floating.$elt.offset().left - $('#diagram').offset().left + floating.$elt.outerWidth() / 2
+        y = floating.$elt.offset().top - $('#diagram').offset().top + floating.$elt.outerHeight() / 2
+        x = (x - diagram.zoom.translate[0]) /  diagram.zoom.scale
+        y = (y - diagram.zoom.translate[1]) /  diagram.zoom.scale
+        x = diagram.snap.x * Math.floor(x / diagram.snap.x)
+        y = diagram.snap.y * Math.floor(y / diagram.snap.y)
+        type = floating.$elt.attr('data-type')
+        node_add(type, x, y)
+        floating.$elt.remove()
+        floating = null
+    )

@@ -18,44 +18,24 @@
 
 order = (a, b) -> d3.ascending(a.ts, b.ts)
 
-node_add = (type) =>
-    xy = mouse_xy(svg.svg.node())
-    x = xy.x
-    y = xy.y
-
-    if new type() instanceof Group
+node_add = (type, x, y) =>
+    if type of diagram.types.groups
+        cls = diagram.types.groups[type]
         set = diagram.groups
-        diagram.last_types.group = type
+        diagram.last_types.group = cls
     else
+        cls = diagram.types.elements[type]
         set = diagram.elements
-        diagram.last_types.element = type
+        diagram.last_types.element = cls
 
-    nth = set.filter((node) -> node instanceof type).length + 1
-    new_node = new type(x, y, "#{type.name} ##{nth}", not diagram.force)
+    nth = set.filter((node) -> node instanceof cls).length + 1
+    new_node = new cls(x, y, "#{type} ##{nth}", not diagram.force)
     set.push(new_node)
     if d3.event
         diagram.selection = [new_node]
 
     svg.sync(true)
 
-    if d3.event
-        # Hack to trigger d3 drag event on newly created element
-        dom_node = null
-        svg.svg.selectAll('g.node').each((node) ->
-            if node == new_node
-                dom_node = @)
-        if d3.event.type = 'touchstart'
-            touch_evt = document.createEvent('TouchEvent')
-            touch_evt.initUIEvent(d3.event.type, d3.event.canBubble, d3.event.cancelable, d3.event.view, d3.event.detail, d3.event.screenX, d3.event.screenY, d3.event.clientX, d3.event.clientY, d3.event.ctrlKey, d3.event.altKey, d3.event.shiftKey, d3.event.metaKey, d3.event.touches, d3.event.targetTouches, d3.event.changedTouches, d3.event.scale, d3.event.rotation)
-            dom_node.dispatchEvent(touch_evt)
-        else
-            mouse_evt = document.createEvent('MouseEvent')
-            mouse_evt.initMouseEvent(
-                d3.event.type, d3.event.canBubble, d3.event.cancelable, d3.event.view,
-                d3.event.detail, d3.event.screenX, d3.event.screenY, d3.event.clientX, d3.event.clientY,
-                d3.event.ctrlKey, d3.event.altKey, d3.event.shiftKey, d3.event.metaKey,
-                d3.event.button, d3.event.relatedTarget)
-            dom_node.dispatchEvent(mouse_evt)
 
 last_command =
     fun: null
@@ -268,8 +248,9 @@ init_commands = ->
             .attr('class', 'icon specific draggable btn btn-default')
             .attr('title', "#{name} [#{hotkey}]")
             .attr('data-hotkey', hotkey)
-            # .on('mousedown', fun)
-            .on('touchstart', fun)
+            .attr('data-type', name)
+            .call(extern_drag)
+
 
         element = svgicon
             .selectAll(if icon instanceof Group then 'g.group' else 'g.element')
@@ -322,8 +303,7 @@ init_commands = ->
             .attr('title', "#{name} [#{hotkey}]")
             .attr('data-hotkey', hotkey)
             .classed('active', first)
-            .on('mousedown', fun(cls))
-            .on('touchstart', fun(cls))
+            .on('click', fun(cls))
 
         link = svgicon
             .selectAll('g.link')
@@ -336,7 +316,6 @@ init_commands = ->
         svgicon
             .attr('height', 20)
             .attr('viewBox', "0 -10 100 20")
-            .attr('preserveAspectRatio', 'none')
         Mousetrap.bind hotkey, wrap(fun)
         if first
             diagram.last_types.link = cls

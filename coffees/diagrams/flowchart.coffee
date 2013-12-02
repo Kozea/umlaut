@@ -43,10 +43,6 @@ class E.Terminator extends Element
          Q #{-w2} #{-h2} #{-w2 + shift} #{-h2}"
 
 class E.Decision extends Lozenge
-    constructor: ->
-        super
-        @margin.x = 0
-        @margin.y = 2
 
 class E.Delay extends Element
     constructor: ->
@@ -199,7 +195,6 @@ class E.ManualInput extends Element
           z"
 
 class E.Preparation extends Hexagon
-    shift: 1.25
 
 class E.InternalStorage extends E.Process
     hshift: 1.5

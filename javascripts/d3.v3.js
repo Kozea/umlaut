@@ -1122,7 +1122,11 @@ d3 = function() {
       this.on("mousedown.drag", mousedown).on("touchstart.drag", touchstart);
     }
     function touchid() {
-      return d3.event.changedTouches[0].identifier;
+      try {
+          return d3.event.changedTouches[0].identifier;
+      } catch (e) {
+          return 0;
+      }
     }
     function touchposition(parent, id) {
       return d3.touches(parent).filter(function(p) {
@@ -1132,6 +1136,7 @@ d3 = function() {
     function dragstart(id, position, move, end) {
       return function() {
         var target = this, parent = target.parentNode, event_ = event.of(target, arguments), eventTarget = d3.event.target, eventId = id(), drag = eventId == null ? "drag" : "drag-" + eventId, origin_ = position(parent, eventId), dragged = 0, offset, w = d3.select(d3_window).on(move + "." + drag, moved).on(end + "." + drag, ended), dragRestore = d3_event_dragSuppress();
+        origin_ = origin_ || [0, 0];
         if (origin) {
           offset = origin.apply(target, arguments);
           offset = [ offset.x - origin_[0], offset.y - origin_[1] ];
