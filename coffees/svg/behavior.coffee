@@ -237,7 +237,7 @@ anchor_link_drag = d3.behavior.drag()
 
         link = diagram.linking[0]
         evt = d3.event.sourceEvent
-        if evt.type = 'touchmove'
+        if evt.type == 'touchmove'
             target = document.elementFromPoint(evt.targetTouches[0].clientX, evt.targetTouches[0].clientY)
         else
             target = evt.target
@@ -308,7 +308,7 @@ link_drag = d3.behavior.drag()
             svg.sync()
 
         evt = d3.event.sourceEvent
-        if evt.type = 'touchmove'
+        if evt.type == 'touchmove'
             target = document.elementFromPoint(evt.targetTouches[0].clientX, evt.targetTouches[0].clientY)
         else
             target = evt.target
