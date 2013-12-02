@@ -3960,9 +3960,7 @@ extern_drag = d3.behavior.drag().on('dragstart.extern', function() {
     }
   };
   $('body').append(floating.$elt.css({
-    position: 'fixed',
-    top: floating.offset.top,
-    left: floating.offset.left
+    position: 'fixed'
   }));
   return d3.event.sourceEvent.stopPropagation();
 }).on("drag.extern", function() {

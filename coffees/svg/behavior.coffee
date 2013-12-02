@@ -356,10 +356,7 @@ extern_drag = d3.behavior.drag()
                 left: $elt.parent().offset().left - $elt.outerWidth() / 2
         $('body').append(
             floating.$elt
-                .css(
-                    position: 'fixed'
-                    top: floating.offset.top
-                    left: floating.offset.left))
+                .css(position: 'fixed'))
         d3.event.sourceEvent.stopPropagation()
     ).on("drag.extern", ->
         floating.$elt.css(top: floating.offset.top + d3.event.y, left: floating.offset.left + d3.event.x)
