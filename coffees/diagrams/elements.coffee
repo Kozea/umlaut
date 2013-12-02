@@ -146,7 +146,9 @@ class Element extends Base
         +min_anchor
 
     in: (rect) ->
-        rect.x < @x < rect.x + rect.width and rect.y < @y < rect.y + rect.height
+        x = @x * diagram.zoom.scale + diagram.zoom.translate[0]
+        y = @y * diagram.zoom.scale + diagram.zoom.translate[1]
+        rect.x < x < rect.x + rect.width and rect.y < y < rect.y + rect.height
 
     contains: ->
         false
@@ -167,14 +169,3 @@ class Mouse extends Element
     width: -> 1
     height: -> 1
     weight: 1
-
-    constructor: ->
-        super
-        @lasts = []
-        for i in [0..5]
-            @lasts.push x:0, y: 0
-
-    dynamic_rotation: ->
-        @_rotation = atan2(
-            @lasts.map((e) -> e.y).reduce(((e, l) -> e + l), 0)
-            @lasts.map((e) -> e.x).reduce(((e, l) -> e + l), 0))

@@ -19,8 +19,9 @@
 order = (a, b) -> d3.ascending(a.ts, b.ts)
 
 node_add = (type) =>
-    x = diagram.mouse.x
-    y = diagram.mouse.y
+    xy = mouse_xy(svg.svg.node())
+    x = xy.x
+    y = xy.y
 
     if new type() instanceof Group
         set = diagram.groups

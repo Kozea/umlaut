@@ -46,7 +46,7 @@ enter_node = (nodes, connect=true) ->
             .enter()
                 .append('path')
                 .attr('class', (anchor) -> "anchor #{anchor}")
-                .call(mouse_anchor)
+                .attr('data-anchor', (anchor) -> anchor)
                 .call(anchor_link_drag))
 
     g.call(move_drag)

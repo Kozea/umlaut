@@ -15,17 +15,111 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see http://www.gnu.org/licenses/.
 
+svg_selection_drag = d3.behavior.drag()
+    .on("dragstart.selection", ->
+        if not d3.event.sourceEvent.shiftKey
+            diagram.selection = []
+            if diagram.linking.length
+                # Something went wrong
+                diagram.linking = []
+                svg.sync()
+            svg.tick()
+            return
+
+    ).on("drag.selection", ->
+        if not d3.event.sourceEvent.shiftKey
+            return
+
+        sel = svg.svg.select('rect.selection')
+        if sel.empty()
+            sel = svg.svg.select('#bg')
+                .append("rect").attr
+                    class: "selection"
+                    x: d3.event.x
+                    y: d3.event.y
+                    width: 0
+                    height: 0
+
+
+        rect =
+            x: + sel.attr('x')
+            y: + sel.attr('y')
+            width: + sel.attr('width')
+            height: + sel.attr('height')
+
+        move =
+            x: (d3.event.x - rect.x)
+            y: (d3.event.y - rect.y)
+
+        if move.x < 1 or (move.x * 2 < rect.width)
+            rect.x = d3.event.x
+            rect.width -= move.x
+        else
+            rect.width = move.x
+        if move.y < 1 or (move.y * 2 < rect.height)
+            rect.y = d3.event.y
+            rect.height -= move.y
+        else
+            rect.height = move.y
+
+        rect.width = Math.max(0, rect.width)
+        rect.height = Math.max(0, rect.height)
+
+        sel.attr rect
+
+        svg.svg.selectAll('g.node').each((elt) ->
+            g = d3.select @
+            selected = elt in diagram.selection
+            inside = elt.in(rect)
+
+            if inside and not selected
+                diagram.selection.push(elt)
+            else if not inside and selected
+                diagram.selection.splice(diagram.selection.indexOf(elt), 1)
+        )
+        svg.tick()
+    ).on("dragend.selection", ->
+        sel = svg.svg.select("rect.selection")
+        if not sel.empty()
+            x = + sel.attr("x")
+            y = + sel.attr("y")
+            width = + sel.attr("width")
+            height = + sel.attr("height")
+            type = diagram.last_types.group
+            if type
+                nth = diagram.groups.filter((grp) -> grp instanceof type).length + 1
+                grp = new type(x + width / 2, y + height / 2, "#{type.name} ##{nth}", not diagram.force)
+                grp._width = width
+                grp._height = height
+                diagram.groups.push grp
+            svg.sync()
+
+        svg.svg.selectAll("rect.selection").remove())
+
 
 move_drag = d3.behavior.drag()
     .origin((i) -> i)
-    .on('dragstart', (node) ->
-        return if d3.event.sourceEvent.which is not 1 or d3.event.sourceEvent.ctrlKey
+    .on('dragstart.move', (node) ->
         svg.svg.classed('dragging', true)
         svg.svg.classed('translating', true)
 
-        diagram.dragging = true
-    ).on("drag", (node) ->
-        return if not diagram.dragging or d3.event.sourceEvent.ctrlKey
+        if node not in diagram.selection
+            if d3.event.sourceEvent.shiftKey
+                diagram.selection.push(node)
+            else
+                diagram.selection = [node]
+
+        node.ts = timestamp()
+        svg.svg.selectAll('g.node').sort(order)
+        if node instanceof Group
+            svg.svg.selectAll('g.element')
+                .each((elt) ->
+                    if elt not in diagram.selection and node.contains elt
+                        diagram.selection.push elt)
+
+        svg.tick()
+        d3.event.sourceEvent.stopPropagation()
+    ).on("drag.move", (node) ->
         x = if diagram.force then 'px' else 'x'
         y = if diagram.force then 'py' else 'y'
 
@@ -52,10 +146,9 @@ move_drag = d3.behavior.drag()
             diagram.force.resume()
         else
             svg.tick()
-    ).on('dragend', (node) ->
+    ).on('dragend.move', (node) ->
         svg.svg.classed('dragging', false)
         svg.svg.classed('translating', false)
-        return if not diagram.dragging
         for node in diagram.nodes()
             node.fixed = false
 
@@ -73,8 +166,7 @@ move_drag = d3.behavior.drag()
         svg.sync(true))
 
 nsweo_resize_drag = d3.behavior.drag()
-    .on("dragstart", (handle) ->
-        return if d3.event.sourceEvent.ctrlKey
+    .on("dragstart.resize", (handle) ->
         svg.svg.classed('dragging', true)
         svg.svg.classed('resizing', true)
         node = d3.select($(@).closest('.node').get(0)).data()[0]
@@ -85,8 +177,7 @@ nsweo_resize_drag = d3.behavior.drag()
         node.oheight = node.height()
         node.fixed = true
         d3.event.sourceEvent.stopPropagation()
-    ).on("drag", (handle) ->
-        return if d3.event.ctrlKey
+    ).on("drag.resize", (handle) ->
         nodes = d3.select($(@).closest('.node').get(0))
         node = nodes.data()[0]
         m = mouse_xy svg.svg.node()
@@ -121,8 +212,7 @@ nsweo_resize_drag = d3.behavior.drag()
 
             nodes.call(update_node)
         svg.tick()
-    ).on("dragend", (handle) ->
-        return if d3.event.ctrlKey
+    ).on("dragend.resize", (handle) ->
         svg.svg.classed('dragging', false)
         svg.svg.classed('resizing', false)
         node = d3.select($(@).closest('.node').get(0)).data()[0]
@@ -130,153 +220,125 @@ nsweo_resize_drag = d3.behavior.drag()
         node.fixed = false
         svg.sync(true))
 
+
 anchor_link_drag = d3.behavior.drag()
-    .on("dragstart", (anchor) ->
-        return if d3.event.sourceEvent.ctrlKey
+    .on("dragstart.link", (anchor) ->
         svg.svg.classed('dragging', true)
         svg.svg.classed('linking', true)
-        node = d3.select($(@).closest('.node').get(0)).data()[0]
-        type = diagram.last_types.link
-        link = new type(node, diagram.mouse)
-        link.source_anchor = anchor
-        diagram.linking.push(link)
-        svg.sync(true)
         d3.event.sourceEvent.stopPropagation()
-    ).on("drag", (anchor) ->
-        return if d3.event.ctrlKey
-        node = d3.select($(@).closest('.node').get(0)).data()[0]
+    ).on("drag.link", (anchor) ->
+        if not diagram.linking.length
+            node = d3.select($(@).closest('.node').get(0)).data()[0]
+            type = diagram.last_types.link
+            link = new type(node, new Mouse(0, 0, ''))
+            link.source_anchor = anchor
+            diagram.linking.push(link)
+            svg.sync()
+
+        link = diagram.linking[0]
+        evt = d3.event.sourceEvent
+        if evt.type = 'touchmove'
+            target = document.elementFromPoint(evt.targetTouches[0].clientX, evt.targetTouches[0].clientY)
+        else
+            target = evt.target
+
+        $anchor = $(target).closest('.anchor')
+        if $anchor.size()
+            $node = $anchor.closest('.node')
+        else
+            $node = $(target).closest('.node')
+        if $node.size()
+            link.target = $node.get(0).__data__
+            if $anchor.size()
+                link.target_anchor = +$anchor.attr('data-anchor')
+            else
+                link.target_anchor = null
+        else
+            if link.target not instanceof Mouse
+                link.target = new Mouse(0, 0, '')
+            link.target.x = link.source.x + d3.event.x
+            link.target.y = link.source.y + d3.event.y
         svg.tick()
-    ).on("dragend", (anchor) ->
-        return if d3.event.ctrlKey
+    ).on("dragend.link", (anchor) ->
         svg.svg.classed('dragging', false)
         svg.svg.classed('linking', false)
-        node = d3.select($(@).closest('.node').get(0)).data()[0]
-        diagram.linking = []
-        svg.sync(true))
+        if diagram.linking.length
+            link = diagram.linking[0]
+            diagram.linking = []
+            if link.target instanceof Mouse
+                svg.sync()
+            else
+                diagram.links.push link
+                svg.sync(true))
 
+mouse_node = (nodes) ->
+    nodes.on('dblclick', (node) ->
+        edit((-> node.text), ((txt) -> node.text = txt)))
 
-mouse_anchor = (anchor) ->
-    anchor
-        .on("mousemove", (anchor) ->
-            return if d3.event.ctrlKey
-            d3.select(@).classed('active', true)
-            node = d3.select($(@).closest('.node').get(0)).data()[0]
-            for lnk in diagram.linking
-                if lnk._drag and lnk._drag == 'source'
-                    lnk.source_anchor = anchor
-                    lnk.source = node
-                else
-                    lnk.target_anchor = anchor
-                    lnk.target = node)
-        .on("mouseout", (anchor) ->
-            return if d3.event.ctrlKey
-            d3.select(@).classed('active', false)
-            for lnk in diagram.linking
-                if lnk._drag and lnk._drag == 'source'
-                    lnk.source_anchor = null
-                    lnk.source = diagram.mouse
-                else
-                    lnk.target_anchor = null
-                    lnk.target = diagram.mouse)
-        .on("mouseup", (anchor) =>
-            return if d3.event.ctrlKey
-            node = d3.select($(@).closest('.node').get(0)).data()[0]
-            if diagram.linking.length
-                for lnk in diagram.linking
-                    if diagram.mouse not in [lnk.source, lnk.target]
-                        diagram.links.push(lnk)
-                diagram.linking = []
-                svg.sync(true)
-                d3.event.preventDefault())
-
-mouse_node = (node) ->
-    node
-        .on("mousedown", (node) ->
-            return if d3.event.ctrlKey
-            selected = node in diagram.selection
-            if (selected and not diagram.dragging) or (not selected) and not d3.event.shiftKey
-                diagram.selection = [node]
-            if d3.event.shiftKey and not selected
-                diagram.selection.push(node)
-            node.ts = timestamp()
-            svg.svg.selectAll('g.node').sort(order)
-            svg.svg.selectAll('g.element')
-                .each((elt) ->
-                    if elt not in diagram.selection and node.contains elt
-                        diagram.selection.push elt)
-            svg.tick())
-        .on("mousemove", (node) ->
-            return if d3.event.ctrlKey
-            for lnk in diagram.linking
-                if lnk._drag and lnk._drag == 'source'
-                    lnk.source = node
-                else
-                    lnk.target = node)
-        .on("mouseout", (node) ->
-            return if d3.event.ctrlKey
-            for lnk in diagram.linking
-                if lnk._drag and lnk._drag == 'source'
-                    lnk.source = diagram.mouse
-                else
-                    lnk.target = diagram.mouse)
-        .on("mouseup", (node) =>
-            return if d3.event.ctrlKey
-            if diagram.linking.length
-                for lnk in diagram.linking
-                    if diagram.mouse not in [lnk.source, lnk.target]
-                        diagram.links.push(lnk)
-                diagram.linking = []
-                svg.sync(true)
-                d3.event.preventDefault())
-        .on('dblclick', (node) ->
-            return if d3.event.ctrlKey
-            edit((-> node.text), ((txt) -> node.text = txt)))
 
 mouse_link = (link) ->
     link
-        .on('mousedown', (lnk) ->
-            if not d3.event.shiftKey
-                diagram.selection = []
-            diagram.selection.push(lnk)
-            svg.tick()
-            d3.event.stopPropagation())
         .on('dblclick', (lnk) ->
-            return if d3.event.ctrlKey
-            nearest = lnk.nearest diagram.mouse
+            nearest = lnk.nearest mouse_xy(svg.svg.node())
             if nearest is lnk.source
                 edit((-> lnk.text.source), ((txt) -> lnk.text.source = txt))
             else
                 edit((-> lnk.text.target), ((txt) -> lnk.text.target = txt)))
 
 link_drag = d3.behavior.drag()
-    .on("dragstart", (link) ->
-        return if d3.event.sourceEvent.ctrlKey
-        if not d3.event.sourceEvent.shiftKey and Math.min(dist(diagram.mouse, link.a1), dist(diagram.mouse, link.a2)) > 20
-            return
+    .on("dragstart.link", (link) ->
+        if not d3.event.sourceEvent.shiftKey
+            diagram.selection = []
+        diagram.selection.push(link)
+        svg.tick()
         svg.svg.classed('dragging', true)
         svg.svg.classed('linking', true)
-
-        diagram.links.splice(diagram.links.indexOf(link), 1)
-
-        nearest = link.nearest diagram.mouse
-        if link.source == nearest
-            link.source = diagram.mouse
-            link.source_anchor = null
-            link._drag = 'source'
-        else
-            link.target = diagram.mouse
-            link.target_anchor = null
-            link._drag = 'target'
-
-        diagram.linking.push(link)
-        svg.sync()
         d3.event.sourceEvent.stopPropagation()
-    ).on("drag", (anchor) ->
-        return if d3.event.ctrlKey
+    ).on("drag.link", (link) ->
+        if not diagram.linking.length
+            diagram.links.splice(diagram.links.indexOf(link), 1)
+            mouse = new Mouse(d3.event.x, d3.event.y, '')
+            nearest = link.nearest mouse
+            if link.source == nearest
+                link.source = link.target
+
+            link.target = mouse
+            link.target_anchor = null
+            diagram.linking.push(link)
+            svg.sync()
+
+        evt = d3.event.sourceEvent
+        if evt.type = 'touchmove'
+            target = document.elementFromPoint(evt.targetTouches[0].clientX, evt.targetTouches[0].clientY)
+        else
+            target = evt.target
+
+        link = diagram.linking[0]
+        $anchor = $(target).closest('.anchor')
+        if $anchor.size()
+            $node = $anchor.closest('.node')
+        else
+            $node = $(target).closest('.node')
+        if $node.size()
+            link.target = $node.get(0).__data__
+            if $anchor.size()
+                link.target_anchor = +$anchor.attr('data-anchor')
+            else
+                link.target_anchor = null
+        else
+            if link.target not instanceof Mouse
+                link.target = new Mouse(0, 0, '')
+            link.target.x = d3.event.x
+            link.target.y = d3.event.y
         svg.tick()
-    ).on("dragend", (anchor) ->
-        return if d3.event.ctrlKey
+    ).on("dragend.link", (anchor) ->
         svg.svg.classed('dragging', false)
         svg.svg.classed('linking', false)
-        diagram.linking = []
-        svg.sync(true))
+        if diagram.linking.length
+            link = diagram.linking[0]
+            diagram.linking = []
+            if link.target instanceof Mouse
+                svg.sync()
+            else
+                diagram.links.push link
+                svg.sync(true))

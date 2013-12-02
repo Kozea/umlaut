@@ -46,9 +46,6 @@ class Diagram extends Base
             element: null
             group: null
 
-        @mouse = new Mouse(0, 0, '')
-        @dragging = false
-        @groupping = false
         @force_conf =
             gravity: .1
             distance: 20

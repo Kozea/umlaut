@@ -33,7 +33,7 @@ class Electric extends Element
     @rotationable: true
 
     anchor_list: ->
-        [cardinal.W, cardinal.E]
+        attach_self [cardinal.W, cardinal.E], @
 
     base_height: ->
         20
@@ -73,7 +73,7 @@ class E.Junction extends Electric
         super() / 4
 
     anchor_list: ->
-        [cardinal.N, cardinal.S, cardinal.W, cardinal.E]
+        attach_self [cardinal.N, cardinal.S, cardinal.W, cardinal.E], @
 
     path: ->
         w2 = @width() / 2
@@ -168,7 +168,7 @@ class Transistor extends Electric
         2 * super() + 2 * @wire_margin()
 
     anchor_list: ->
-        [cardinal.W, cardinal.N, cardinal.S]
+        attach_self [cardinal.W, cardinal.N, cardinal.S], @
 
     wire_margin: ->
         super()

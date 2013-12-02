@@ -83,7 +83,7 @@ cardinal_to_direction = (c) ->
             y: -1
 
 timestamp = ->
-    new Date().getTime()
+    new Date().getTime() * 1000 + Math.round((Math.random() * 1000))
 
 capitalize = (s) ->
     s.charAt(0).toUpperCase() + s.substr(1).toLowerCase()
@@ -141,3 +141,6 @@ node_style = (node) ->
 
 text_style = () ->
     1
+
+attach_self = (list, self) ->
+    {key: l, self: self} for l in list

@@ -58,11 +58,11 @@ history_pop = () ->
                 diagram.links.push(new link(e21, e22))
                 diagram.start_force()
 
-    if diagram.cls.name != $('aside h3').attr('id')
-        init_commands()
-        svg.resize()
-        if 'webkitRequestAnimationFrame' of window
-            # Webkit workaround
-            setTimeout((-> svg.sync()), 50)
+    # if diagram.cls.name != $('aside h3').attr('id')
+    init_commands()
+    svg.resize()
+    if 'webkitRequestAnimationFrame' of window
+        # Webkit workaround
+        setTimeout((-> svg.sync()), 50)
 
     svg.sync()

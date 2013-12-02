@@ -438,35 +438,30 @@ svg.linking .anchor.active {
   fill: rgba(0, 255, 0, 0.5);
   stroke: lime;
 }
-/* line 321, ../sass/umlaut.sass */
-svg .underlay .selection {
-  fill: rgba(0, 255, 0, 0.05);
-  stroke: rgba(0, 255, 0, 0.3);
-}
-/* line 326, ../sass/umlaut.sass */
-svg .overlay .selection {
+/* line 320, ../sass/umlaut.sass */
+svg .selection {
   fill: rgba(0, 0, 255, 0.05);
   stroke: rgba(0, 0, 255, 0.3);
   stroke-width: 2;
 }
 
 @media screen and (max-width: 780px) {
-  /* line 332, ../sass/umlaut.sass */
+  /* line 326, ../sass/umlaut.sass */
   body > section {
     margin: 0;
   }
-  /* line 336, ../sass/umlaut.sass */
+  /* line 330, ../sass/umlaut.sass */
   body > section #main .btns {
     position: static;
     max-width: 100%;
   }
-  /* line 340, ../sass/umlaut.sass */
+  /* line 334, ../sass/umlaut.sass */
   body > section #main .btns .glyphicon {
     font-size: 12px;
   }
 }
 @media screen and (max-width: 480px) {
-  /* line 345, ../sass/umlaut.sass */
+  /* line 339, ../sass/umlaut.sass */
   body > section #main {
     -webkit-box-orient: vertical;
     -moz-box-orient: vertical;
@@ -474,11 +469,11 @@ svg .overlay .selection {
     -webkit-flex-direction: column;
     flex-direction: column;
   }
-  /* line 348, ../sass/umlaut.sass */
+  /* line 342, ../sass/umlaut.sass */
   body > section #main > .outside {
     flex: 3;
   }
-  /* line 351, ../sass/umlaut.sass */
+  /* line 345, ../sass/umlaut.sass */
   body > section #main > .sidebar {
     -webkit-box-flex: 1;
     -moz-box-flex: 1;
@@ -487,7 +482,7 @@ svg .overlay .selection {
     flex: 1;
     width: auto;
   }
-  /* line 355, ../sass/umlaut.sass */
+  /* line 349, ../sass/umlaut.sass */
   body > section #main > .sidebar .icons {
     -webkit-box-orient: horizontal;
     -moz-box-orient: horizontal;
@@ -500,14 +495,14 @@ svg .overlay .selection {
     -webkit-flex-wrap: wrap;
     flex-wrap: wrap;
   }
-  /* line 358, ../sass/umlaut.sass */
+  /* line 352, ../sass/umlaut.sass */
   body > section #main > .sidebar .icons .icon {
     width: 20%;
   }
 }
 @-moz-document url-prefix() {
   @media screen and (max-width: 480px) {
-    /* line 367, ../sass/umlaut.sass */
+    /* line 361, ../sass/umlaut.sass */
     body > section #main > .sidebar .icons {
       display: block;
     }

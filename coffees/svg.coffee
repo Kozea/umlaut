@@ -36,14 +36,14 @@ class Svg extends Base
             .translate(diagram.zoom.translate)
             .scaleExtent([.05, 5])
             .on("zoom", ->
-                if d3.event.sourceEvent.type in ['wheel', 'click'] or d3.event.sourceEvent.ctrlKey or d3.event.sourceEvent.which is 2
+                if not d3.event.sourceEvent.shiftKey
                     diagram.zoom.translate = d3.event.translate
                     diagram.zoom.scale = d3.event.scale
                     svg.sync_transform()
             ).on("zoomend", ->
                 svg.sync(true))
 
-        d3.select("article")
+        d3.select(".inside")
             .selectAll('svg')
             .data([diagram])
             .enter()
@@ -53,111 +53,7 @@ class Svg extends Base
                 .attr("height", @height)
                 .call(@create)
 
-        @svg = d3.select('#diagram')
-
-        @svg.on("mousedown", (event) =>
-            return if not d3.select(d3.event.target).classed('background') or d3.event.ctrlKey or d3.event.which is 2
-            # return if diagram.dragging or d3.event.ctrlKey or d3.event.which is 2
-            if d3.event.altKey and d3.event.shiftKey
-                diagram.groupping = true
-
-            if not d3.event.shiftKey
-                diagram.selection = []
-                svg.tick()
-
-            mouse = mouse_xy(@svg.node())
-            @svg.select(if diagram.groupping then 'g.underlay' else 'g.overlay')
-                .append("rect").attr
-                    class: "selection"
-                    x: mouse.x
-                    y: mouse.y
-                    width: 0
-                    height: 0
-            d3.event.preventDefault()
-        )
-
-        d3.select(window).on("mousemove", =>
-            return if d3.event.ctrlKey
-            mouse = mouse_xy(@svg.node())
-            diagram.mouse.lasts.push
-                x: diagram.mouse.x - mouse.x
-                y: diagram.mouse.y - mouse.y
-
-            diagram.mouse.dynamic_rotation()
-            diagram.mouse.lasts.shift()
-
-            diagram.mouse.x = mouse.x
-            diagram.mouse.y = mouse.y
-
-            sel = @svg.select("rect.selection")
-            unless sel.empty()
-                rect =
-                    x: + sel.attr("x")
-                    y: + sel.attr("y")
-                    width: + sel.attr("width")
-                    height: + sel.attr("height")
-
-                move =
-                    x: mouse.x - rect.x
-                    y: mouse.y - rect.y
-
-                if move.x < 1 or (move.x * 2 < rect.width)
-                    rect.x = mouse.x
-                    rect.width -= move.x
-                else
-                    rect.width = move.x
-                if move.y < 1 or (move.y * 2 < rect.height)
-                    rect.y = mouse.y
-                    rect.height -= move.y
-                else
-                    rect.height = move.y
-
-                rect.width = Math.max(0, rect.width)
-                rect.height = Math.max(0, rect.height)
-
-                sel.attr rect
-
-                @svg.selectAll('g.node').each((elt) ->
-                    g = d3.select @
-                    selected = elt in diagram.selection
-                    if elt.in(rect) and not selected
-                        diagram.selection.push(elt)
-                    else if not elt.in(rect) and selected and not d3.event.shiftKey
-                        diagram.selection.splice(diagram.selection.indexOf(elt), 1)
-                )
-                svg.tick()
-                d3.event.preventDefault()
-
-        ).on("mouseup", =>
-            return if d3.event.ctrlKey
-            if diagram.linking.length
-                diagram.linking = []
-                @sync()
-
-            if diagram.groupping
-                sel = @svg.select("rect.selection")
-                x = + sel.attr("x")
-                y = + sel.attr("y")
-                width = + sel.attr("width")
-                height = + sel.attr("height")
-                type = diagram.last_types.group
-                if type
-                    nth = diagram.groups.filter((grp) -> grp instanceof type).length + 1
-                    grp = new type(x + width / 2, y + height / 2, "#{type.name} ##{nth}", not diagram.force)
-                    grp._width = width
-                    grp._height = height
-                    diagram.groups.push grp
-                diagram.groupping = false
-                @sync()
-
-            @svg.selectAll("rect.selection").remove()
-            d3.event.preventDefault()
-        ).on("keydown", =>
-            if d3.event.ctrlKey
-                d3.select('.background').classed('move', true)
-        ).on("keyup", =>
-            d3.select('.background').classed('move', false)
-        )
+        @svg = d3.select('#diagram').call(svg_selection_drag)
 
     sync_transform: ->
         d3.select('.root').attr("transform", "translate(" + diagram.zoom.translate + ")scale(" + diagram.zoom.scale + ")")
@@ -271,7 +167,7 @@ class Svg extends Base
         @svg.select('g.links').selectAll('g.link').call(tick_link)
 
     resize: ->
-        article = d3.select("article").node()
+        article = d3.select(".inside").node()
         @width = article.clientWidth
         @height = article.clientHeight or 500
         @svg
