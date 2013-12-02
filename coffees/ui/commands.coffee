@@ -44,13 +44,18 @@ node_add = (type) =>
         svg.svg.selectAll('g.node').each((node) ->
             if node == new_node
                 dom_node = @)
-        mouse_evt = document.createEvent('MouseEvent')
-        mouse_evt.initMouseEvent(
-            d3.event.type, d3.event.canBubble, d3.event.cancelable, d3.event.view,
-            d3.event.detail, d3.event.screenX, d3.event.screenY, d3.event.clientX, d3.event.clientY,
-            d3.event.ctrlKey, d3.event.altKey, d3.event.shiftKey, d3.event.metaKey,
-            d3.event.button, d3.event.relatedTarget)
-        dom_node.dispatchEvent(mouse_evt)
+        if d3.event.type = 'touchstart'
+            touch_evt = document.createEvent('TouchEvent')
+            touch_evt.initUIEvent(d3.event.type, d3.event.canBubble, d3.event.cancelable, d3.event.view, d3.event.detail, d3.event.screenX, d3.event.screenY, d3.event.clientX, d3.event.clientY, d3.event.ctrlKey, d3.event.altKey, d3.event.shiftKey, d3.event.metaKey, d3.event.touches, d3.event.targetTouches, d3.event.changedTouches, d3.event.scale, d3.event.rotation)
+            dom_node.dispatchEvent(touch_evt)
+        else
+            mouse_evt = document.createEvent('MouseEvent')
+            mouse_evt.initMouseEvent(
+                d3.event.type, d3.event.canBubble, d3.event.cancelable, d3.event.view,
+                d3.event.detail, d3.event.screenX, d3.event.screenY, d3.event.clientX, d3.event.clientY,
+                d3.event.ctrlKey, d3.event.altKey, d3.event.shiftKey, d3.event.metaKey,
+                d3.event.button, d3.event.relatedTarget)
+            dom_node.dispatchEvent(mouse_evt)
 
 last_command =
     fun: null
@@ -263,7 +268,8 @@ init_commands = ->
             .attr('class', 'icon specific draggable btn btn-default')
             .attr('title', "#{name} [#{hotkey}]")
             .attr('data-hotkey', hotkey)
-            .on('mousedown', fun)
+            # .on('mousedown', fun)
+            .on('touchstart', fun)
 
         element = svgicon
             .selectAll(if icon instanceof Group then 'g.group' else 'g.element')
@@ -303,18 +309,21 @@ init_commands = ->
         e1.set_txt_bbox(width: 10, height: 10)
         e2.set_txt_bbox(width: 10, height: 10)
 
+        fun = (lnk) ->
+            ->
+                diagram.last_types.link = lnk
+                d3.selectAll('aside .icons .link').classed('active', false)
+                d3.select(@).classed('active', true)
+
+
         svgicon = d3.select('aside .icons')
             .append('svg')
             .attr('class', "icon specific btn btn-default link #{name}")
             .attr('title', "#{name} [#{hotkey}]")
             .attr('data-hotkey', hotkey)
             .classed('active', first)
-            .on('mousedown', ((lnk) ->
-                ->
-                    diagram.last_types.link = lnk
-                    d3.selectAll('aside .icons .link').classed('active', false)
-                    d3.select(@).classed('active', true)
-                    )(cls))
+            .on('mousedown', fun(cls))
+            .on('touchstart', fun(cls))
 
         link = svgicon
             .selectAll('g.link')

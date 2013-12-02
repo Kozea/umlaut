@@ -21,10 +21,11 @@ history_pop = () ->
     $editor = $('#editor')
 
     if not location.hash
-        $diagrams.removeClass('hidden')
-        $editor.addClass('hidden')
-        $('aside h3').attr('id' ,'')
-        list_diagrams()
+        if not $editor.hasClass('hidden')
+            $diagrams.removeClass('hidden')
+            $editor.addClass('hidden')
+            $('aside h3').attr('id' ,'')
+            list_diagrams()
         return
 
     $editor.removeClass('hidden')

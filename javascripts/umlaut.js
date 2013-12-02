@@ -3169,7 +3169,7 @@ order = function(a, b) {
 };
 
 node_add = function(type) {
-  var dom_node, mouse_evt, new_node, nth, set, x, xy, y;
+  var dom_node, mouse_evt, new_node, nth, set, touch_evt, x, xy, y;
   xy = mouse_xy(svg.svg.node());
   x = xy.x;
   y = xy.y;
@@ -3196,9 +3196,15 @@ node_add = function(type) {
         return dom_node = this;
       }
     });
-    mouse_evt = document.createEvent('MouseEvent');
-    mouse_evt.initMouseEvent(d3.event.type, d3.event.canBubble, d3.event.cancelable, d3.event.view, d3.event.detail, d3.event.screenX, d3.event.screenY, d3.event.clientX, d3.event.clientY, d3.event.ctrlKey, d3.event.altKey, d3.event.shiftKey, d3.event.metaKey, d3.event.button, d3.event.relatedTarget);
-    return dom_node.dispatchEvent(mouse_evt);
+    if (d3.event.type = 'touchstart') {
+      touch_evt = document.createEvent('TouchEvent');
+      touch_evt.initUIEvent(d3.event.type, d3.event.canBubble, d3.event.cancelable, d3.event.view, d3.event.detail, d3.event.screenX, d3.event.screenY, d3.event.clientX, d3.event.clientY, d3.event.ctrlKey, d3.event.altKey, d3.event.shiftKey, d3.event.metaKey, d3.event.touches, d3.event.targetTouches, d3.event.changedTouches, d3.event.scale, d3.event.rotation);
+      return dom_node.dispatchEvent(touch_evt);
+    } else {
+      mouse_evt = document.createEvent('MouseEvent');
+      mouse_evt.initMouseEvent(d3.event.type, d3.event.canBubble, d3.event.cancelable, d3.event.view, d3.event.detail, d3.event.screenX, d3.event.screenY, d3.event.clientX, d3.event.clientY, d3.event.ctrlKey, d3.event.altKey, d3.event.shiftKey, d3.event.metaKey, d3.event.button, d3.event.relatedTarget);
+      return dom_node.dispatchEvent(mouse_evt);
+    }
   }
 };
 
@@ -3477,7 +3483,7 @@ init_commands = function() {
       icon._height = 70;
       icon._width = 90;
     }
-    svgicon = d3.select('aside .icons').append('svg').attr('class', 'icon specific draggable btn btn-default').attr('title', "" + name + " [" + hotkey + "]").attr('data-hotkey', hotkey).on('mousedown', fun);
+    svgicon = d3.select('aside .icons').append('svg').attr('class', 'icon specific draggable btn btn-default').attr('title', "" + name + " [" + hotkey + "]").attr('data-hotkey', hotkey).on('touchstart', fun);
     element = svgicon.selectAll(icon instanceof Group ? 'g.group' : 'g.element').data([icon]);
     element.enter().call(enter_node, false);
     element.call(update_node);
@@ -3510,13 +3516,14 @@ init_commands = function() {
       width: 10,
       height: 10
     });
-    svgicon = d3.select('aside .icons').append('svg').attr('class', "icon specific btn btn-default link " + name).attr('title', "" + name + " [" + hotkey + "]").attr('data-hotkey', hotkey).classed('active', first).on('mousedown', (function(lnk) {
+    fun = function(lnk) {
       return function() {
         diagram.last_types.link = lnk;
         d3.selectAll('aside .icons .link').classed('active', false);
         return d3.select(this).classed('active', true);
       };
-    })(cls));
+    };
+    svgicon = d3.select('aside .icons').append('svg').attr('class', "icon specific btn btn-default link " + name).attr('title', "" + name + " [" + hotkey + "]").attr('data-hotkey', hotkey).classed('active', first).on('mousedown', fun(cls)).on('touchstart', fun(cls));
     link = svgicon.selectAll('g.link').data([icon]);
     link.enter().call(enter_link, false);
     link.call(update_link);
@@ -4428,10 +4435,12 @@ history_pop = function() {
   $diagrams = $('#diagrams');
   $editor = $('#editor');
   if (!location.hash) {
-    $diagrams.removeClass('hidden');
-    $editor.addClass('hidden');
-    $('aside h3').attr('id', '');
-    list_diagrams();
+    if (!$editor.hasClass('hidden')) {
+      $diagrams.removeClass('hidden');
+      $editor.addClass('hidden');
+      $('aside h3').attr('id', '');
+      list_diagrams();
+    }
     return;
   }
   $editor.removeClass('hidden');
