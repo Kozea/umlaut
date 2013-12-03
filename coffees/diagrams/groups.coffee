@@ -38,6 +38,10 @@ class Group extends Element
          z
          M #{w2} #{h2l}
          L #{w2} #{h2}
+
+         M #{-w2} #{h2l}
          L #{-w2} #{h2}
-         L #{-w2} #{h2l}
+
+         M #{-w2} #{h2}
+         L #{w2} #{h2}
         "

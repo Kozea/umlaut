@@ -19,7 +19,6 @@
 class Diagram extends Base
     @init_types: ->
         elements: {}
-        groups: {}
         links: {}
 
     constructor: ->
@@ -32,7 +31,6 @@ class Diagram extends Base
 
         @elements = []
         @links = []
-        @groups = []
 
         @snap =
             x: 25
@@ -44,7 +42,6 @@ class Diagram extends Base
         @last_types =
             link: null
             element: null
-            group: null
 
         @force_conf =
             gravity: .1
@@ -95,7 +92,7 @@ class Diagram extends Base
         svg_clone = d3.select(svg.svg.node().cloneNode(true))
         svg_clone.select('.background').remove()
         svg_clone.selectAll('.handles,.anchors').remove()
-        svg_clone.selectAll('.node').classed('selected', false)
+        svg_clone.selectAll('.element').classed('selected', false)
         svg_clone.selectAll('.ghost').remove()
         svg_clone.select('defs').append('style').text(css)
         margin = 50
@@ -114,16 +111,12 @@ class Diagram extends Base
             content = $(svg_clone.node()).wrap('<div>').parent().html()
         "<svg xmlns='http://www.w3.org/2000/svg'  xmlns:xlink='http://www.w3.org/1999/xlink' width='#{rect.width + 2 * margin}' height='#{rect.height + 2 * margin}'><!--Generated with umlaut (http://kozea.github.io/umlaut/) (c) Mounier Florian Kozea 2013 on #{(new Date()).toString()}-->#{content}</svg>"
 
-    nodes: ->
-        @elements.concat(@groups)
-
     objectify: ->
         name: @constructor.name
         title: @title
         linkstyle: @linkstyle.cls.name
         zoom: @zoom
         elements: @elements.map (elt) -> elt.objectify()
-        groups: @groups.map (grp) -> grp.objectify()
         links: @links.map (lnk) -> lnk.objectify()
         force: if @force then true else false
 
@@ -138,15 +131,6 @@ class Diagram extends Base
         if obj.zoom
             @zoom = obj.zoom
 
-        for grp in (obj.groups or [])
-            group_type = @types.groups[grp.name]
-            group = new group_type(grp.x, grp.y, grp.text, false)
-            group._width = grp.width or null
-            group._height = grp.height or null
-            group._rotation = grp.rotation or 0
-            group.attrs = grp.attrs
-            @groups.push(group)
-
         for elt in obj.elements
             element_type = @types.elements[elt.name]
             element = new element_type(elt.x, elt.y, elt.text, false)
@@ -158,7 +142,7 @@ class Diagram extends Base
 
         for lnk in obj.links
             link_type = @types.links[lnk.name] or @types.links['Link']
-            link = new link_type(@nodes()[lnk.source], @nodes()[lnk.target], lnk.text)
+            link = new link_type(@elements[lnk.source], @elements[lnk.target], lnk.text)
             link.source_anchor = lnk.source_anchor
             link.target_anchor = lnk.target_anchor
             link.attrs = lnk.attrs or {}

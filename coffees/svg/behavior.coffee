@@ -103,12 +103,9 @@ move_drag = d3.behavior.drag()
                 diagram.selection = [node]
 
         node.ts = timestamp()
-        svg.svg.selectAll('g.node').sort(order)
         if node instanceof Group
-            svg.svg.selectAll('g.element')
-                .each((elt) ->
-                    if elt not in diagram.selection and node.contains elt
-                        diagram.selection.push elt)
+            node.ts *= -1
+        svg.svg.selectAll('g.node').sort(order)
 
         svg.tick()
         d3.event.sourceEvent.stopPropagation()
@@ -142,15 +139,13 @@ move_drag = d3.behavior.drag()
     ).on('dragend.move', (node) ->
         svg.svg.classed('dragging', false)
         svg.svg.classed('translating', false)
-        for node in diagram.nodes()
+        for node in diagram.elements
             node.fixed = false
 
         diagram.dragging = false
         if not $(d3.event.sourceEvent.target).closest('.inside').size()
             if node in diagram.elements
                 diagram.elements.splice(diagram.elements.indexOf(node), 1)
-            if node in diagram.groups
-                diagram.groups.splice(diagram.groups.indexOf(node), 1)
             if node in diagram.selection
                 diagram.selection.splice(diagram.selection.indexOf(node), 1)
             for lnk in diagram.links.slice()
@@ -162,7 +157,7 @@ nsweo_resize_drag = d3.behavior.drag()
     .on("dragstart.resize", (handle) ->
         svg.svg.classed('dragging', true)
         svg.svg.classed('resizing', true)
-        node = d3.select($(@).closest('.node').get(0)).data()[0]
+        node = d3.select($(@).closest('.element').get(0)).data()[0]
         diagram._origin = mouse_xy svg.svg.node()
         node.ox = node.x
         node.oy = node.y
@@ -171,7 +166,7 @@ nsweo_resize_drag = d3.behavior.drag()
         node.fixed = true
         d3.event.sourceEvent.stopPropagation()
     ).on("drag.resize", (handle) ->
-        nodes = d3.select($(@).closest('.node').get(0))
+        nodes = d3.select($(@).closest('.element').get(0))
         node = nodes.data()[0]
         m = mouse_xy svg.svg.node()
         if handle is 'O'
@@ -208,7 +203,7 @@ nsweo_resize_drag = d3.behavior.drag()
     ).on("dragend.resize", (handle) ->
         svg.svg.classed('dragging', false)
         svg.svg.classed('resizing', false)
-        node = d3.select($(@).closest('.node').get(0)).data()[0]
+        node = d3.select($(@).closest('.element').get(0)).data()[0]
         node.ox = node.oy = node.owidth = node.oheight = null
         node.fixed = false
         svg.sync(true))
@@ -221,7 +216,7 @@ anchor_link_drag = d3.behavior.drag()
         d3.event.sourceEvent.stopPropagation()
     ).on("drag.link", (anchor) ->
         if not diagram.linking.length
-            node = d3.select($(@).closest('.node').get(0)).data()[0]
+            node = d3.select($(@).closest('.element').get(0)).data()[0]
             type = diagram.last_types.link
             link = new type(node, new Mouse(0, 0, ''))
             link.source_anchor = anchor
@@ -237,9 +232,9 @@ anchor_link_drag = d3.behavior.drag()
 
         $anchor = $(target).closest('.anchor')
         if $anchor.size()
-            $node = $anchor.closest('.node')
+            $node = $anchor.closest('.element')
         else
-            $node = $(target).closest('.node')
+            $node = $(target).closest('.element')
         if $node.size()
             link.target = $node.get(0).__data__
             if $anchor.size()
@@ -310,9 +305,9 @@ link_drag = d3.behavior.drag()
         link = diagram.linking[0]
         $anchor = $(target).closest('.anchor')
         if $anchor.size()
-            $node = $anchor.closest('.node')
+            $node = $anchor.closest('.element')
         else
-            $node = $(target).closest('.node')
+            $node = $(target).closest('.element')
         if $node.size()
             link.target = $node.get(0).__data__
             if $anchor.size()

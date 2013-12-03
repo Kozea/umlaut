@@ -970,8 +970,8 @@ Link = (function(_super) {
   Link.prototype.objectify = function() {
     return {
       name: this.constructor.name,
-      source: diagram.nodes().indexOf(this.source),
-      target: diagram.nodes().indexOf(this.target),
+      source: diagram.elements.indexOf(this.source),
+      target: diagram.elements.indexOf(this.target),
       source_anchor: this.source_anchor,
       target_anchor: this.target_anchor,
       text: this.text,
@@ -1016,7 +1016,6 @@ Diagram = (function(_super) {
   Diagram.init_types = function() {
     return {
       elements: {},
-      groups: {},
       links: {}
     };
   };
@@ -1031,7 +1030,6 @@ Diagram = (function(_super) {
     };
     this.elements = [];
     this.links = [];
-    this.groups = [];
     this.snap = {
       x: 25,
       y: 25,
@@ -1041,8 +1039,7 @@ Diagram = (function(_super) {
     this.linking = [];
     this.last_types = {
       link: null,
-      element: null,
-      group: null
+      element: null
     };
     this.force_conf = {
       gravity: .1,
@@ -1098,7 +1095,7 @@ Diagram = (function(_super) {
     svg_clone = d3.select(svg.svg.node().cloneNode(true));
     svg_clone.select('.background').remove();
     svg_clone.selectAll('.handles,.anchors').remove();
-    svg_clone.selectAll('.node').classed('selected', false);
+    svg_clone.selectAll('.element').classed('selected', false);
     svg_clone.selectAll('.ghost').remove();
     svg_clone.select('defs').append('style').text(css);
     margin = 50;
@@ -1113,10 +1110,6 @@ Diagram = (function(_super) {
     return "<svg xmlns='http://www.w3.org/2000/svg'  xmlns:xlink='http://www.w3.org/1999/xlink' width='" + (rect.width + 2 * margin) + "' height='" + (rect.height + 2 * margin) + "'><!--Generated with umlaut (http://kozea.github.io/umlaut/) (c) Mounier Florian Kozea 2013 on " + ((new Date()).toString()) + "-->" + content + "</svg>";
   };
 
-  Diagram.prototype.nodes = function() {
-    return this.elements.concat(this.groups);
-  };
-
   Diagram.prototype.objectify = function() {
     return {
       name: this.constructor.name,
@@ -1125,9 +1118,6 @@ Diagram = (function(_super) {
       zoom: this.zoom,
       elements: this.elements.map(function(elt) {
         return elt.objectify();
-      }),
-      groups: this.groups.map(function(grp) {
-        return grp.objectify();
       }),
       links: this.links.map(function(lnk) {
         return lnk.objectify();
@@ -1141,7 +1131,7 @@ Diagram = (function(_super) {
   };
 
   Diagram.prototype.loads = function(obj) {
-    var element, element_type, elt, group, group_type, grp, link, link_type, lnk, _i, _j, _k, _len, _len1, _len2, _ref17, _ref18, _ref19;
+    var element, element_type, elt, link, link_type, lnk, _i, _j, _len, _len1, _ref17, _ref18;
     if (obj.title) {
       this.title = obj.title;
     }
@@ -1151,20 +1141,9 @@ Diagram = (function(_super) {
     if (obj.zoom) {
       this.zoom = obj.zoom;
     }
-    _ref17 = obj.groups || [];
+    _ref17 = obj.elements;
     for (_i = 0, _len = _ref17.length; _i < _len; _i++) {
-      grp = _ref17[_i];
-      group_type = this.types.groups[grp.name];
-      group = new group_type(grp.x, grp.y, grp.text, false);
-      group._width = grp.width || null;
-      group._height = grp.height || null;
-      group._rotation = grp.rotation || 0;
-      group.attrs = grp.attrs;
-      this.groups.push(group);
-    }
-    _ref18 = obj.elements;
-    for (_j = 0, _len1 = _ref18.length; _j < _len1; _j++) {
-      elt = _ref18[_j];
+      elt = _ref17[_i];
       element_type = this.types.elements[elt.name];
       element = new element_type(elt.x, elt.y, elt.text, false);
       element._width = elt.width || null;
@@ -1173,11 +1152,11 @@ Diagram = (function(_super) {
       element.attrs = elt.attrs || {};
       this.elements.push(element);
     }
-    _ref19 = obj.links;
-    for (_k = 0, _len2 = _ref19.length; _k < _len2; _k++) {
-      lnk = _ref19[_k];
+    _ref18 = obj.links;
+    for (_j = 0, _len1 = _ref18.length; _j < _len1; _j++) {
+      lnk = _ref18[_j];
       link_type = this.types.links[lnk.name] || this.types.links['Link'];
-      link = new link_type(this.nodes()[lnk.source], this.nodes()[lnk.target], lnk.text);
+      link = new link_type(this.elements[lnk.source], this.elements[lnk.target], lnk.text);
       link.source_anchor = lnk.source_anchor;
       link.target_anchor = lnk.target_anchor;
       link.attrs = lnk.attrs || {};
@@ -1740,7 +1719,7 @@ Group = (function(_super) {
     w2 = this.width() / 2;
     h2 = this.height() / 2;
     h2l = -h2 + this.txt_height() + this.margin.y;
-    return "M " + (-w2) + " " + (-h2) + "         L " + w2 + " " + (-h2) + "         L " + w2 + " " + h2l + "         L " + (-w2) + " " + h2l + "         z         M " + w2 + " " + h2l + "         L " + w2 + " " + h2 + "         L " + (-w2) + " " + h2 + "         L " + (-w2) + " " + h2l + "        ";
+    return "M " + (-w2) + " " + (-h2) + "         L " + w2 + " " + (-h2) + "         L " + w2 + " " + h2l + "         L " + (-w2) + " " + h2l + "         z         M " + w2 + " " + h2l + "         L " + w2 + " " + h2 + "         M " + (-w2) + " " + h2l + "         L " + (-w2) + " " + h2 + "         M " + (-w2) + " " + h2 + "         L " + w2 + " " + h2 + "        ";
   };
 
   return Group;
@@ -2102,7 +2081,7 @@ Diagrams.FlowChart.prototype.types.links.Flow = (function(_super) {
 
 })(Link);
 
-Diagrams.FlowChart.prototype.types.groups.Container = (function(_super) {
+Diagrams.FlowChart.prototype.types.elements.Container = (function(_super) {
   __extends(Container, _super);
 
   function Container() {
@@ -2674,7 +2653,7 @@ Diagrams.UseCase.prototype.types.elements.Actor = (function(_super) {
 
 })(Element);
 
-Diagrams.UseCase.prototype.types.groups.System = (function(_super) {
+Diagrams.UseCase.prototype.types.elements.System = (function(_super) {
   __extends(System, _super);
 
   function System() {
@@ -3107,7 +3086,7 @@ Diagrams.Class.prototype.types.elements.Class = (function(_super) {
 
 })(Rect);
 
-Diagrams.Class.prototype.types.groups.System = (function(_super) {
+Diagrams.Class.prototype.types.elements.System = (function(_super) {
   __extends(System, _super);
 
   function System() {
@@ -3186,21 +3165,14 @@ order = function(a, b) {
 };
 
 node_add = function(type, x, y) {
-  var cls, new_node, nth, set;
-  if (type in diagram.types.groups) {
-    cls = diagram.types.groups[type];
-    set = diagram.groups;
-    diagram.last_types.group = cls;
-  } else {
-    cls = diagram.types.elements[type];
-    set = diagram.elements;
-    diagram.last_types.element = cls;
-  }
-  nth = set.filter(function(node) {
+  var cls, new_node, nth;
+  cls = diagram.types.elements[type];
+  diagram.last_types.element = cls;
+  nth = diagram.elements.filter(function(node) {
     return node instanceof cls;
   }).length + 1;
   new_node = new cls(x, y, "" + type + " #" + nth, !diagram.force);
-  set.push(new_node);
+  diagram.elements.push(new_node);
   if (d3.event) {
     diagram.selection = [new_node];
   }
@@ -3309,9 +3281,7 @@ commands = {
       _ref93 = diagram.selection;
       for (_i = 0, _len = _ref93.length; _i < _len; _i++) {
         node = _ref93[_i];
-        if (__indexOf.call(diagram.groups, node) >= 0) {
-          diagram.groups.splice(diagram.groups.indexOf(node), 1);
-        } else if (__indexOf.call(diagram.elements, node) >= 0) {
+        if (__indexOf.call(diagram.elements, node) >= 0) {
           diagram.elements.splice(diagram.elements.indexOf(node), 1);
         } else if (__indexOf.call(diagram.links, node) >= 0) {
           diagram.links.splice(diagram.links.indexOf(node), 1);
@@ -3333,7 +3303,7 @@ commands = {
   },
   select_all: {
     fun: function(e) {
-      diagram.selection = diagram.nodes().concat(diagram.links);
+      diagram.selection = diagram.elements.concat(diagram.links);
       svg.tick();
       return e != null ? e.preventDefault() : void 0;
     },
@@ -3377,7 +3347,7 @@ commands = {
   snaptogrid: {
     fun: function() {
       var node, _i, _len, _ref93;
-      _ref93 = diagram.nodes();
+      _ref93 = diagram.elements;
       for (_i = 0, _len = _ref93.length; _i < _len; _i++) {
         node = _ref93[_i];
         node.x = node.px = diagram.snap.x * Math.floor(node.x / diagram.snap.x);
@@ -3516,7 +3486,7 @@ init_commands = function() {
   });
   $('aside .icons svg').remove();
   $('aside h3').attr('id', diagram.cls.name).addClass('specific').text(diagram.label);
-  _ref95 = merge_copy(diagram.types.elements, diagram.types.groups);
+  _ref95 = diagram.types.elements;
   for (name in _ref95) {
     cls = _ref95[name];
     if (cls.alias) {
@@ -3535,20 +3505,13 @@ init_commands = function() {
     })(cls);
     hotkey = "a " + key;
     icon = new cls(0, 0, name);
-    if (icon instanceof Group) {
-      icon._height = 70;
-      icon._width = 90;
-    }
     svgicon = d3.select('aside .icons').append('svg').attr('class', 'icon specific draggable btn btn-default').attr('title', "" + name + " [" + hotkey + "]").attr('data-hotkey', hotkey).attr('data-type', name).call(extern_drag);
-    element = svgicon.selectAll(icon instanceof Group ? 'g.group' : 'g.element').data([icon]);
+    element = svgicon.selectAll('g.element').data([icon]);
     element.enter().call(enter_node, false);
     element.call(update_node);
     margin = 3;
     svgicon.attr('viewBox', "                " + (-icon.width() / 2 - margin) + "                " + (-icon.height() / 2 - margin) + "                " + (icon.width() + 2 * margin) + "                " + (icon.height() + 2 * margin)).attr('width', icon.width()).attr('height', icon.height()).attr('preserveAspectRatio', 'xMidYMid meet');
     Mousetrap.bind(hotkey, wrap(fun));
-    if (name in diagram.types.groups && !diagram.last_types.group) {
-      diagram.last_types.group = cls;
-    }
   }
   taken_hotkeys = [];
   first = true;
@@ -3724,14 +3687,10 @@ move_drag = d3.behavior.drag().origin(function(i) {
     }
   }
   node.ts = timestamp();
-  svg.svg.selectAll('g.node').sort(order);
   if (node instanceof Group) {
-    svg.svg.selectAll('g.element').each(function(elt) {
-      if (__indexOf.call(diagram.selection, elt) < 0 && node.contains(elt)) {
-        return diagram.selection.push(elt);
-      }
-    });
+    node.ts *= -1;
   }
+  svg.svg.selectAll('g.node').sort(order);
   svg.tick();
   return d3.event.sourceEvent.stopPropagation();
 }).on("drag.move", function(node) {
@@ -3772,7 +3731,7 @@ move_drag = d3.behavior.drag().origin(function(i) {
   var lnk, _i, _j, _len, _len1, _ref93, _ref94;
   svg.svg.classed('dragging', false);
   svg.svg.classed('translating', false);
-  _ref93 = diagram.nodes();
+  _ref93 = diagram.elements;
   for (_i = 0, _len = _ref93.length; _i < _len; _i++) {
     node = _ref93[_i];
     node.fixed = false;
@@ -3781,9 +3740,6 @@ move_drag = d3.behavior.drag().origin(function(i) {
   if (!$(d3.event.sourceEvent.target).closest('.inside').size()) {
     if (__indexOf.call(diagram.elements, node) >= 0) {
       diagram.elements.splice(diagram.elements.indexOf(node), 1);
-    }
-    if (__indexOf.call(diagram.groups, node) >= 0) {
-      diagram.groups.splice(diagram.groups.indexOf(node), 1);
     }
     if (__indexOf.call(diagram.selection, node) >= 0) {
       diagram.selection.splice(diagram.selection.indexOf(node), 1);
@@ -3803,7 +3759,7 @@ nsweo_resize_drag = d3.behavior.drag().on("dragstart.resize", function(handle) {
   var node;
   svg.svg.classed('dragging', true);
   svg.svg.classed('resizing', true);
-  node = d3.select($(this).closest('.node').get(0)).data()[0];
+  node = d3.select($(this).closest('.element').get(0)).data()[0];
   diagram._origin = mouse_xy(svg.svg.node());
   node.ox = node.x;
   node.oy = node.y;
@@ -3813,7 +3769,7 @@ nsweo_resize_drag = d3.behavior.drag().on("dragstart.resize", function(handle) {
   return d3.event.sourceEvent.stopPropagation();
 }).on("drag.resize", function(handle) {
   var angle, delta, m, node, nodes, shift, signs, x, y;
-  nodes = d3.select($(this).closest('.node').get(0));
+  nodes = d3.select($(this).closest('.element').get(0));
   node = nodes.data()[0];
   m = mouse_xy(svg.svg.node());
   if (handle === 'O') {
@@ -3851,7 +3807,7 @@ nsweo_resize_drag = d3.behavior.drag().on("dragstart.resize", function(handle) {
   var node;
   svg.svg.classed('dragging', false);
   svg.svg.classed('resizing', false);
-  node = d3.select($(this).closest('.node').get(0)).data()[0];
+  node = d3.select($(this).closest('.element').get(0)).data()[0];
   node.ox = node.oy = node.owidth = node.oheight = null;
   node.fixed = false;
   return svg.sync(true);
@@ -3864,7 +3820,7 @@ anchor_link_drag = d3.behavior.drag().on("dragstart.link", function(anchor) {
 }).on("drag.link", function(anchor) {
   var $anchor, $node, evt, link, node, target, type;
   if (!diagram.linking.length) {
-    node = d3.select($(this).closest('.node').get(0)).data()[0];
+    node = d3.select($(this).closest('.element').get(0)).data()[0];
     type = diagram.last_types.link;
     link = new type(node, new Mouse(0, 0, ''));
     link.source_anchor = anchor;
@@ -3880,9 +3836,9 @@ anchor_link_drag = d3.behavior.drag().on("dragstart.link", function(anchor) {
   }
   $anchor = $(target).closest('.anchor');
   if ($anchor.size()) {
-    $node = $anchor.closest('.node');
+    $node = $anchor.closest('.element');
   } else {
-    $node = $(target).closest('.node');
+    $node = $(target).closest('.element');
   }
   if ($node.size()) {
     link.target = $node.get(0).__data__;
@@ -3978,9 +3934,9 @@ link_drag = d3.behavior.drag().on("dragstart.link", function(link) {
   link = diagram.linking[0];
   $anchor = $(target).closest('.anchor');
   if ($anchor.size()) {
-    $node = $anchor.closest('.node');
+    $node = $anchor.closest('.element');
   } else {
-    $node = $(target).closest('.node');
+    $node = $(target).closest('.element');
   }
   if ($node.size()) {
     link.target = $node.get(0).__data__;
@@ -4063,9 +4019,7 @@ enter_node = function(nodes, connect) {
   if (connect == null) {
     connect = true;
   }
-  g = nodes.append('g').attr('class', function(node) {
-    return 'node ' + (node instanceof Group ? 'group' : 'element');
-  });
+  g = nodes.append('g').attr('class', 'element');
   g.append('path').attr('class', 'ghost');
   g.append('path').attr('class', function(node) {
     return "shape fill-" + node.cls.fill + " stroke-" + node.cls.stroke;
@@ -4378,14 +4332,13 @@ Svg = (function(_super) {
     pattern.append('path').attr('d', 'M 10 0 L 0 0 L 0 10');
     root = background_g.append('g').attr('class', 'root');
     root.append('g').attr('class', 'underlay');
-    root.append('g').attr('class', 'groups');
     root.append('g').attr('class', 'links');
     root.append('g').attr('class', 'elements');
     return root.append('g').attr('class', 'overlay');
   };
 
   Svg.prototype.sync = function(persist) {
-    var element, group, link, markers;
+    var element, link, markers;
     if (persist == null) {
       persist = false;
     }
@@ -4397,16 +4350,12 @@ Svg = (function(_super) {
     markers.enter().call(enter_marker);
     markers.call(update_marker);
     markers.exit().remove();
-    group = this.svg.select('g.groups').selectAll('g.group').data(diagram.groups.sort(order));
     element = this.svg.select('g.elements').selectAll('g.element').data(diagram.elements.sort(order));
     link = this.svg.select('g.links').selectAll('g.link').data(diagram.links.concat(diagram.linking));
-    group.enter().call(enter_node);
     element.enter().call(enter_node);
     link.enter().call(enter_link);
-    group.call(update_node);
     element.call(update_node);
     link.call(update_link);
-    group.exit().remove();
     element.exit().remove();
     link.exit().remove();
     this.tick();
@@ -4415,13 +4364,12 @@ Svg = (function(_super) {
     }
     if (diagram.force) {
       diagram.force.stop();
-      diagram.force.nodes(diagram.nodes()).links(diagram.links);
+      diagram.force.nodes(diagram.elements).links(diagram.links);
       return diagram.force.start();
     }
   };
 
   Svg.prototype.tick = function() {
-    this.svg.select('g.groups').selectAll('g.group').call(tick_node);
     this.svg.select('g.elements').selectAll('g.element').call(tick_node);
     return this.svg.select('g.links').selectAll('g.link').call(tick_link);
   };

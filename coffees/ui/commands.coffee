@@ -19,18 +19,12 @@
 order = (a, b) -> d3.ascending(a.ts, b.ts)
 
 node_add = (type, x, y) =>
-    if type of diagram.types.groups
-        cls = diagram.types.groups[type]
-        set = diagram.groups
-        diagram.last_types.group = cls
-    else
-        cls = diagram.types.elements[type]
-        set = diagram.elements
-        diagram.last_types.element = cls
+    cls = diagram.types.elements[type]
+    diagram.last_types.element = cls
 
-    nth = set.filter((node) -> node instanceof cls).length + 1
+    nth = diagram.elements.filter((node) -> node instanceof cls).length + 1
     new_node = new cls(x, y, "#{type} ##{nth}", not diagram.force)
-    set.push(new_node)
+    diagram.elements.push(new_node)
     if d3.event
         diagram.selection = [new_node]
 
@@ -112,9 +106,7 @@ commands =
     remove:
         fun: ->
             for node in diagram.selection
-                if node in diagram.groups
-                    diagram.groups.splice(diagram.groups.indexOf(node), 1)
-                else if node in diagram.elements
+                if node in diagram.elements
                     diagram.elements.splice(diagram.elements.indexOf(node), 1)
                 else if node in diagram.links
                     diagram.links.splice(diagram.links.indexOf(node), 1)
@@ -129,7 +121,7 @@ commands =
 
     select_all:
         fun: (e) ->
-            diagram.selection = diagram.nodes().concat(diagram.links)
+            diagram.selection = diagram.elements.concat(diagram.links)
             svg.tick()
             e?.preventDefault()
 
@@ -168,7 +160,7 @@ commands =
 
     snaptogrid:
         fun: ->
-            for node in diagram.nodes()
+            for node in diagram.elements
                 node.x = node.px = diagram.snap.x * Math.floor(node.x / diagram.snap.x)
                 node.y = node.py = diagram.snap.y * Math.floor(node.y / diagram.snap.y)
             svg.tick()
@@ -259,7 +251,7 @@ init_commands = ->
         .addClass('specific')
         .text(diagram.label)
 
-    for name, cls of merge_copy(diagram.types.elements, diagram.types.groups)
+    for name, cls of diagram.types.elements
         if cls.alias
             continue
         i = 1
@@ -272,9 +264,6 @@ init_commands = ->
         fun = ((node) -> -> node_add(node))(cls)
         hotkey = "a #{key}"
         icon = new cls(0, 0, name)
-        if icon instanceof Group
-            icon._height = 70
-            icon._width = 90
         svgicon = d3.select('aside .icons')
             .append('svg')
             .attr('class', 'icon specific draggable btn btn-default')
@@ -285,7 +274,7 @@ init_commands = ->
 
 
         element = svgicon
-            .selectAll(if icon instanceof Group then 'g.group' else 'g.element')
+            .selectAll('g.element')
             .data([icon])
 
         element.enter()
@@ -304,8 +293,6 @@ init_commands = ->
             .attr('height', icon.height())
             .attr('preserveAspectRatio', 'xMidYMid meet')
         Mousetrap.bind hotkey, wrap(fun)
-        if name of diagram.types.groups and not diagram.last_types.group
-            diagram.last_types.group = cls
 
     taken_hotkeys = []
     first = true

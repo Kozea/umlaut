@@ -33,8 +33,8 @@ class Link extends Base
 
     objectify: ->
         name: @constructor.name
-        source: diagram.nodes().indexOf(@source)
-        target: diagram.nodes().indexOf(@target)
+        source: diagram.elements.indexOf(@source)
+        target: diagram.elements.indexOf(@target)
         source_anchor: @source_anchor
         target_anchor: @target_anchor
         text: @text

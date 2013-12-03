@@ -109,10 +109,6 @@ class Svg extends Base
 
         root
             .append('g')
-            .attr('class', 'groups')
-
-        root
-            .append('g')
             .attr('class', 'links')
 
         root
@@ -135,19 +131,15 @@ class Svg extends Base
         markers.call(update_marker)
         markers.exit().remove()
 
-        group = @svg.select('g.groups').selectAll('g.group').data(diagram.groups.sort(order))
         element = @svg.select('g.elements').selectAll('g.element').data(diagram.elements.sort(order))
         link = @svg.select('g.links').selectAll('g.link').data(diagram.links.concat(diagram.linking))
 
-        group.enter().call(enter_node)
         element.enter().call(enter_node)
         link.enter().call(enter_link)
 
-        group.call(update_node)
         element.call(update_node)
         link.call(update_link)
 
-        group.exit().remove()
         element.exit().remove()
         link.exit().remove()
 
@@ -158,11 +150,10 @@ class Svg extends Base
 
         if diagram.force
             diagram.force.stop()
-            diagram.force.nodes(diagram.nodes()).links(diagram.links)
+            diagram.force.nodes(diagram.elements).links(diagram.links)
             diagram.force.start()
 
     tick: ->
-        @svg.select('g.groups').selectAll('g.group').call(tick_node)
         @svg.select('g.elements').selectAll('g.element').call(tick_node)
         @svg.select('g.links').selectAll('g.link').call(tick_link)
 

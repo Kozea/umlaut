@@ -44,7 +44,7 @@ class Diagrams.Class::types.elements.Class extends Rect
          M #{-w2} #{h2 - 2 * @shift}
          L #{w2} #{h2 - 2 * @shift}
         "
-class Diagrams.Class::types.groups.System extends Group
+class Diagrams.Class::types.elements.System extends Group
 
 L = Diagrams.Class::types.links
 class L.Association extends Association

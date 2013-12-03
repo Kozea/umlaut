@@ -67,7 +67,7 @@ class Diagrams.UseCase::types.elements.Actor extends Element
          "
 
 
-class Diagrams.UseCase::types.groups.System extends Group
+class Diagrams.UseCase::types.elements.System extends Group
 
 class Diagrams.UseCase::types.links.Association extends Association
 class Diagrams.UseCase::types.links.Inheritance extends Inheritance

@@ -19,7 +19,7 @@
 enter_node = (nodes, connect=true) ->
     g = nodes
         .append('g')
-        .attr('class', (node) -> 'node ' + if node instanceof Group then 'group' else 'element')
+        .attr('class', 'element')
     g.append('path').attr('class', 'ghost')
     g.append('path').attr('class', (node) -> "shape fill-#{node.cls.fill} stroke-#{node.cls.stroke}")
     g.append('text')
