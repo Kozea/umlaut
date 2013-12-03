@@ -16,8 +16,6 @@
 # along with this program.  If not, see http://www.gnu.org/licenses/.
 
 
-
-
 edit = (getter, setter) ->
     overlay = d3.select('#overlay')
         .classed('visible', true)
@@ -39,10 +37,13 @@ edit = (getter, setter) ->
     textarea_node.value = getter()
     textarea_node.select()
     textarea_node.focus()
+    close = ->
+        if d3.event.target is @
+            textarea.on('input', null)
+            textarea.on('keydown', null)
+            textarea_node.value = ''
+            overlay.classed('visible', false)
     overlay
-        .on('click', ->
-            if d3.event.target is @
-                textarea.on('input', null)
-                textarea.on('keydown', null)
-                textarea_node.value = ''
-                overlay.classed('visible', false))
+        .on('click', close)
+        .on('touchstart', close)
+

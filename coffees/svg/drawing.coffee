@@ -231,8 +231,8 @@ tick_link = (links) ->
             bb = link._source_bbox
             pos =
                 x: link.text_margin + bb.width / 2
-                y: - link.text_margin - bb.height / 2
-            delta = rotate(pos, link.o1)
+                y: link.text_margin + bb.height / 2
+            delta = rotate(pos, link.o1 + 3 * pi / 2)
             "translate(#{link.a1.x + delta.x}, #{link.a1.y + delta.y})")
 
     links
@@ -241,8 +241,8 @@ tick_link = (links) ->
             bb = link._target_bbox
             pos =
                 x: link.text_margin + bb.width / 2
-                y: - link.text_margin - bb.height / 2
-            delta = rotate(pos, link.o2)
+                y: link.text_margin + bb.height / 2
+            delta = rotate(pos, link.o2 + 3 * pi / 2)
             "translate(#{link.a2.x + delta.x}, #{link.a2.y + delta.y})")
 
 enter_marker = (markers, open=false) ->

@@ -323,7 +323,11 @@ svg
     stroke: rgba(0, 0, 255, .3)
     stroke-width: 2
 
+
 @media screen and (max-width: 780px)
+  #overlay div
+    width: 50%
+
   body > section
     margin: 0
 
@@ -336,7 +340,13 @@ svg
           font-size: 12px
 
 @media screen and (max-width: 480px)
+  #overlay div
+    width: 80%
+
   body > section
+    &#editor
+      margin: 1em
+
     #main
       +flex-direction(column)
 
@@ -358,9 +368,6 @@ svg
 @-moz-document url-prefix()
   @media screen and (max-width: 480px)
     body > section
-      &#editor
-        margin: 1em
-
       #main
         > .sidebar
           .icons

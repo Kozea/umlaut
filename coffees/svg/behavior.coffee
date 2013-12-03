@@ -272,13 +272,13 @@ anchor_link_drag = d3.behavior.drag()
                 svg.sync(true))
 
 mouse_node = (nodes) ->
-    nodes.on('dblclick', (node) ->
+    nodes.call(edit_it, (node) ->
         edit((-> node.text), ((txt) -> node.text = txt)))
 
 
 mouse_link = (link) ->
     link
-        .on('dblclick', (lnk) ->
+        .call(edit_it, (lnk) ->
             nearest = lnk.nearest mouse_xy(svg.svg.node())
             if nearest is lnk.source
                 edit((-> lnk.text.source), ((txt) -> lnk.text.source = txt))
@@ -373,3 +373,9 @@ extern_drag = d3.behavior.drag()
         floating.$elt.remove()
         floating = null
     )
+
+
+edit_it = (node, fun) ->
+    node
+        .on('dblclick', fun)
+        .dblTap(fun)

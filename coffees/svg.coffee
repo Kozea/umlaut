@@ -80,7 +80,7 @@ class Svg extends Base
             .attr('id', 'title')
             .attr('x', @width / 2)
             .attr('y', 50)
-            .on('dblclick', ->
+            .call(edit_it, ->
                 edit((-> diagram.title), ((txt) -> diagram.title = txt)))
 
         d3.select(window).on('resize', => @resize())
