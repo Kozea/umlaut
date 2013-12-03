@@ -82,7 +82,7 @@ update_node = (nodes) ->
         .attr('class', (node) -> "shape fill-#{node.cls.fill} stroke-#{node.cls.stroke}")
         .attr('style', node_style)
         .attr('d', (node) -> node.path())
-    nodes.select('.ghost').attr('d', (node) -> Rect::path.apply(node))
+    nodes.select('.ghost').attr('d', (node) -> if node not instanceof Group then Rect::path.apply(node) else 'M 0 0')
 
     nodes.call(update_handles)
     nodes.call(update_anchors)

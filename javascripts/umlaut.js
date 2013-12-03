@@ -3649,7 +3649,7 @@ svg_selection_drag = d3.behavior.drag().on("dragstart.selection", function() {
   rect.width = Math.max(0, rect.width);
   rect.height = Math.max(0, rect.height);
   sel.attr(rect);
-  svg.svg.selectAll('g.node').each(function(elt) {
+  svg.svg.selectAll('g.element').each(function(elt) {
     var g, inside, selected;
     g = d3.select(this);
     selected = __indexOf.call(diagram.selection, elt) >= 0;
@@ -3690,7 +3690,7 @@ move_drag = d3.behavior.drag().origin(function(i) {
   if (node instanceof Group) {
     node.ts *= -1;
   }
-  svg.svg.selectAll('g.node').sort(order);
+  svg.svg.selectAll('g.element').sort(order);
   svg.tick();
   return d3.event.sourceEvent.stopPropagation();
 }).on("drag.move", function(node) {
@@ -4087,7 +4087,11 @@ update_node = function(nodes) {
     return node.path();
   });
   nodes.select('.ghost').attr('d', function(node) {
-    return Rect.prototype.path.apply(node);
+    if (!(node instanceof Group)) {
+      return Rect.prototype.path.apply(node);
+    } else {
+      return 'M 0 0';
+    }
   });
   nodes.call(update_handles);
   return nodes.call(update_anchors);

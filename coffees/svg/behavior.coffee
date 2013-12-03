@@ -67,7 +67,7 @@ svg_selection_drag = d3.behavior.drag()
 
         sel.attr rect
 
-        svg.svg.selectAll('g.node').each((elt) ->
+        svg.svg.selectAll('g.element').each((elt) ->
             g = d3.select @
             selected = elt in diagram.selection
             inside = elt.in(rect)
@@ -105,7 +105,7 @@ move_drag = d3.behavior.drag()
         node.ts = timestamp()
         if node instanceof Group
             node.ts *= -1
-        svg.svg.selectAll('g.node').sort(order)
+        svg.svg.selectAll('g.element').sort(order)
 
         svg.tick()
         d3.event.sourceEvent.stopPropagation()
