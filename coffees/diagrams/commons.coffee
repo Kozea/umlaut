@@ -112,14 +112,6 @@ class Parallelogram extends Element
     constructor: ->
         super
 
-        @anchors[cardinal.N] = =>
-            x: @x - @height() / 4
-            y: @y - @height() / 2
-
-        @anchors[cardinal.S] = =>
-            x: @x + @height() / 4
-            y: @y + @height() / 2
-
         @anchors[cardinal.E] = =>
             x: @x + @width() / 2 - @height() / 4
             y: @y

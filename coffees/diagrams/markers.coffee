@@ -116,6 +116,13 @@ class Markers.Tee extends Markers.Box
     width: ->
         7.5
 
+marker_to_dot = (m) ->
+    name = m.cls.name.toLowerCase()
+    if m.open
+        "o#{name}"
+    else
+        name
+
 Markers._get = (type, start=false) ->
     open = false
     if type.indexOf('o') == 0
@@ -127,3 +134,13 @@ Markers._get = (type, start=false) ->
         m = new Markers[type](open, start)
     else
         m = new Markers.None(open, start)
+
+Markers._cycle = (link, start=false) ->
+    arrow = if start then 'arrowtail' else 'arrowhead'
+    marker = if start then 'marker_start' else 'marker_end'
+    type = link.attrs[arrow] or marker_to_dot(link[marker] or link.cls[marker])
+    if type.indexOf('o') is 0
+        link.attrs[arrow] = type.slice('1')
+    else
+        link.attrs[arrow] = 'o' + next(Markers, Markers._get(type, start).cls.name)
+    link[marker] = Markers._get(link.attrs[arrow], start)

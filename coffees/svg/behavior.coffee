@@ -85,13 +85,6 @@ svg_selection_drag = d3.behavior.drag()
             y = + sel.attr("y")
             width = + sel.attr("width")
             height = + sel.attr("height")
-            type = diagram.last_types.group
-            if type
-                nth = diagram.groups.filter((grp) -> grp instanceof type).length + 1
-                grp = new type(x + width / 2, y + height / 2, "#{type.name} ##{nth}", not diagram.force)
-                grp._width = width
-                grp._height = height
-                diagram.groups.push grp
             svg.sync()
 
         svg.svg.selectAll("rect.selection").remove())
@@ -301,6 +294,7 @@ link_drag = d3.behavior.drag()
             nearest = link.nearest mouse
             if link.source == nearest
                 link.source = link.target
+                link.source_anchor = link.target_anchor
 
             link.target = mouse
             link.target_anchor = null

@@ -57,13 +57,6 @@ class Diagrams.Dot extends Diagram
                 dot = "#{dot}[#{attrs.join(',')}]"
             dot = "#{dot};\n"
 
-        marker_to_dot = (m) ->
-            name = m.cls.name.toLowerCase()
-            if m.open
-                "o#{name}"
-            else
-                name
-
         for link in diagram.links
             if not link.marker_end
                 op = '--'  # Graph not directed
@@ -214,8 +207,5 @@ class E.Underline extends Element
         "
 
 class E.Note extends Note
-
-for n, t of E
-    t.rotationable = true
 
 class L.Link extends Link

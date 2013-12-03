@@ -19,7 +19,7 @@
 class Element extends Base
     @handle_size: 10
     @resizeable: true
-    @rotationable: false
+    @rotationable: true
     @fill: 'bg'
     @stroke: 'fg'
 

@@ -90,7 +90,10 @@ capitalize = (s) ->
 
 next = (o, k) ->
     keys = Object.keys(o)
-    keys[(keys.indexOf(k) + 1) % keys.length]
+    next_key = keys[(keys.indexOf(k) + 1) % keys.length]
+    if next_key.indexOf('_') is 0
+        return next(o, next_key)
+    next_key
 
 merge = (o1, o2) ->
     for attr of o2

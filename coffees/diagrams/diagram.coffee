@@ -70,11 +70,20 @@ class Diagram extends Base
         @force.start()
 
     markers: ->
-        markers = {}
-        for name, type of @types.links
-            markers[type.marker_start.id] = type.marker_start
-            markers[type.marker_end.id] = type.marker_end
-        val for key, val of markers
+        # markers = {}
+        # for name, type of @types.links
+        #     markers[type.marker_start.id] = type.marker_start
+        #     markers[type.marker_end.id] = type.marker_end
+        # val for key, val of markers
+        markers = []
+        for name, marker of Markers
+            if name.indexOf('_') is 0
+                continue
+            markers.push new marker(false, false)
+            markers.push new marker(true, false)
+            markers.push new marker(false, true)
+            markers.push new marker(true, true)
+        markers
 
     to_svg: ->
         css = ''
@@ -144,7 +153,7 @@ class Diagram extends Base
             element._width = elt.width or null
             element._height = elt.height or null
             element._rotation = elt.rotation or 0
-            element.attrs = elt.attrs
+            element.attrs = elt.attrs or {}
             @elements.push(element)
 
         for lnk in obj.links
@@ -152,10 +161,10 @@ class Diagram extends Base
             link = new link_type(@nodes()[lnk.source], @nodes()[lnk.target], lnk.text)
             link.source_anchor = lnk.source_anchor
             link.target_anchor = lnk.target_anchor
-            link.attrs = lnk.attrs
-            if link.attrs?.arrowhead
+            link.attrs = lnk.attrs or {}
+            if link.attrs.arrowhead
                 link.marker_end = Markers._get(link.attrs.arrowhead)
-            if link.attrs?.arrowtail
+            if link.attrs.arrowtail
                 link.marker_start = Markers._get(link.attrs.arrowtail, true)
             @links.push(link)
 

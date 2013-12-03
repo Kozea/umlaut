@@ -189,6 +189,32 @@ commands =
         glyph: 'transfer'
         hotkey: 'w'
 
+    cycle_start_marker:
+        fun: ->
+            for node in diagram.selection
+                if node instanceof Link
+                    Markers._cycle(node, true)
+                if node instanceof Element
+                    for link in diagram.links
+                        Markers._cycle(link, true)
+            svg.sync(true)
+        label: 'Cycle start marker'
+        glyph: 'arrow-right'
+        hotkey: 'm s'
+
+    cycle_end_marker:
+        fun: ->
+            for node in diagram.selection
+                if node instanceof Link
+                    Markers._cycle(node)
+                if node instanceof Element
+                    for link in diagram.links
+                        Markers._cycle(link)
+            svg.sync(true)
+        label: 'Cycle end marker'
+        glyph: 'arrow-left'
+        hotkey: 'm e'
+
     back_to_list:
         fun: ->
             if diagram.force
