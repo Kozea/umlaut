@@ -46,7 +46,7 @@ wrap = (fun) ->
         last_command =
             fun: fun
             args: arguments
-        fun.apply(arguments)
+        fun.apply @, arguments
 
 
 commands =
@@ -87,8 +87,14 @@ commands =
 
     export_to_textile:
         fun: (e) ->
-            edit((-> "!data:image/svg+xml;base64,#{btoa(diagram.to_svg())}!:http://kozea.github.io/umlaut/#" + location.hash), (-> null))
+            edit((-> "!data:image/svg+xml;base64,#{btoa(diagram.to_svg())}!:http://kozea.github.io/umlaut/#{location.hash}"), (-> null))
         hotkey: 'ctrl+b'
+
+    export_to_markdown:
+        fun: (e) ->
+            edit((-> "[![#{diagram.title}][#{diagram.title} - base64]][#{diagram.title} - umlaut_url]\n\n[#{diagram.title} - base64]: data:image/svg+xml;base64,#{btoa(diagram.to_svg())}\n[#{diagram.title} - umlaut_url]: http://kozea.github.io/umlaut/#{location.hash}"), (-> null))
+            e.preventDefault()
+        hotkey: 'ctrl+m ctrl+d'
 
     edit:
         fun: ->
@@ -206,7 +212,7 @@ $ ->
                 .append('span')
                 .attr('class', "glyphicon glyphicon-#{command.glyph}")
         Mousetrap.bind command.hotkey, wrap(command.fun)
-    Mousetrap.bind 'z', -> last_command.fun.apply(last_command.args)
+    Mousetrap.bind 'z', -> last_command.fun.apply(@, last_command.args)
 
 
 init_commands = ->

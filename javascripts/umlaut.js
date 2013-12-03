@@ -1055,12 +1055,12 @@ Diagram = (function(_super) {
   };
 
   Diagram.prototype.to_svg = function() {
-    var content, css, margin, rect, rule, svg_clone, _i, _len, _ref17;
+    var content, css, margin, rect, rule, svg_clone, _i, _len, _ref17, _ref18;
     css = '';
     _ref17 = d3.select('#style').node().sheet.cssRules;
     for (_i = 0, _len = _ref17.length; _i < _len; _i++) {
       rule = _ref17[_i];
-      if (rule.selectorText.match(/^svg\s/)) {
+      if ((_ref18 = rule.selectorText) != null ? _ref18.match(/^svg\s/) : void 0) {
         if (!rule.cssText.match(/:hover/) && !rule.cssText.match(/:active/) && !rule.cssText.match(/transition/)) {
           css += rule.cssText.replace(/svg\s/g, '');
         }
@@ -1076,11 +1076,12 @@ Diagram = (function(_super) {
     rect = svg.svg.select('.root').node().getBoundingClientRect();
     svg_clone.select('.root').attr('transform', "translate(" + (diagram.zoom.translate[0] - rect.left + margin) + "," + (diagram.zoom.translate[1] - rect.top + margin) + ")scale(" + diagram.zoom.scale + ")");
     svg_clone.select('#title').attr('x', rect.width / 2 + margin);
+    svg_clone.append('image').attr('xlink:href', 'data:image/png;base64,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').attr('x', 10).attr('width', 100).attr('y', rect.height + 50).attr('height', 39);
     content = svg_clone.html();
     if (content == null) {
       content = $(svg_clone.node()).wrap('<div>').parent().html();
     }
-    return "<svg xmlns='http://www.w3.org/2000/svg' width='" + (rect.width + 2 * margin) + "' height='" + (rect.height + 2 * margin) + "'>" + content + "</svg>";
+    return "<svg xmlns='http://www.w3.org/2000/svg'  xmlns:xlink='http://www.w3.org/1999/xlink' width='" + (rect.width + 2 * margin) + "' height='" + (rect.height + 2 * margin) + "'><!--Generated with umlaut (http://kozea.github.io/umlaut/) (c) Mounier Florian Kozea 2013 on " + ((new Date()).toString()) + "-->" + content + "</svg>";
   };
 
   Diagram.prototype.nodes = function() {
@@ -3214,7 +3215,7 @@ wrap = function(fun) {
       fun: fun,
       args: arguments
     };
-    return fun.apply(arguments);
+    return fun.apply(this, arguments);
   };
 };
 
@@ -3258,12 +3259,23 @@ commands = {
   export_to_textile: {
     fun: function(e) {
       return edit((function() {
-        return ("!data:image/svg+xml;base64," + (btoa(diagram.to_svg())) + "!:http://kozea.github.io/umlaut/#") + location.hash;
+        return "!data:image/svg+xml;base64," + (btoa(diagram.to_svg())) + "!:http://kozea.github.io/umlaut/" + location.hash;
       }), (function() {
         return null;
       }));
     },
     hotkey: 'ctrl+b'
+  },
+  export_to_markdown: {
+    fun: function(e) {
+      edit((function() {
+        return "[![" + diagram.title + "][" + diagram.title + " - base64]][" + diagram.title + " - umlaut_url]\n\n[" + diagram.title + " - base64]: data:image/svg+xml;base64," + (btoa(diagram.to_svg())) + "\n[" + diagram.title + " - umlaut_url]: http://kozea.github.io/umlaut/" + location.hash;
+      }), (function() {
+        return null;
+      }));
+      return e.preventDefault();
+    },
+    hotkey: 'ctrl+m ctrl+d'
   },
   edit: {
     fun: function() {
@@ -3423,7 +3435,7 @@ $(function() {
     Mousetrap.bind(command.hotkey, wrap(command.fun));
   }
   return Mousetrap.bind('z', function() {
-    return last_command.fun.apply(last_command.args);
+    return last_command.fun.apply(this, last_command.args);
   });
 });
 
