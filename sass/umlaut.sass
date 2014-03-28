@@ -133,6 +133,9 @@ body
           width: 100%
           height: auto
 
+  .colpick
+    z-index: 2000
+
 footer
   +display-flex
 
@@ -159,13 +162,19 @@ footer
   &.visible
     visibility: visible
 
-  div
+  > div
     width: 30%
     margin: 100px auto
     background-color: rgba(255, 255, 255, .6)
     border: 1px solid #000
     padding: 15px
     text-align: center
+
+    .color-box
+      display: inline-block
+      width: 30px
+      height: 30px
+      background-color: rgba(255, 255, 255, .6)
 
   textarea
     border: 1px solid #888

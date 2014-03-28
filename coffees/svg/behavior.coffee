@@ -40,7 +40,6 @@ svg_selection_drag = d3.behavior.drag()
                     width: 0
                     height: 0
 
-
         rect =
             x: + sel.attr('x')
             y: + sel.attr('y')
@@ -144,13 +143,16 @@ move_drag = d3.behavior.drag()
 
         diagram.dragging = false
         if not $(d3.event.sourceEvent.target).closest('.inside').size()
-            if node in diagram.elements
-                diagram.elements.splice(diagram.elements.indexOf(node), 1)
-            if node in diagram.selection
-                diagram.selection.splice(diagram.selection.indexOf(node), 1)
-            for lnk in diagram.links.slice()
-                if node == lnk.source or node == lnk.target
-                    diagram.links.splice(diagram.links.indexOf(lnk), 1)
+            for node in diagram.selection
+                if node in diagram.elements
+                    diagram.elements.splice(diagram.elements.indexOf(node), 1)
+
+                for lnk in diagram.links.slice()
+                    if node == lnk.source or node == lnk.target
+                        index = diagram.links.indexOf(lnk)
+                        if index >= 0
+                            diagram.links.splice(index, 1)
+            diagram.selection = []
         svg.sync(true))
 
 nsweo_resize_drag = d3.behavior.drag()
@@ -261,7 +263,7 @@ anchor_link_drag = d3.behavior.drag()
 
 mouse_node = (nodes) ->
     nodes.call(edit_it, (node) ->
-        edit((-> node.text), ((txt) -> node.text = txt)))
+        edit((-> [node.text, node.attrs?.color, node.attrs?.fillcolor]), ((txt) -> node.text = txt)))
 
 
 mouse_link = (link) ->
@@ -269,9 +271,9 @@ mouse_link = (link) ->
         .call(edit_it, (lnk) ->
             nearest = lnk.nearest mouse_xy(svg.svg.node())
             if nearest is lnk.source
-                edit((-> lnk.text.source), ((txt) -> lnk.text.source = txt))
+                edit((-> [lnk.text.source, null, null]), ((txt) -> lnk.text.source = txt))
             else
-                edit((-> lnk.text.target), ((txt) -> lnk.text.target = txt)))
+                edit((-> [lnk.text.target, null, null]), ((txt) -> lnk.text.target = txt)))
 
 link_drag = d3.behavior.drag()
     .on("dragstart.link", (link) ->

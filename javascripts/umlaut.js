@@ -2138,7 +2138,7 @@ Diagrams.Dot = (function(_super) {
       for (key in _ref1) {
         val = _ref1[key];
         if (key !== 'shape' && key !== 'label') {
-          attrs.push("" + key + "=" + val);
+          attrs.push("" + key + "=\"" + val + "\"");
         }
       }
       if (attrs.length) {
@@ -2173,7 +2173,7 @@ Diagrams.Dot = (function(_super) {
       for (key in _ref3) {
         val = _ref3[key];
         if (key !== 'arrowhead' && key !== 'arrowtail' && key !== 'headlabel' && key !== 'taillabel') {
-          attrs.push("" + key + "=" + val);
+          attrs.push("" + key + "=\"" + val + "\"");
         }
       }
       if (attrs.length) {
@@ -3186,7 +3186,6 @@ commands = {
       var $a, svgout;
       svgout = diagram.to_svg();
       $('body').append($a = $('<a>', {
-        "class": 'eph',
         href: URL.createObjectURL(new Blob([svgout], {
           type: 'image/svg+xml'
         })),
@@ -3223,10 +3222,12 @@ commands = {
   edit: {
     fun: function() {
       return edit((function() {
+        var e, _ref, _ref1;
         if (diagram.selection.length === 1) {
-          return diagram.selection[0].text;
+          e = diagram.selection[0];
+          return [e.text, (_ref = e.attrs) != null ? _ref.color : void 0, (_ref1 = e.attrs) != null ? _ref1.fillcolor : void 0];
         } else {
-          return '';
+          return ['', '#ffffff', '#000000'];
         }
       }), (function(txt) {
         var node, _i, _len, _ref, _results;
@@ -3528,7 +3529,7 @@ init_commands = function() {
 };
 
 edit = function(getter, setter) {
-  var close, overlay, textarea, textarea_node;
+  var bg, close, fg, overlay, text, textarea, textarea_node, _ref;
   overlay = d3.select('#overlay').classed('visible', true);
   textarea = overlay.select('textarea');
   textarea_node = textarea.node();
@@ -3554,7 +3555,10 @@ edit = function(getter, setter) {
       return svg.sync(true);
     }
   });
-  textarea_node.value = getter();
+  _ref = getter(), text = _ref[0], fg = _ref[1], bg = _ref[2];
+  $('.color-box.fg').css('background-color', fg || '#000000');
+  $('.color-box.bg').css('background-color', bg || '#ffffff');
+  textarea_node.value = text;
   textarea_node.select();
   textarea_node.focus();
   close = function() {
@@ -3567,6 +3571,34 @@ edit = function(getter, setter) {
   };
   return overlay.on('click', close).on('touchstart', close);
 };
+
+$((function(_this) {
+  return function() {
+    return $('.color-box').colpick({
+      layout: 'hex',
+      submit: 0,
+      onChange: function(hsb, hex, rgb, el) {
+        var $el, fg, node, _i, _len, _ref;
+        $el = $(el);
+        $el.css('background-color', "#" + hex);
+        fg = $el.hasClass('fg');
+        _ref = diagram.selection;
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          node = _ref[_i];
+          if (!node.attrs) {
+            node.attrs = {};
+          }
+          if (fg) {
+            node.attrs.color = '#' + hex;
+          } else {
+            node.attrs.fillcolor = '#' + hex;
+          }
+        }
+        return svg.sync();
+      }
+    });
+  };
+})(this));
 
 svg_selection_drag = d3.behavior.drag().on("dragstart.selection", function() {
   if (!d3.event.sourceEvent.shiftKey) {
@@ -3696,7 +3728,7 @@ move_drag = d3.behavior.drag().origin(function(i) {
     return svg.tick();
   }
 }).on('dragend.move', function(node) {
-  var lnk, _i, _j, _len, _len1, _ref, _ref1;
+  var index, lnk, _i, _j, _k, _len, _len1, _len2, _ref, _ref1, _ref2;
   svg.svg.classed('dragging', false);
   svg.svg.classed('translating', false);
   _ref = diagram.elements;
@@ -3706,19 +3738,24 @@ move_drag = d3.behavior.drag().origin(function(i) {
   }
   diagram.dragging = false;
   if (!$(d3.event.sourceEvent.target).closest('.inside').size()) {
-    if (__indexOf.call(diagram.elements, node) >= 0) {
-      diagram.elements.splice(diagram.elements.indexOf(node), 1);
-    }
-    if (__indexOf.call(diagram.selection, node) >= 0) {
-      diagram.selection.splice(diagram.selection.indexOf(node), 1);
-    }
-    _ref1 = diagram.links.slice();
+    _ref1 = diagram.selection;
     for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
-      lnk = _ref1[_j];
-      if (node === lnk.source || node === lnk.target) {
-        diagram.links.splice(diagram.links.indexOf(lnk), 1);
+      node = _ref1[_j];
+      if (__indexOf.call(diagram.elements, node) >= 0) {
+        diagram.elements.splice(diagram.elements.indexOf(node), 1);
+      }
+      _ref2 = diagram.links.slice();
+      for (_k = 0, _len2 = _ref2.length; _k < _len2; _k++) {
+        lnk = _ref2[_k];
+        if (node === lnk.source || node === lnk.target) {
+          index = diagram.links.indexOf(lnk);
+          if (index >= 0) {
+            diagram.links.splice(index, 1);
+          }
+        }
       }
     }
+    diagram.selection = [];
   }
   return svg.sync(true);
 });
@@ -3842,7 +3879,8 @@ anchor_link_drag = d3.behavior.drag().on("dragstart.link", function(anchor) {
 mouse_node = function(nodes) {
   return nodes.call(edit_it, function(node) {
     return edit((function() {
-      return node.text;
+      var _ref, _ref1;
+      return [node.text, (_ref = node.attrs) != null ? _ref.color : void 0, (_ref1 = node.attrs) != null ? _ref1.fillcolor : void 0];
     }), (function(txt) {
       return node.text = txt;
     }));
@@ -3855,13 +3893,13 @@ mouse_link = function(link) {
     nearest = lnk.nearest(mouse_xy(svg.svg.node()));
     if (nearest === lnk.source) {
       return edit((function() {
-        return lnk.text.source;
+        return [lnk.text.source, null, null];
       }), (function(txt) {
         return lnk.text.source = txt;
       }));
     } else {
       return edit((function() {
-        return lnk.text.target;
+        return [lnk.text.target, null, null];
       }), (function(txt) {
         return lnk.text.target = txt;
       }));
@@ -4291,7 +4329,7 @@ Svg = (function(_super) {
     background = background_g.append('rect').attr('class', 'background').attr('width', this.width).attr('height', this.height).attr('fill', 'url(#grid)').call(this.zoom);
     svg.append('text').attr('id', 'title').attr('x', this.width / 2).attr('y', 50).call(edit_it, function() {
       return edit((function() {
-        return diagram.title;
+        return [diagram.title, null, null];
       }), (function(txt) {
         return diagram.title = txt;
       }));

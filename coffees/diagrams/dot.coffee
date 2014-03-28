@@ -52,7 +52,7 @@ class Diagrams.Dot extends Diagram
 
             for key, val of element.attrs
                 if key not in ['shape', 'label']
-                    attrs.push "#{key}=#{val}"
+                    attrs.push "#{key}=\"#{val}\""
             if attrs.length
                 dot = "#{dot}[#{attrs.join(',')}]"
             dot = "#{dot};\n"
@@ -78,7 +78,7 @@ class Diagrams.Dot extends Diagram
 
             for key, val of link.attrs
                 if key not in ['arrowhead', 'arrowtail', 'headlabel', 'taillabel']
-                    attrs.push "#{key}=#{val}"
+                    attrs.push "#{key}=\"#{val}\""
             if attrs.length
                 dot = "#{dot}[#{attrs.join(',')}]"
             dot = "#{dot};\n"

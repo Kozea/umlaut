@@ -34,7 +34,10 @@ edit = (getter, setter) ->
                 textarea_node.value = ''
                 overlay.classed('visible', false)
                 svg.sync(true))
-    textarea_node.value = getter()
+    [text, fg, bg] = getter()
+    $('.color-box.fg').css 'background-color', fg or '#000000'
+    $('.color-box.bg').css 'background-color', bg or '#ffffff'
+    textarea_node.value = text
     textarea_node.select()
     textarea_node.focus()
     close = ->
@@ -47,3 +50,19 @@ edit = (getter, setter) ->
         .on('click', close)
         .on('touchstart', close)
 
+$ =>
+    $('.color-box').colpick
+        layout: 'hex'
+        submit: 0
+        onChange: (hsb, hex, rgb, el) ->
+            $el = $ el
+            $el.css 'background-color', "##{hex}"
+            fg = $el.hasClass 'fg'
+            for node in diagram.selection
+                if not node.attrs
+                    node.attrs = {}
+                if fg
+                    node.attrs.color = '#' + hex
+                else
+                    node.attrs.fillcolor = '#' + hex
+            svg.sync()

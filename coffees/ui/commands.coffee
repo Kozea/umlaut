@@ -77,7 +77,6 @@ commands =
             svgout = diagram.to_svg()
             $('body').append(
                 $a = $('<a>', {
-                    class: 'eph',
                     href: URL.createObjectURL(new Blob([svgout], type: 'image/svg+xml')),
                     download: "#{diagram.title}.svg"
                 }))
@@ -102,9 +101,10 @@ commands =
         fun: ->
             edit((->
                 if diagram.selection.length == 1
-                    diagram.selection[0].text
+                    e = diagram.selection[0]
+                    return [e.text, e.attrs?.color, e.attrs?.fillcolor]
                 else
-                    ''), ((txt) ->
+                    return ['', '#ffffff', '#000000']), ((txt) ->
                 for node in diagram.selection
                     node.text = txt))
         label: 'Edit elements text'
@@ -239,7 +239,6 @@ $ ->
                 .attr('class', "glyphicon glyphicon-#{command.glyph}")
         Mousetrap.bind command.hotkey, wrap(command.fun)
     Mousetrap.bind 'z', -> last_command.fun.apply(@, last_command.args)
-
 
 init_commands = ->
     for conf, val of diagram.force_conf
