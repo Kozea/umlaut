@@ -26,5 +26,5 @@ $ =>
 
     @addEventListener("popstate", history_pop)
     # ff hack
-    if location.hash and @mozInnerScreenX?
+    if location.hash
         history_pop()

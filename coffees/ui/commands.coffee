@@ -74,7 +74,15 @@ commands =
 
     export:
         fun: (e) ->
-            location.href = "data:image/svg+xml;base64,#{btoa(diagram.to_svg())}"
+            svgout = diagram.to_svg()
+            $('body').append(
+                $a = $('<a>', {
+                    class: 'eph',
+                    href: URL.createObjectURL(new Blob([svgout], type: 'image/svg+xml')),
+                    download: "#{diagram.title}.svg"
+                }))
+            $a[0].click()
+            $a.remove()
         label: 'Export to svg'
         glyph: 'export'
         hotkey: 'ctrl+enter'

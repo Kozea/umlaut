@@ -31,9 +31,6 @@ list_local = ->
             $('<td>').text((new (Diagrams._get(type))()).label),
             $('<td>')
                 .append($('<a>').attr('href', "##{b64_diagram}").append($('<i>', class: 'glyphicon glyphicon-folder-open')))
-                .append($('<a>').attr('href', "#").append($('<i>', class: 'glyphicon glyphicon-cloud-upload')).on('click', ((k, b64) -> ->
-                    publish(k, b64, list_remote)
-                    false)(key, b64_diagram)))
                 .append($('<a>').attr('href', "#").append($('<i>', class: 'glyphicon glyphicon-trash')).on('click', ((k) -> ->
                     localStorage.removeItem k
                     $(@).closest('tr').remove()
@@ -54,25 +51,7 @@ list_new = ->
             $('<td>').text(diagram.label),
             $('<td>').append($('<a>').attr('href', "##{b64_diagram}").append($('<i>', class: 'glyphicon glyphicon-file'))))
 
-list_remote = ->
-    $tbody = $('.table.server tbody')
-    $tbody.find('tr').remove()
-
-    remoteStorage.getItem('umlaut_key_list', (list) ->
-        list = JSON.parse(list) or []
-        for key in list
-            remoteStorage.getItem(key, (b64_diagram, key_) ->
-                [type, title] = key_.slice(7).split('-_-')
-                if not title?
-                    return
-                $tbody.append($tr = $('<tr>'))
-                $tr.append(
-                    $('<td>').text(title),
-                    $('<td>').text((new (Diagrams._get(type))()).label),
-                    $('<td>')
-                        .append($('<a>').attr('href', "##{b64_diagram}").append($('<i>', class: 'glyphicon glyphicon-cloud-download'))))))
 
 list_diagrams = ->
     list_local()
     list_new()
-    list_remote()
