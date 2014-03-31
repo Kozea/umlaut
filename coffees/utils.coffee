@@ -100,7 +100,7 @@ merge = (o1, o2) ->
         o1[attr] = o2[attr]
     o1
 
-copy = (o) ->
+o_copy = (o) ->
     c = {}
     for attr of o
         c[attr] = o[attr]

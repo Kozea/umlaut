@@ -132,28 +132,34 @@ class Diagram extends Base
             @zoom = obj.zoom
 
         for elt in obj.elements
-            element_type = @types.elements[elt.name]
-            element = new element_type(elt.x, elt.y, elt.text, false)
-            element._width = elt.width or null
-            element._height = elt.height or null
-            element._rotation = elt.rotation or 0
-            element.attrs = elt.attrs or {}
-            @elements.push(element)
+            @elements.push(@elementify elt)
 
         for lnk in obj.links
-            link_type = @types.links[lnk.name] or @types.links['Link']
-            link = new link_type(@elements[lnk.source], @elements[lnk.target], lnk.text)
-            link.source_anchor = lnk.source_anchor
-            link.target_anchor = lnk.target_anchor
-            link.attrs = lnk.attrs or {}
-            if link.attrs.arrowhead
-                link.marker_end = Markers._get(link.attrs.arrowhead)
-            if link.attrs.arrowtail
-                link.marker_start = Markers._get(link.attrs.arrowtail, true)
-            @links.push(link)
+            @links.push(@linkify lnk)
 
         if obj.force
             @start_force()
+
+    elementify: (elt) ->
+        element_type = @types.elements[elt.name]
+        element = new element_type(elt.x, elt.y, elt.text, false)
+        element._width = elt.width or null
+        element._height = elt.height or null
+        element._rotation = elt.rotation or 0
+        element.attrs = o_copy(elt.attrs or {})
+        element
+
+    linkify: (lnk, elements=@elements) ->
+        link_type = @types.links[lnk.name] or @types.links['Link']
+        link = new link_type(elements[lnk.source], elements[lnk.target], lnk.text)
+        link.source_anchor = lnk.source_anchor
+        link.target_anchor = lnk.target_anchor
+        link.attrs = o_copy(lnk.attrs or {})
+        if link.attrs.arrowhead
+            link.marker_end = Markers._get(link.attrs.arrowhead)
+        if link.attrs.arrowtail
+            link.marker_start = Markers._get(link.attrs.arrowtail, true)
+        link
 
 Diagrams =
     _get: (type) ->

@@ -31,6 +31,69 @@ node_add = (type, x, y) =>
     svg.sync(true)
 
 
+remove = (nodes) ->
+    for node in nodes
+        if node in diagram.elements
+            diagram.elements.splice(diagram.elements.indexOf(node), 1)
+        else if node in diagram.links
+            diagram.links.splice(diagram.links.indexOf(node), 1)
+
+        for lnk in diagram.links.slice()
+            if node == lnk.source or node == lnk.target
+                diagram.links.splice(diagram.links.indexOf(lnk), 1)
+
+clip =
+    elements: []
+    links: []
+
+cut = ->
+    copy()
+    remove diagram.selection
+    diagram.selection = []
+    svg.sync true
+
+copy = ->
+    clip.elements = []
+    clip.links = []
+
+    elts = []
+    for node in diagram.selection
+        if node in diagram.elements
+            clip.elements.push node.objectify()
+            elts.push node
+
+    for node in diagram.selection
+        if node in diagram.links
+            if node.source in diagram.selection and node.target in diagram.selection
+                clip.links.push node.objectify(elts)
+
+paste = ->
+    elts = []
+    diagram.selection = []
+    if not diagram.force
+        shift =
+            x: Math.round(50 * (Math.random() * 2 - 1))
+            y: Math.round(50 * (Math.random() * 2 - 1))
+    else
+        shift = x: 0, y: 0
+
+
+    for node in clip.elements
+        elt = diagram.elementify node
+        elt.x += shift.x
+        elt.y += shift.y
+        diagram.elements.push elt
+        elts.push elt
+        diagram.selection.push elt
+
+    for node in clip.links
+        link = diagram.linkify(node, elts)
+        diagram.links.push link
+        diagram.selection.push link
+
+    svg.sync true
+
+
 last_command =
     fun: null
     args: null
@@ -116,14 +179,7 @@ commands =
 
     remove:
         fun: ->
-            for node in diagram.selection
-                if node in diagram.elements
-                    diagram.elements.splice(diagram.elements.indexOf(node), 1)
-                else if node in diagram.links
-                    diagram.links.splice(diagram.links.indexOf(node), 1)
-                for lnk in diagram.links.slice()
-                    if node == lnk.source or node == lnk.target
-                        diagram.links.splice(diagram.links.indexOf(lnk), 1)
+            remove diagram.selection
             diagram.selection = []
             svg.sync(true)
         label: 'Remove elements'
@@ -229,6 +285,19 @@ commands =
         glyph: 'list'
         hotkey: 'esc'
 
+    # Workaround for firefox
+    cut:
+        fun: cut
+        hotkey: 'ctrl+x'
+
+    copy:
+        fun: copy
+        hotkey: 'ctrl+c'
+
+    paste:
+        fun: paste
+        hotkey: 'ctrl+v'
+
 
 $ ->
    for name, command of commands
@@ -243,11 +312,15 @@ $ ->
         Mousetrap.bind command.hotkey, wrap(command.fun)
     Mousetrap.bind 'z', -> last_command.fun.apply(@, last_command.args)
 
+    $(window).on('cut', cut).on('copy', copy).on('paste', paste)
+
     $('.waterlogo').on('wheel', (e) ->
         if e.originalEvent.deltaY > 0
             history.go(-1)
         else
-            history.go(1))
+            history.go(1)
+    )
+
 
 init_commands = ->
     for conf, val of diagram.force_conf

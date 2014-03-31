@@ -31,10 +31,10 @@ class Link extends Base
             target: text?.target or ''
         @color = null
 
-    objectify: ->
+    objectify: (elements=diagram.elements)->
         name: @constructor.name
-        source: diagram.elements.indexOf(@source)
-        target: diagram.elements.indexOf(@target)
+        source: elements.indexOf(@source)
+        target: elements.indexOf(@target)
         source_anchor: @source_anchor
         target_anchor: @target_anchor
         text: @text

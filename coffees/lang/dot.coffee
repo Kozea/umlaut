@@ -365,9 +365,9 @@ dot = (src) ->
         node: {}
 
     copy_attributes = ->
-        graph: copy(attributes.graph)
-        edge: copy(attributes.edge)
-        node: copy(attributes.node)
+        graph: o_copy(attributes.graph)
+        edge: o_copy(attributes.edge)
+        node: o_copy(attributes.node)
 
 
     populate = (statements) ->

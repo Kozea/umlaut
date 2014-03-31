@@ -384,19 +384,19 @@ svg .shape {
 }
 /* line 274, ../sass/umlaut.sass */
 svg .selected .shape {
-  stroke: blue;
+  stroke: blue !important;
 }
 /* line 278, ../sass/umlaut.sass */
 svg .selected.moving .shape {
-  stroke: magenta;
+  stroke: magenta !important;
 }
 /* line 282, ../sass/umlaut.sass */
 svg .moving .shape {
-  stroke: red;
+  stroke: red !important;
 }
 /* line 286, ../sass/umlaut.sass */
 svg .link .shape {
-  fill: none;
+  fill: none !important;
 }
 /* line 289, ../sass/umlaut.sass */
 svg .link text {

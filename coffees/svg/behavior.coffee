@@ -72,9 +72,21 @@ svg_selection_drag = d3.behavior.drag()
             inside = elt.in(rect)
 
             if inside and not selected
+                # New element in selection
                 diagram.selection.push(elt)
+                for link in diagram.links
+                    # Check if there's 2 linked element in selection, in this case the link should be in selection too
+                    if (link.source is elt and link.target in diagram.selection and link not in diagram.selection) or (
+                        link.target is elt and link.source in diagram.selection and link not in diagram.selection)
+                        diagram.selection.push link
             else if not inside and selected
+                # Element not in selection anymore
                 diagram.selection.splice(diagram.selection.indexOf(elt), 1)
+                for link in diagram.links
+                    # Check if there's a selected link which is not in selected elements anymore
+                    if (link.source is elt and link.target not in diagram.selection and link in diagram.selection) or (
+                        link.target is elt and link.source not in diagram.selection and link in diagram.selection)
+                        diagram.selection.splice(diagram.selection.indexOf(link), 1)
         )
         svg.tick()
     ).on("dragend.selection", ->
