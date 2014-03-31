@@ -27,11 +27,8 @@ edit = (getter, setter, color=true) ->
         )
         .on('keydown', (e) ->
             if e.keyCode is 27
-                $textarea.off('input')
-                $textarea.off('keydown')
-                $textarea.val('')
-                $overlay.removeClass('visible')
-                svg.sync(true))
+                $overlay.click()
+        )
     if color
         $overlay.find('.with-color').show()
         [text, fg, bg] = getter()
@@ -49,6 +46,8 @@ edit = (getter, setter, color=true) ->
             $textarea.off('keydown')
             $textarea.val('')
             $overlay.removeClass('visible')
+            $('.color-box').colpickHide()
+            svg.sync(true)
 
     $overlay
         .on('click', close)

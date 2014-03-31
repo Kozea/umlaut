@@ -243,6 +243,12 @@ $ ->
         Mousetrap.bind command.hotkey, wrap(command.fun)
     Mousetrap.bind 'z', -> last_command.fun.apply(@, last_command.args)
 
+    $('.waterlogo').on('wheel', (e) ->
+        if e.originalEvent.deltaY > 0
+            history.go(-1)
+        else
+            history.go(1))
+
 init_commands = ->
     for conf, val of diagram.force_conf
         for way, inc of {increase: 1.1, decrease: 0.9}

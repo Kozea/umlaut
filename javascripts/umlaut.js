@@ -3428,8 +3428,15 @@ $(function() {
     }
     Mousetrap.bind(command.hotkey, wrap(command.fun));
   }
-  return Mousetrap.bind('z', function() {
+  Mousetrap.bind('z', function() {
     return last_command.fun.apply(this, last_command.args);
+  });
+  return $('.waterlogo').on('wheel', function(e) {
+    if (e.originalEvent.deltaY > 0) {
+      return history.go(-1);
+    } else {
+      return history.go(1);
+    }
   });
 });
 
@@ -3556,11 +3563,7 @@ edit = function(getter, setter, color) {
     return svg.sync();
   }).on('keydown', function(e) {
     if (e.keyCode === 27) {
-      $textarea.off('input');
-      $textarea.off('keydown');
-      $textarea.val('');
-      $overlay.removeClass('visible');
-      return svg.sync(true);
+      return $overlay.click();
     }
   });
   if (color) {
@@ -3578,7 +3581,9 @@ edit = function(getter, setter, color) {
       $textarea.off('input');
       $textarea.off('keydown');
       $textarea.val('');
-      return $overlay.removeClass('visible');
+      $overlay.removeClass('visible');
+      $('.color-box').colpickHide();
+      return svg.sync(true);
     }
   };
   return $overlay.on('click', close).on('touchstart', close);
