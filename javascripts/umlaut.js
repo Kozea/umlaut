@@ -3190,11 +3190,12 @@ cut = function() {
   copy();
   remove(diagram.selection);
   diagram.selection = [];
-  return svg.sync(true);
+  svg.sync(true);
+  return false;
 };
 
 copy = function() {
-  var elts, node, _i, _j, _len, _len1, _ref, _ref1, _ref2, _ref3, _results;
+  var elts, node, _i, _j, _len, _len1, _ref, _ref1, _ref2, _ref3;
   clip.elements = [];
   clip.links = [];
   elts = [];
@@ -3207,20 +3208,15 @@ copy = function() {
     }
   }
   _ref1 = diagram.selection;
-  _results = [];
   for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
     node = _ref1[_j];
     if (__indexOf.call(diagram.links, node) >= 0) {
       if ((_ref2 = node.source, __indexOf.call(diagram.selection, _ref2) >= 0) && (_ref3 = node.target, __indexOf.call(diagram.selection, _ref3) >= 0)) {
-        _results.push(clip.links.push(node.objectify(elts)));
-      } else {
-        _results.push(void 0);
+        clip.links.push(node.objectify(elts));
       }
-    } else {
-      _results.push(void 0);
     }
   }
-  return _results;
+  return false;
 };
 
 paste = function() {
@@ -3255,7 +3251,8 @@ paste = function() {
     diagram.links.push(link);
     diagram.selection.push(link);
   }
-  return svg.sync(true);
+  svg.sync(true);
+  return false;
 };
 
 last_command = {

@@ -51,6 +51,7 @@ cut = ->
     remove diagram.selection
     diagram.selection = []
     svg.sync true
+    false
 
 copy = ->
     clip.elements = []
@@ -66,6 +67,7 @@ copy = ->
         if node in diagram.links
             if node.source in diagram.selection and node.target in diagram.selection
                 clip.links.push node.objectify(elts)
+    false
 
 paste = ->
     elts = []
@@ -92,7 +94,7 @@ paste = ->
         diagram.selection.push link
 
     svg.sync true
-
+    false
 
 last_command =
     fun: null
