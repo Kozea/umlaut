@@ -37,6 +37,9 @@ last_command =
 
 wrap = (fun) ->
     ->
+        if $('#overlay').hasClass('visible')
+            $('#overlay').click() if arguments[1] is 'esc'
+            return
         last_command =
             fun: fun
             args: arguments
@@ -216,7 +219,7 @@ commands =
         hotkey: 'm e'
 
     back_to_list:
-        fun: ->
+        fun: (e) ->
             if diagram.force
                 diagram.force.stop()
             if diagram instanceof Diagrams.Dot

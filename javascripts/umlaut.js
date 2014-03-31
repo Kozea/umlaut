@@ -3144,6 +3144,12 @@ last_command = {
 
 wrap = function(fun) {
   return function() {
+    if ($('#overlay').hasClass('visible')) {
+      if (arguments[1] === 'esc') {
+        $('#overlay').click();
+      }
+      return;
+    }
     last_command = {
       fun: fun,
       args: arguments
@@ -3398,7 +3404,7 @@ commands = {
     hotkey: 'm e'
   },
   back_to_list: {
-    fun: function() {
+    fun: function(e) {
       if (diagram.force) {
         diagram.force.stop();
       }
@@ -3528,12 +3534,14 @@ init_commands = function() {
   return _results;
 };
 
-edit = function(getter, setter) {
-  var bg, close, fg, overlay, text, textarea, textarea_node, _ref;
-  overlay = d3.select('#overlay').classed('visible', true);
-  textarea = overlay.select('textarea');
-  textarea_node = textarea.node();
-  textarea.on('input', function() {
+edit = function(getter, setter, color) {
+  var $overlay, $textarea, bg, close, fg, text, _ref;
+  if (color == null) {
+    color = true;
+  }
+  $overlay = $('#overlay').addClass('visible');
+  $textarea = $overlay.find('textarea');
+  $textarea.on('input', function() {
     var val;
     setter(((function() {
       var _i, _len, _ref, _results;
@@ -3546,30 +3554,34 @@ edit = function(getter, setter) {
       return _results;
     }).call(this)).join('\n'));
     return svg.sync();
-  }).on('keydown', function() {
-    if (d3.event.keyCode === 27) {
-      textarea.on('input', null);
-      textarea.on('keydown', null);
-      textarea_node.value = '';
-      overlay.classed('visible', false);
+  }).on('keydown', function(e) {
+    if (e.keyCode === 27) {
+      $textarea.off('input');
+      $textarea.off('keydown');
+      $textarea.val('');
+      $overlay.removeClass('visible');
       return svg.sync(true);
     }
   });
-  _ref = getter(), text = _ref[0], fg = _ref[1], bg = _ref[2];
-  $('.color-box.fg').css('background-color', fg || '#000000');
-  $('.color-box.bg').css('background-color', bg || '#ffffff');
-  textarea_node.value = text;
-  textarea_node.select();
-  textarea_node.focus();
-  close = function() {
-    if (d3.event.target === this) {
-      textarea.on('input', null);
-      textarea.on('keydown', null);
-      textarea_node.value = '';
-      return overlay.classed('visible', false);
+  if (color) {
+    $overlay.find('.with-color').show();
+    _ref = getter(), text = _ref[0], fg = _ref[1], bg = _ref[2];
+    $('.color-box.fg').css('background-color', fg || '#000000');
+    $('.color-box.bg').css('background-color', bg || '#ffffff');
+  } else {
+    $overlay.find('.with-color').hide();
+    text = getter();
+  }
+  $textarea.val(text).select().focus();
+  close = function(e) {
+    if (e.target === this) {
+      $textarea.off('input');
+      $textarea.off('keydown');
+      $textarea.val('');
+      return $overlay.removeClass('visible');
     }
   };
-  return overlay.on('click', close).on('touchstart', close);
+  return $overlay.on('click', close).on('touchstart', close);
 };
 
 $((function(_this) {
@@ -4329,10 +4341,10 @@ Svg = (function(_super) {
     background = background_g.append('rect').attr('class', 'background').attr('width', this.width).attr('height', this.height).attr('fill', 'url(#grid)').call(this.zoom);
     svg.append('text').attr('id', 'title').attr('x', this.width / 2).attr('y', 50).call(edit_it, function() {
       return edit((function() {
-        return [diagram.title, null, null];
+        return diagram.title;
       }), (function(txt) {
         return diagram.title = txt;
-      }));
+      }), false);
     });
     d3.select(window).on('resize', (function(_this) {
       return function() {

@@ -83,12 +83,14 @@
 
     <div id="overlay">
       <div>
-        Enter the new text:
+        <p>Enter the new text:</p>
         <textarea></textarea>
-        Change the color:
-        <div>Foreground: <div class="color-box fg"></div></div>
-        <div>Background: <div class="color-box bg"></div></div>
-        (Use [Esc] to close)
+        <div class="with-color">
+          <p>Change the color:</p>
+          <div class="fg-box">Foreground: <div class="color-box fg" tabindex="0"></div></div>
+          <div class="bg-box">Background: <div class="color-box bg" tabindex="0"></div></div>
+        </div>
+        <div class="bottom-tip">(Use [Esc] to close)</div>
       </div>
     </div>
 

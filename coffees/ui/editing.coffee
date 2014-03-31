@@ -16,37 +16,41 @@
 # along with this program.  If not, see http://www.gnu.org/licenses/.
 
 
-edit = (getter, setter) ->
-    overlay = d3.select('#overlay')
-        .classed('visible', true)
-    textarea = overlay
-        .select('textarea')
-    textarea_node = textarea.node()
-    textarea
+edit = (getter, setter, color=true) ->
+    $overlay = $('#overlay').addClass('visible')
+    $textarea = $overlay.find('textarea')
+
+    $textarea
         .on('input', ->
             setter((val or ' ' for val in @value.split('\n')).join('\n'))
             svg.sync()
         )
-        .on('keydown', ->
-            if d3.event.keyCode is 27
-                textarea.on('input', null)
-                textarea.on('keydown', null)
-                textarea_node.value = ''
-                overlay.classed('visible', false)
+        .on('keydown', (e) ->
+            if e.keyCode is 27
+                $textarea.off('input')
+                $textarea.off('keydown')
+                $textarea.val('')
+                $overlay.removeClass('visible')
                 svg.sync(true))
-    [text, fg, bg] = getter()
-    $('.color-box.fg').css 'background-color', fg or '#000000'
-    $('.color-box.bg').css 'background-color', bg or '#ffffff'
-    textarea_node.value = text
-    textarea_node.select()
-    textarea_node.focus()
-    close = ->
-        if d3.event.target is @
-            textarea.on('input', null)
-            textarea.on('keydown', null)
-            textarea_node.value = ''
-            overlay.classed('visible', false)
-    overlay
+    if color
+        $overlay.find('.with-color').show()
+        [text, fg, bg] = getter()
+        $('.color-box.fg').css 'background-color', fg or '#000000'
+        $('.color-box.bg').css 'background-color', bg or '#ffffff'
+    else
+        $overlay.find('.with-color').hide()
+        text = getter()
+
+    $textarea.val(text).select().focus()
+
+    close = (e) ->
+        if e.target is @
+            $textarea.off('input')
+            $textarea.off('keydown')
+            $textarea.val('')
+            $overlay.removeClass('visible')
+
+    $overlay
         .on('click', close)
         .on('touchstart', close)
 
