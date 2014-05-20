@@ -1,0 +1,24 @@
+{
+  "name": "umlaut",
+  "version": "1.0.0",
+  "authors": [
+    "Florian Mounier <florian.mounier@kozea.fr>"
+  ],
+  "description": "Because a picture is worth a thousand words",
+  "license": "None",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "lz-string": "*",
+    "d3": "~3.4.8",
+    "mousetrap": "~1.4.6",
+    "colpick": "~2.0.2",
+    "jquery": "~2.1.1"
+  }
+}
