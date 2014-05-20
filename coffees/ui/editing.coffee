@@ -52,20 +52,3 @@ edit = (getter, setter, color=true) ->
   $overlay
     .on('click', close)
     .on('touchstart', close)
-
-$ ->
-  $('.color-box').colpick
-    layout: 'hex'
-    submit: 0
-    onChange: (hsb, hex, rgb, el) ->
-      $el = $ el
-      $el.css 'background-color', "##{hex}"
-      fg = $el.hasClass 'fg'
-      for node in diagram.selection
-        if not node.attrs
-          node.attrs = {}
-        if fg
-          node.attrs.color = '#' + hex
-        else
-          node.attrs.fillcolor = '#' + hex
-      svg.sync()

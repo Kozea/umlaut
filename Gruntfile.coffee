@@ -10,6 +10,8 @@ module.exports = (grunt) ->
         sourceMap: true
 
       umlaut:
+        options:
+          mangle: false
         files:
           'assets/main.min.js': 'assets/main.js'
 
@@ -23,6 +25,15 @@ module.exports = (grunt) ->
             'bower_components/colpick/js/colpick.js'
           ]
 
+      test:
+        files:
+          'test/deps.min.js': [
+            'bower_components/jquery/dist/jquery.min.js'
+            'bower_components/d3/d3.min.js'
+            'bower_components/mousetrap/mousetrap.min.js'
+            'bower_components/qunit/qunit/qunit.js'
+          ]
+
     cssmin:
       options:
         banner: '/*! <%= pkg.name %>
@@ -33,6 +44,12 @@ module.exports = (grunt) ->
           'assets/deps.min.css': [
             'bower_components/bootstrap/dist/css/bootstrap.min.css'
             'bower_components/colpick/css/colpick.css'
+          ]
+
+      test:
+        files:
+          'test/deps.min.css': [
+            'bower_components/qunit/qunit/qunit.css'
           ]
 
     sass:
@@ -54,6 +71,7 @@ module.exports = (grunt) ->
     coffee:
       options:
         sourceMap: true
+        bare: true
 
       umlaut:
         files:
@@ -82,6 +100,10 @@ module.exports = (grunt) ->
             'coffees/init.coffee'
           ]
 
+      test:
+        files:
+          'test/tests.js': 'test/*.coffee'
+
     coffeelint:
       umlaut: [
         'coffees/**/*.coffee'
@@ -93,6 +115,13 @@ module.exports = (grunt) ->
         options:
           port: 11111
           base: ''
+
+    qunit:
+      test:
+        options:
+          urls: [
+            'http://localhost:11111/test/index.html'
+          ]
 
     watch:
       options:
@@ -115,6 +144,7 @@ module.exports = (grunt) ->
   grunt.loadNpmTasks 'grunt-contrib-watch'
   grunt.loadNpmTasks 'grunt-contrib-uglify'
   grunt.loadNpmTasks 'grunt-contrib-cssmin'
+  grunt.loadNpmTasks 'grunt-contrib-qunit'
   grunt.loadNpmTasks 'grunt-contrib-connect'
   grunt.loadNpmTasks 'grunt-coffeelint'
   grunt.loadNpmTasks 'grunt-sass'
@@ -130,4 +160,7 @@ module.exports = (grunt) ->
     'uglify']
   grunt.registerTask 'umlaut', [
     'connect', 'watch'
+  ]
+  grunt.registerTask 'test', [
+    'connect', 'qunit'
   ]
