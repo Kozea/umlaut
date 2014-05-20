@@ -38,7 +38,8 @@ history_pop = () ->
     catch ex1
       # Compat
       try
-        load(JSON.parse(decodeURIComponent(escape(atob(location.hash.slice(1))))))
+        load(JSON.parse(
+          decodeURIComponent(escape(atob(location.hash.slice(1))))))
       catch ex2
         window.diagram = new Diagrams.Dot()
         note = Diagrams.Dot::types.elements.Note
@@ -49,8 +50,11 @@ history_pop = () ->
         diagram.elements.push(e2 = new note(undefined, undefined, ex1.stack))
         diagram.elements.push(e21 = new note(undefined, undefined, ex2.message))
         diagram.elements.push(e22 = new note(undefined, undefined, ex2.stack))
-        diagram.elements.push(e3 = new note(undefined, undefined, 'You can try to reload\nyour browser without cache'))
-        diagram.elements.push(e4 = new note(undefined, undefined, 'Otherwise it may be that\n your diagram is not compatible\nwith this version'))
+        diagram.elements.push(e3 = new note(undefined, undefined,
+          'You can try to reload\nyour browser without cache'))
+        diagram.elements.push(e4 = new note(undefined, undefined,
+          'Otherwise it may be that\n your diagram is
+           not compatible\nwith this version'))
         diagram.links.push(new link(e2, e1))
         diagram.links.push(new link(e2, e3))
         diagram.links.push(new link(e2, e4))

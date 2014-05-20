@@ -1,24 +1,19 @@
-/* This file is part of umlaut
+/* This file is part of umlaut */
 
-/* Copyright (C) 2013 Kozea - Mounier Florian <paradoxxx.zero->gmail.com>
+/* Copyright (C) 2013 Kozea - Mounier Florian <paradoxxx.zero->gmail.com> */
 
-/* umlaut is free software: you can redistribute it and/or modify
-/* it under the terms of the GNU Affero General Public License as
-/* published by the Free Software Foundation, either version 3 of the
-/* License, or any later version.
+/* umlaut is free software: you can redistribute it and/or modify */
+/* it under the terms of the GNU Affero General Public License as */
+/* published by the Free Software Foundation, either version 3 of the */
+/* License, or any later version. */
 
-/* umlaut is distributed in the hope that it will be useful,
-/* but WITHOUT ANY WARRANTY; without even the implied warranty of
-/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-/* GNU Affero General Public License for more details.
+/* umlaut is distributed in the hope that it will be useful, */
+/* but WITHOUT ANY WARRANTY; without even the implied warranty of */
+/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the */
+/* GNU Affero General Public License for more details. */
 
-/* You should have received a copy of the GNU Affero General Public License
-/* along with this program.  If not, see http://www.gnu.org/licenses/.
-
-
-@import compass/css3
-@import flexbox
-@import compass/typography/text/replacement
+/* You should have received a copy of the GNU Affero General Public License */
+/* along with this program.  If not, see http://www.gnu.org/licenses/. */
 
 $bg: #fff
 $fg: #000
@@ -38,8 +33,8 @@ body, html
   height: 100%
   margin: 0
   padding: 0
-  +display-flex
-  +flex-direction(column)
+  display: flex
+  flex-direction: column
   > header
     h1
       font-size: 2em
@@ -52,13 +47,13 @@ header
     height: 131px
 
     a
-      +squish-text
+      font-size: 0
 
 body
   #editor
-    +flex(1)
-    +display-flex
-    +flex-direction(column)
+    display: flex
+    flex: 1
+    flex-direction: column
     margin: 1em
     margin-right: 0
 
@@ -76,8 +71,8 @@ body
   #main
     -webkit-user-select: none
     -moz-user-select: none
-    +flex(1)
-    +display-flex
+    flex: 1
+    display: flex
     flex-direction: row
 
     .waterlogo
@@ -90,7 +85,7 @@ body
       bottom: 10px
       height: 131px
       width: 333px
-      +transition(500ms)
+      transition: 500ms
 
       &:hover
         -webkit-filter: blur(5px)
@@ -109,12 +104,12 @@ body
         font-size: 20px
 
     .outside
-      +flex(1)
-      +display-flex
-      +flex-direction(column)
+      flex: 1
+      display: flex
+      flex-direction: column
 
       .inside
-        +flex(1)
+        flex: 1
 
     aside
       padding: 0 0.5em 0 0
@@ -129,8 +124,8 @@ body
 
       .icons
         overflow-y: auto
-        +display-flex
-        +flex-direction(column)
+        display: flex
+        flex-direction: column
 
         .icon
           margin: 0 0 6px
@@ -141,10 +136,10 @@ body
     z-index: 2000
 
 footer
-  +display-flex
+  display: flex
 
   h4
-    +flex(1)
+    flex: 1
     margin: 0
     padding: 0b
 
@@ -238,7 +233,7 @@ svg
     font-size: 14px
 
   .ghost
-    +transition(stroke 500ms)
+    transition: stroke 500ms
 
     &:hover
       stroke: rgba(0, 0, 255, .1)
@@ -264,7 +259,7 @@ svg
       stroke-width: 2
 
   .shape
-    +transition(stroke-width 500ms)
+    transition: stroke-width 500ms
 
   .shape
     stroke: $fg
@@ -298,20 +293,25 @@ svg
       stroke: none
 
     .handle, .anchor
-      +transition(fill 500ms, stroke 500ms)
+      transition: fill 500ms, stroke 500ms
       fill: rgba(0, 0, 0, 0)
       stroke: rgba(0, 0, 0, 0)
 
     .handle
-      &.NW
+
+      &.nw
         cursor: nw-resize
-      &.NE
+
+      &.ne
         cursor: ne-resize
-      &.SW
+
+      &.sw
         cursor: sw-resize
-      &.SE
+
+      &.se
         cursor: se-resize
-      &.O
+
+      &.o
         cursor: crosshair
 
     .anchor
@@ -374,18 +374,18 @@ svg
       margin: 1em
 
     #main
-      +flex-direction(column)
+      flex-direction: column
 
       > .outside
         flex: 4
 
       > .sidebar
-        +flex(1)
+        flex: 1
         width: auto
 
         .icons
-          +flex-direction(row)
-          +flex-wrap(wrap)
+          flex-direction: row
+          flex-wrap: wrap
           .icon
             width: 20%
             height: 40px

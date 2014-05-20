@@ -13,13 +13,43 @@ module.exports = (grunt) ->
         files:
           'assets/main.min.js': 'assets/main.js'
 
+      deps:
+        files:
+          'assets/deps.min.js': [
+            'bower_components/jquery/dist/jquery.min.js'
+            'bower_components/d3/d3.min.js'
+            'bower_components/mousetrap/mousetrap.min.js'
+            'bower_components/lz-string/libs/lz-string-1.3.3-min.js'
+            'bower_components/colpick/js/colpick.js'
+          ]
+
+    cssmin:
+      options:
+        banner: '/*! <%= pkg.name %>
+           <%= grunt.template.today("yyyy-mm-dd") %> */\n'
+
+      deps:
+        files:
+          'assets/deps.min.css': [
+            'bower_components/bootstrap/dist/css/bootstrap.min.css'
+            'bower_components/colpick/css/colpick.css'
+          ]
+
     sass:
       umlaut:
         expand: true
-        cwd: 'sass/'
-        src: '*.sass'
+        cwd: 'scss/'
+        src: '*.scss'
         dest: 'assets/'
         ext: '.css'
+
+    sass_to_scss:
+      butterfly:
+        expand: true
+        cwd: 'sass/'
+        src: '*.sass'
+        dest: 'scss/'
+        ext: '.scss'
 
     coffee:
       options:
@@ -53,8 +83,10 @@ module.exports = (grunt) ->
           ]
 
     coffeelint:
-      umlaut:
+      umlaut: [
+        'coffees/**/*.coffee'
         'coffees/*.coffee'
+      ]
 
     connect:
       serve:
@@ -67,6 +99,7 @@ module.exports = (grunt) ->
         livereload: true
       coffee:
         files: [
+          'coffees/**/*.coffee'
           'coffees/*.coffee'
           'Gruntfile.coffee'
         ]
@@ -88,12 +121,13 @@ module.exports = (grunt) ->
   grunt.loadNpmTasks 'grunt-sass-to-scss'
 
   grunt.registerTask 'dev', [
-    'coffeelint', 'coffee', 'sass', 'watch']
-  grunt.registerTask 'css', ['sass']
+    'coffeelint', 'coffee', 'sass_to_scss', 'sass', 'watch']
+  grunt.registerTask 'css', ['sass_to_scss', 'sass']
   grunt.registerTask 'default', [
     'coffeelint', 'coffee',
     'sass_to_scss', 'sass',
+    'cssmin',
     'uglify']
-  grunt.registerTask 'watchserve', [
+  grunt.registerTask 'umlaut', [
     'connect', 'watch'
   ]

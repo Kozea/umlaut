@@ -190,12 +190,14 @@ class Polygon extends Element
   _x: (a) ->
     o = pi / @n
     w2 = @width() / 2
-    r = w2 * (Math.cos(o) / (Math.cos((a + @shift) % (2 * o) - o) )) * Math.cos(a - pi / 2)
+    r = w2 * (Math.cos(o) / (Math.cos(
+      (a + @shift) % (2 * o) - o) )) * Math.cos(a - pi / 2)
 
   _y: (a) ->
     o = pi / @n
     h2 = @height() / 2
-    r = h2 * (Math.cos(o) / (Math.cos((a + @shift) % (2 * o) - o) )) * Math.sin(a - pi / 2)
+    r = h2 * (Math.cos(o) / (Math.cos(
+      (a + @shift) % (2 * o) - o) )) * Math.sin(a - pi / 2)
 
   constructor: ->
     super
@@ -227,7 +229,9 @@ class Polygon extends Element
     angle = 2 * pi / @n
     path = ''
     for i in [0..@n]
-      path = "#{path} #{if i == 0 then 'M' else 'L'}  #{w2 * Math.sin(i * angle + @shift)} #{-h2 * Math.cos(i * angle + @shift)}"
+      path = "#{path} #{if i == 0 then 'M' else 'L'}
+        #{w2 * Math.sin(i * angle + @shift)}
+        #{-h2 * Math.cos(i * angle + @shift)}"
     "#{path} z"
 
 class Triangle extends Polygon
@@ -268,7 +272,10 @@ class Star extends Pentagon
 
     path = "M 0 #{-h2}"
     for i in [0..@n]
-      path = "#{path} L #{w2 * Math.sin(i * angle)} #{-h2 * Math.cos(i * angle)} L #{lw2 * Math.sin((i + .5) * angle)} #{-lh2 * Math.cos((i + .5) * angle)}"
+      path = "#{path}
+        L #{w2 * Math.sin(i * angle)} #{-h2 * Math.cos(i * angle)}
+        L #{lw2 * Math.sin((i + .5) * angle)}
+          #{-lh2 * Math.cos((i + .5) * angle)}"
     "#{path} z"
 
 

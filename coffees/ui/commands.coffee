@@ -18,7 +18,7 @@
 
 order = (a, b) -> d3.ascending(a.ts, b.ts)
 
-node_add = (type, x, y) =>
+node_add = (type, x, y) ->
   cls = diagram.types.elements[type]
   diagram.last_types.element = cls
 
@@ -156,12 +156,17 @@ commands =
 
   export_to_textile:
     fun: (e) ->
-      edit((-> "!data:image/svg+xml;base64,#{btoa(diagram.to_svg())}!:http://kozea.github.io/umlaut/#{location.hash}"), (-> null))
+      edit((-> "!data:image/svg+xml;base64,#{btoa(diagram.to_svg())}!:\
+        http://kozea.github.io/umlaut/#{location.hash}"), (-> null))
     hotkey: 'ctrl+b'
 
   export_to_markdown:
     fun: (e) ->
-      edit((-> "[![#{diagram.title}][#{diagram.title} - base64]][#{diagram.title} - umlaut_url]\n\n[#{diagram.title} - base64]: data:image/svg+xml;base64,#{btoa(diagram.to_svg())}\n[#{diagram.title} - umlaut_url]: http://kozea.github.io/umlaut/#{location.hash}"), (-> null))
+      edit((-> "[![#{diagram.title}][#{diagram.title} - base64]]\
+        [#{diagram.title} - umlaut_url]\n\n[#{diagram.title} - base64]:
+        data:image/svg+xml;base64,#{btoa(diagram.to_svg())}\n\
+        [#{diagram.title} - umlaut_url]:
+        http://kozea.github.io/umlaut/#{location.hash}"), (-> null))
       e.preventDefault()
     hotkey: 'ctrl+m ctrl+d'
 
@@ -212,7 +217,8 @@ commands =
 
   linkstyle:
     fun: ->
-      diagram.linkstyle = new LinkStyles[next(LinkStyles, diagram.linkstyle.cls.name)]()
+      diagram.linkstyle = new LinkStyles[next(
+        LinkStyles, diagram.linkstyle.cls.name)]()
       svg.tick()
     label: 'Change link style'
     glyph: 'retweet'
@@ -302,7 +308,7 @@ commands =
 
 
 $ ->
-   for name, command of commands
+  for name, command of commands
     if command.glyph
       button = d3.select('.btns')
         .append('button')
@@ -327,12 +333,13 @@ $ ->
 init_commands = ->
   for conf, val of diagram.force_conf
     for way, inc of {increase: 1.1, decrease: 0.9}
-      Mousetrap.bind "f #{conf[0]} #{if way == 'increase' then '+' else '-'}", ((c, i) ->
-        wrap((e) ->
-          if diagram.force
-            diagram.force_conf[c] *= i
-            diagram.force.stop()
-          diagram.start_force()))(conf, inc)
+      Mousetrap.bind "f #{conf[0]} #{if way == 'increase' then '+' else '-'}", (
+        (c, i) ->
+          wrap((e) ->
+            if diagram.force
+              diagram.force_conf[c] *= i
+              diagram.force.stop()
+            diagram.start_force()))(conf, inc)
 
   taken_hotkeys = []
   $('aside .icons .specific').each(-> Mousetrap.unbind $(@).attr('data-hotkey'))

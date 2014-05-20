@@ -40,8 +40,7 @@ class Svg extends Base
           diagram.zoom.translate = d3.event.translate
           diagram.zoom.scale = d3.event.scale
           svg.sync_transform()
-      ).on("zoomend", ->
-        svg.sync(true))
+      ).on("zoomend", -> svg.sync(true))
 
     d3.select(".inside")
       .selectAll('svg')
@@ -56,8 +55,12 @@ class Svg extends Base
     @svg = d3.select('#diagram').call(svg_selection_drag)
 
   sync_transform: ->
-    d3.select('.root').attr("transform", "translate(" + diagram.zoom.translate + ")scale(" + diagram.zoom.scale + ")")
-    d3.select('#grid').attr("patternTransform", "translate(" + diagram.zoom.translate + ")scale(" + diagram.zoom.scale + ")")
+    d3.select('.root')
+      .attr("transform",
+       "translate(#{diagram.zoom.translate})scale(#{diagram.zoom.scale})")
+    d3.select('#grid')
+    .attr("patternTransform",
+     "translate(#{diagram.zoom.translate})scale(#{diagram.zoom.scale})")
 
   create: (svg) =>
     defs = svg
@@ -131,8 +134,10 @@ class Svg extends Base
     markers.call(update_marker)
     markers.exit().remove()
 
-    element = @svg.select('g.elements').selectAll('g.element').data(diagram.elements.sort(order))
-    link = @svg.select('g.links').selectAll('g.link').data(diagram.links.concat(diagram.linking))
+    element = @svg.select('g.elements').selectAll('g.element')
+      .data(diagram.elements.sort(order))
+    link = @svg.select('g.links').selectAll('g.link')
+      .data(diagram.links.concat(diagram.linking))
 
     element.enter().call(enter_node)
     link.enter().call(enter_link)

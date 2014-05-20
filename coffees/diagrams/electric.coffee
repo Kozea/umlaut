@@ -96,7 +96,8 @@ class E.Resistor extends Electric
     path = "M #{-w2} 0
         L #{-lw2} 0"
     for w in [-3..2]
-      path = "#{path} L #{lw2 * w / 3 + lw2 / 6} #{h2 * if w % 2 then -1 else 1}"
+      path = "#{path}
+        L #{lw2 * w / 3 + lw2 / 6} #{h2 * if w % 2 then -1 else 1}"
     "#{path}
      L #{lw2} 0
      L #{w2} 0"

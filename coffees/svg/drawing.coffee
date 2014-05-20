@@ -21,7 +21,8 @@ enter_node = (nodes, connect=true) ->
     .append('g')
     .attr('class', 'element')
   g.append('path').attr('class', 'ghost')
-  g.append('path').attr('class', (node) -> "shape fill-#{node.cls.fill} stroke-#{node.cls.stroke}")
+  g.append('path').attr('class', (node) ->
+    "shape fill-#{node.cls.fill} stroke-#{node.cls.stroke}")
   g.append('text')
   if not connect
     return
@@ -34,7 +35,7 @@ enter_node = (nodes, connect=true) ->
       .data(node.handle_list())
       .enter()
         .append('path')
-        .attr('class', (handle) -> "handle #{handle}")
+        .attr('class', (handle) -> "handle #{handle.toLowerCase()}")
         .call(nsweo_resize_drag))
 
   g.append('g')
@@ -69,7 +70,8 @@ update_node = (nodes) ->
     .select('text')
     .each((node) ->
       txt = d3.select @
-      current_text = txt.selectAll('tspan')[0].map((e) -> d3.select(e).text()).join('\n')
+      current_text = txt.selectAll('tspan')[0].map((e) ->
+        d3.select(e).text()).join('\n')
       return if node.text == current_text
       txt.call(write_text, node.text))
     .each((node) -> node.set_txt_bbox(@getBBox()))
@@ -79,10 +81,13 @@ update_node = (nodes) ->
       .attr('x', (node) -> node.txt_x())
 
   nodes.select('.shape')
-    .attr('class', (node) -> "shape fill-#{node.cls.fill} stroke-#{node.cls.stroke}")
+    .attr('class', (node) ->
+      "shape fill-#{node.cls.fill} stroke-#{node.cls.stroke}")
     .attr('style', node_style)
     .attr('d', (node) -> node.path())
-  nodes.select('.ghost').attr('d', (node) -> if node not instanceof Group then Rect::path.apply(node) else 'M 0 0')
+  nodes.select('.ghost')
+    .attr('d', (node) ->
+      if node not instanceof Group then Rect::path.apply(node) else 'M 0 0')
 
   nodes.call(update_handles)
   nodes.call(update_anchors)
@@ -100,8 +105,10 @@ enter_link = (links, connect=true) ->
   g
     .append("path")
     .attr('class', (link) -> "shape #{link.cls.type}")
-    .attr("marker-start", (link) -> "url(##{link.marker_start?.id or link.cls.marker_start.id})")
-    .attr("marker-end", (link) -> "url(##{link.marker_end?.id or link.cls.marker_end.id})")
+    .attr("marker-start", (link) ->
+      "url(##{link.marker_start?.id or link.cls.marker_start.id})")
+    .attr("marker-end", (link) ->
+      "url(##{link.marker_end?.id or link.cls.marker_end.id})")
 
   g
     .each((link) ->
@@ -129,8 +136,10 @@ update_link = (links) ->
   links
     .each((link) ->
       d3.select(@).selectAll('path').attr('d', link.path())
-        .attr("marker-start", "url(##{link.marker_start?.id or link.cls.marker_start.id})")
-        .attr("marker-end", "url(##{link.marker_end?.id or link.cls.marker_end.id})"))
+        .attr("marker-start",
+          "url(##{link.marker_start?.id or link.cls.marker_start.id})")
+        .attr("marker-end",
+          "url(##{link.marker_end?.id or link.cls.marker_end.id})"))
 
   links
     .each((link) ->
@@ -214,7 +223,8 @@ update_anchors = (nodes) ->
 
 tick_node = (nodes) ->
   nodes
-    .attr("transform", ((node) -> "translate(#{node.x},#{node.y})rotate(#{to_svg_angle(node._rotation)})"))
+    .attr("transform", ((node) ->
+      "translate(#{node.x},#{node.y})rotate(#{to_svg_angle(node._rotation)})"))
     .classed('selected', (node) -> node in diagram.selection)
 
 tick_link = (links) ->
@@ -253,7 +263,8 @@ enter_marker = (markers, open=false) ->
 update_marker = (markers) ->
   markers
     .attr('id', (m) -> m.id)
-    .attr('class', (m) -> "marker fill-#{if m.open then 'bg' else 'fg'} stroke-fg")
+    .attr('class', (m) ->
+      "marker fill-#{if m.open then 'bg' else 'fg'} stroke-fg")
     .attr('viewBox', (m) -> m.viewbox())
     .attr('markerUnits', 'userSpaceOnUse')
     .attr('markerWidth', (m) -> m.width())

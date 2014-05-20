@@ -24,11 +24,9 @@ svg_selection_drag = d3.behavior.drag()
         diagram.linking = []
         svg.sync()
       svg.tick()
-      return
-
-  ).on("drag.selection", ->
-    if not d3.event.sourceEvent.shiftKey
-      return
+      return)
+  .on("drag.selection", ->
+    return unless d3.event.sourceEvent.shiftKey
 
     sel = svg.svg.select('rect.selection')
     if sel.empty()
@@ -75,21 +73,35 @@ svg_selection_drag = d3.behavior.drag()
         # New element in selection
         diagram.selection.push(elt)
         for link in diagram.links
-          # Check if there's 2 linked element in selection, in this case the link should be in selection too
-          if (link.source is elt and link.target in diagram.selection and link not in diagram.selection) or (
-            link.target is elt and link.source in diagram.selection and link not in diagram.selection)
+          # Check if there's 2 linked element in selection,
+          # in this case the link should be in selection too
+          if (
+            link.source is elt and
+            link.target in diagram.selection and
+            link not in diagram.selection
+          ) or (
+            link.target is elt and
+            link.source in diagram.selection and
+            link not in diagram.selection)
             diagram.selection.push link
       else if not inside and selected
         # Element not in selection anymore
         diagram.selection.splice(diagram.selection.indexOf(elt), 1)
         for link in diagram.links
-          # Check if there's a selected link which is not in selected elements anymore
-          if (link.source is elt and link.target not in diagram.selection and link in diagram.selection) or (
-            link.target is elt and link.source not in diagram.selection and link in diagram.selection)
+          # Check if there's a selected link
+          # which is not in selected elements anymore
+          if (
+            link.source is elt and
+            link.target not in diagram.selection and
+            link in diagram.selection
+          ) or (
+            link.target is elt and
+            link.source not in diagram.selection and
+            link in diagram.selection)
             diagram.selection.splice(diagram.selection.indexOf(link), 1)
     )
-    svg.tick()
-  ).on("dragend.selection", ->
+    svg.tick())
+  .on("dragend.selection", ->
     sel = svg.svg.select("rect.selection")
     if not sel.empty()
       x = + sel.attr("x")
@@ -119,8 +131,8 @@ move_drag = d3.behavior.drag()
     svg.svg.selectAll('g.element').sort(order)
 
     svg.tick()
-    d3.event.sourceEvent.stopPropagation()
-  ).on("drag.move", (node) ->
+    d3.event.sourceEvent.stopPropagation())
+  .on("drag.move", (node) ->
     x = if diagram.force then 'px' else 'x'
     y = if diagram.force then 'py' else 'y'
 
@@ -146,8 +158,8 @@ move_drag = d3.behavior.drag()
     if diagram.force
       diagram.force.resume()
     else
-      svg.tick()
-  ).on('dragend.move', (node) ->
+      svg.tick())
+  .on('dragend.move', (node) ->
     svg.svg.classed('dragging', false)
     svg.svg.classed('translating', false)
     for node in diagram.elements
@@ -178,8 +190,8 @@ nsweo_resize_drag = d3.behavior.drag()
     node.owidth = node.width()
     node.oheight = node.height()
     node.fixed = true
-    d3.event.sourceEvent.stopPropagation()
-  ).on("drag.resize", (handle) ->
+    d3.event.sourceEvent.stopPropagation())
+  .on("drag.resize", (handle) ->
     nodes = d3.select($(@).closest('.element').get(0))
     node = nodes.data()[0]
     m = mouse_xy svg.svg.node()
@@ -191,7 +203,8 @@ nsweo_resize_drag = d3.behavior.drag()
       angle = atan2(delta.y, delta.x) + pi / 2  # Mouse is above
 
       if not d3.event.sourceEvent.shiftKey
-        angle = to_rad(diagram.snap.a * Math.floor(to_deg(angle) / diagram.snap.a))
+        angle = to_rad(diagram.snap.a * Math.floor(
+          to_deg(angle) / diagram.snap.a))
 
       node._rotation = angle
     else
@@ -213,8 +226,8 @@ nsweo_resize_drag = d3.behavior.drag()
       node[y] = node.oy + shift.y
 
       nodes.call(update_node)
-    svg.tick()
-  ).on("dragend.resize", (handle) ->
+    svg.tick())
+  .on("dragend.resize", (handle) ->
     svg.svg.classed('dragging', false)
     svg.svg.classed('resizing', false)
     node = d3.select($(@).closest('.element').get(0)).data()[0]
@@ -227,8 +240,8 @@ anchor_link_drag = d3.behavior.drag()
   .on("dragstart.link", (anchor) ->
     svg.svg.classed('dragging', true)
     svg.svg.classed('linking', true)
-    d3.event.sourceEvent.stopPropagation()
-  ).on("drag.link", (anchor) ->
+    d3.event.sourceEvent.stopPropagation())
+  .on("drag.link", (anchor) ->
     if not diagram.linking.length
       node = d3.select($(@).closest('.element').get(0)).data()[0]
       type = diagram.last_types.link
@@ -240,7 +253,8 @@ anchor_link_drag = d3.behavior.drag()
     link = diagram.linking[0]
     evt = d3.event.sourceEvent
     if evt.type == 'touchmove'
-      target = document.elementFromPoint(evt.targetTouches[0].clientX, evt.targetTouches[0].clientY)
+      target = document.elementFromPoint(
+        evt.targetTouches[0].clientX, evt.targetTouches[0].clientY)
     else
       target = evt.target
 
@@ -260,8 +274,8 @@ anchor_link_drag = d3.behavior.drag()
         link.target = new Mouse(0, 0, '')
       link.target.x = link.source.x + d3.event.x
       link.target.y = link.source.y + d3.event.y
-    svg.tick()
-  ).on("dragend.link", (anchor) ->
+    svg.tick())
+  .on("dragend.link", (anchor) ->
     svg.svg.classed('dragging', false)
     svg.svg.classed('linking', false)
     if diagram.linking.length
@@ -275,7 +289,8 @@ anchor_link_drag = d3.behavior.drag()
 
 mouse_node = (nodes) ->
   nodes.call(edit_it, (node) ->
-    edit((-> [node.text, node.attrs?.color, node.attrs?.fillcolor]), ((txt) -> node.text = txt)))
+    edit((-> [node.text, node.attrs?.color, node.attrs?.fillcolor]),
+     ((txt) -> node.text = txt)))
 
 
 mouse_link = (link) ->
@@ -283,9 +298,11 @@ mouse_link = (link) ->
     .call(edit_it, (lnk) ->
       nearest = lnk.nearest mouse_xy(svg.svg.node())
       if nearest is lnk.source
-        edit((-> [lnk.text.source, null, null]), ((txt) -> lnk.text.source = txt))
+        edit((-> [lnk.text.source, null, null]),
+          ((txt) -> lnk.text.source = txt))
       else
-        edit((-> [lnk.text.target, null, null]), ((txt) -> lnk.text.target = txt)))
+        edit((-> [lnk.text.target, null, null]),
+          ((txt) -> lnk.text.target = txt)))
 
 link_drag = d3.behavior.drag()
   .on("dragstart.link", (link) ->
@@ -295,8 +312,8 @@ link_drag = d3.behavior.drag()
     svg.tick()
     svg.svg.classed('dragging', true)
     svg.svg.classed('linking', true)
-    d3.event.sourceEvent.stopPropagation()
-  ).on("drag.link", (link) ->
+    d3.event.sourceEvent.stopPropagation())
+  .on("drag.link", (link) ->
     if not diagram.linking.length
       diagram.links.splice(diagram.links.indexOf(link), 1)
       mouse = new Mouse(d3.event.x, d3.event.y, '')
@@ -312,7 +329,9 @@ link_drag = d3.behavior.drag()
 
     evt = d3.event.sourceEvent
     if evt.type == 'touchmove'
-      target = document.elementFromPoint(evt.targetTouches[0].clientX, evt.targetTouches[0].clientY)
+      target = document.elementFromPoint(
+        evt.targetTouches[0].clientX,
+        evt.targetTouches[0].clientY)
     else
       target = evt.target
 
@@ -333,8 +352,8 @@ link_drag = d3.behavior.drag()
         link.target = new Mouse(0, 0, '')
       link.target.x = d3.event.x
       link.target.y = d3.event.y
-    svg.tick()
-  ).on("dragend.link", (anchor) ->
+    svg.tick())
+  .on("dragend.link", (anchor) ->
     svg.svg.classed('dragging', false)
     svg.svg.classed('linking', false)
     if diagram.linking.length
@@ -360,13 +379,17 @@ extern_drag = d3.behavior.drag()
     $('body').append(
       floating.$elt
         .css(position: 'fixed'))
-    d3.event.sourceEvent.stopPropagation()
-  ).on("drag.extern", ->
-    floating.$elt.css(top: floating.offset.top + d3.event.y, left: floating.offset.left + d3.event.x)
-  ).on('dragend.extern', ->
+    d3.event.sourceEvent.stopPropagation())
+  .on("drag.extern", ->
+    floating.$elt.css
+      top: floating.offset.top + d3.event.y
+      left: floating.offset.left + d3.event.x)
+  .on('dragend.extern', ->
     return if not floating
-    x = floating.$elt.offset().left - $('#diagram').offset().left + floating.$elt.outerWidth() / 2
-    y = floating.$elt.offset().top - $('#diagram').offset().top + floating.$elt.outerHeight() / 2
+    x = floating.$elt.offset().left -
+      $('#diagram').offset().left + floating.$elt.outerWidth() / 2
+    y = floating.$elt.offset().top -
+      $('#diagram').offset().top + floating.$elt.outerHeight() / 2
     x = (x - diagram.zoom.translate[0]) /  diagram.zoom.scale
     y = (y - diagram.zoom.translate[1]) /  diagram.zoom.scale
     x = diagram.snap.x * Math.floor(x / diagram.snap.x)
@@ -374,9 +397,7 @@ extern_drag = d3.behavior.drag()
     type = floating.$elt.attr('data-type')
     node_add(type, x, y)
     floating.$elt.remove()
-    floating = null
-  )
-
+    floating = null)
 
 edit_it = (node, fun) ->
   node

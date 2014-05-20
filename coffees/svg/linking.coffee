@@ -12,15 +12,15 @@ class LinkStyles.Rectangular extends LinkStyle
     horizontal_2 = Math.abs(o2 % pi) < pi / 4
     path = "M #{a1.x} #{a1.y} L"
     if not horizontal_1 and horizontal_2
-         path = "#{path} #{a1.x} #{a2.y}"
-       else if horizontal_1 and not horizontal_2
-         path = "#{path} #{a2.x} #{a1.y}"
-       else if horizontal_1 and horizontal_2
-         mid = a1.x + .5 * (a2.x - a1.x)
-         path = "#{path} #{mid} #{a1.y} L #{mid} #{a2.y}"
-       else if not horizontal_1 and not horizontal_2
-         mid = a1.y + .5 * (a2.y - a1.y)
-         path = "#{path} #{a1.x} #{mid} L #{a2.x} #{mid}"
+      path = "#{path} #{a1.x} #{a2.y}"
+    else if horizontal_1 and not horizontal_2
+      path = "#{path} #{a2.x} #{a1.y}"
+    else if horizontal_1 and horizontal_2
+      mid = a1.x + .5 * (a2.x - a1.x)
+      path = "#{path} #{mid} #{a1.y} L #{mid} #{a2.y}"
+    else if not horizontal_1 and not horizontal_2
+      mid = a1.y + .5 * (a2.y - a1.y)
+      path = "#{path} #{a1.x} #{mid} L #{a2.x} #{mid}"
     "#{path} L #{a2.x} #{a2.y}"
 
 class LinkStyles.Arc extends LinkStyle

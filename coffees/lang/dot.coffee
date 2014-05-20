@@ -29,6 +29,10 @@ RE_ALPHADIGIT = /[a-zA-Z0-9_\u00C0-\u017F]/
 RE_COMMENT = /\/|\#/
 PANIC_THRESHOLD = 9999
 
+class ParserError
+  constructor: (@message) ->
+
+
 class Token
   constructor: (@value) ->
 
@@ -147,7 +151,7 @@ dot_tokenize = (s) ->
             col++
             pos++
     else
-      throw "[Dot Tokenizer] Syntax error in dot #{chr} at #{row}, #{col}"
+      throw new ParserError "Syntax error in dot #{chr} at #{row}, #{col}"
 
     if token
       tokens.push(token)
@@ -188,7 +192,7 @@ dot_lex = (tokens) ->
   pos = 0
   level = 0
   if tokens[pos] not instanceof Keyword
-    throw 'First token is not a keyword'
+    throw new ParserError 'First token is not a keyword'
 
   strict = false
   if tokens[pos].value == 'strict'
@@ -201,7 +205,7 @@ dot_lex = (tokens) ->
   else if tokens[pos].value == 'digraph'
     type = 'directed'
   if type == null
-    throw 'Unknown graph type'
+    throw new ParserError 'Unknown graph type'
 
   id = null
   if tokens[++pos] instanceof Id
@@ -215,20 +219,22 @@ dot_lex = (tokens) ->
       else
         return null
     if tokens[pos] not instanceof Id
-      throw "Invalid left hand side of attribute '#{tokens[pos].value}'"
+      throw new ParserError(
+        "Invalid left hand side of attribute '#{tokens[pos].value}'")
     left = tokens[pos].value
     pos++
     if tokens[pos] not instanceof Assign
-      throw "Invalid assignement '#{tokens[pos].value}'"
+      throw new ParserError "Invalid assignement '#{tokens[pos].value}'"
     pos++
     if tokens[pos] not instanceof Id
-      throw "Invalid right hand side of attribute '#{tokens[pos].value}'"
+      throw new ParserError(
+        "Invalid right hand side of attribute '#{tokens[pos].value}'")
     right = tokens[pos].value
     new Attribute(left, right)
 
   parse_attribute_list = ->
     if not (tokens[pos] instanceof Brace and tokens[pos].value == '[')
-      throw 'No opening brace "[" for attribute list'
+      throw new ParserError 'No opening brace "[" for attribute list'
     pos++
     attributes = []
     panic = 0
@@ -242,7 +248,7 @@ dot_lex = (tokens) ->
         if tokens[pos] instanceof Delimiter and tokens[pos].value == ','
           pos++
     if --panic == PANIC_THRESHOLD
-      throw 'Infinite loop for statement list parsing'
+      throw new ParserError 'Infinite loop for statement list parsing'
     attributes
 
   parse_subgraph = ->
@@ -263,19 +269,20 @@ dot_lex = (tokens) ->
       node = parse_subgraph()
     else
       if tokens[pos] not instanceof Id
-        throw "Invalid edge id '#{tokens[pos].value}'"
+        throw new ParserError "Invalid edge id '#{tokens[pos].value}'"
       id = tokens[pos].value
       port = null
       compass_pt = null
       if tokens[pos+1] instanceof Delimiter and tokens[pos+1].value == ':'
         pos+=2
         if tokens[pos] not instanceof Id
-          throw "Invalid port id '#{tokens[pos].value}'"
+          throw new ParserError "Invalid port id '#{tokens[pos].value}'"
         port = tokens[pos].value
         if tokens[pos+1] instanceof Delimiter and tokens[pos+1].value == ':'
           pos+=2
-          if tokens[pos] not instanceof Id or tokens[pos].value not in COMPASS_PTS
-            throw "Invalid compass point '#{tokens[pos].value}'"
+          if tokens[pos] not instanceof Id or
+             tokens[pos].value not in COMPASS_PTS
+            throw new ParserError "Invalid compass point '#{tokens[pos].value}'"
           compass_pt = tokens[pos].value
         if port and not compass_pt and port in COMPASS_PTS
           compass_pt = port
@@ -296,19 +303,22 @@ dot_lex = (tokens) ->
 
     if tokens[pos] instanceof Keyword and tokens[pos].value != 'subgraph'
       if tokens[pos].value not in ['graph', 'node', 'edge']
-        throw 'Unexpected keyword ' + tokens[pos]
+        throw new ParserError 'Unexpected keyword ' + tokens[pos]
       statement = new Attributes(tokens[pos++].value)
       statement.attributes = parse_attribute_list()
       return statement
 
-    if not (tokens[pos] instanceof Id or (tokens[pos] instanceof Keyword and tokens[pos].value == 'subgraph') or (tokens[pos] instanceof Brace and tokens[pos].value == '{'))
-      throw "Unexpected statement '#{tokens[pos].value}'"
+    if not (tokens[pos] instanceof Id or
+       (tokens[pos] instanceof Keyword and tokens[pos].value == 'subgraph') or
+       (tokens[pos] instanceof Brace and tokens[pos].value == '{'))
+      throw new ParserError "Unexpected statement '#{tokens[pos].value}'"
 
     if tokens[pos] instanceof Id and tokens[pos+1] instanceof Assign
       left = tokens[pos].value
       pos+=2
       if tokens[pos] not instanceof Id
-        throw "Invalid right hand side of attribute '#{tokens[pos].value}'"
+        throw new ParserError(
+          "Invalid right hand side of attribute '#{tokens[pos].value}'")
       statement = new Attribute(left, tokens[pos].value)
       return statement
 
@@ -324,7 +334,7 @@ dot_lex = (tokens) ->
   # Populate graph statements list
   parse_statement_list = ->
     if not (tokens[pos] instanceof Brace and tokens[pos].value == '{')
-      throw 'No opening brace "{" for statement list'
+      throw ParserError 'No opening brace "{" for statement list'
     pos++
 
     statements = []
@@ -339,13 +349,14 @@ dot_lex = (tokens) ->
         if tokens[pos] instanceof Delimiter and tokens[pos].value == ';'
           pos++
     if --panic == PANIC_THRESHOLD
-      throw 'Infinite loop for statement list parsing'
+      throw ParserError 'Infinite loop for statement list parsing'
     statements
 
   graph = new Graph(type, id, strict)
   graph.statements = parse_statement_list()
   if pos + 1 != tokens.length
-    throw "Error in dot file, parsed #{pos} elements out of #{tokens.length}"
+    throw ParserError(
+      "Error in dot file, parsed #{pos} elements out of #{tokens.length}")
 
   window.g = graph
 
@@ -400,7 +411,8 @@ dot = (src) ->
           if node.id not of nodes_by_id or statements.length == 1
             label = current_attributes.node.label or node.id
             type = current_attributes.node.shape or 'ellipse'
-            Type = d.types.elements[capitalize(type)] or d.types.elements.Ellipse
+            Type = d.types.elements[capitalize(type)] or
+              d.types.elements.Ellipse
             nodes_by_id[node.id] =
               label: label
               type: Type

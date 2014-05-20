@@ -48,7 +48,8 @@ class Diagrams.Dot extends Diagram
         attrs.push "height=#{element.height() / element.txt_height()}"
 
       if not diagram.force
-        attrs.push "pos=\"#{element.x.toFixed()},#{element.y.toFixed()}#{if element.fixed then '!' else ''}\""
+        attrs.push "pos=\"#{element.x.toFixed()},
+          #{element.y.toFixed()}#{if element.fixed then '!' else ''}\""
 
       for key, val of element.attrs
         if key not in ['shape', 'label']

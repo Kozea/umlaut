@@ -30,8 +30,13 @@ list_local = ->
       $('<td>').text(title),
       $('<td>').text((new (Diagrams._get(type))()).label),
       $('<td>')
-        .append($('<a>').attr('href', "##{b64_diagram}").append($('<i>', class: 'glyphicon glyphicon-folder-open')))
-        .append($('<a>').attr('href', "#").append($('<i>', class: 'glyphicon glyphicon-trash')).on('click', ((k) -> ->
+        .append($('<a>')
+          .attr('href', "##{b64_diagram}")
+          .append($('<i>', class: 'glyphicon glyphicon-folder-open')))
+        .append($('<a>')
+          .attr('href', "#")
+          .append($('<i>', class: 'glyphicon glyphicon-trash'))
+        .on('click', ((k) -> ->
           localStorage.removeItem k
           $(@).closest('tr').remove()
           false)(key))))
@@ -49,8 +54,10 @@ list_new = ->
     $tbody.append($tr = $('<tr>'))
     $tr.append(
       $('<td>').text(diagram.label),
-      $('<td>').append($('<a>').attr('href', "##{b64_diagram}").append($('<i>', class: 'glyphicon glyphicon-file'))))
-
+      $('<td>')
+        .append($('<a>')
+          .attr('href', "##{b64_diagram}")
+          .append($('<i>', class: 'glyphicon glyphicon-file'))))
 
 list_diagrams = ->
   list_local()

@@ -53,7 +53,7 @@ edit = (getter, setter, color=true) ->
     .on('click', close)
     .on('touchstart', close)
 
-$ =>
+$ ->
   $('.color-box').colpick
     layout: 'hex'
     submit: 0

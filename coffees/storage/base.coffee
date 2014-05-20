@@ -16,13 +16,13 @@
 # along with this program.  If not, see http://www.gnu.org/licenses/.
 
 
-load = (data) =>
+load = (data) ->
   Type = Diagrams._get(data.name)
   window.diagram = new Type()
   window.svg = new Svg()
   diagram.loads data
 
-save = =>
+save = ->
   localStorage.setItem("#{diagram.cls.name}|#{diagram.title}", diagram.hash())
 
 generate_url = ->

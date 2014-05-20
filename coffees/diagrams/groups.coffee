@@ -25,7 +25,8 @@ class Group extends Element
 
   txt_y: ->
     lines = @text.split('\n').length
-    @margin.y - @height() / 2 + @_txt_bbox.height - (@_txt_bbox.height * (lines - 1) / lines)
+    @margin.y - @height() / 2 + @_txt_bbox.height - (
+      @_txt_bbox.height * (lines - 1) / lines)
 
   path: ->
     w2 = @width() / 2
