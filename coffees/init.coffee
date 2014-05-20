@@ -17,14 +17,14 @@
 
 
 $ =>
-    if location.pathname.match /\/test\//
-        return
-    list_diagrams()
+  if location.pathname.match /\/test\//
+    return
+  list_diagrams()
 
-    $('.dot2umlaut').click(->
-        location.hash = dot($(@).siblings('textarea.dot').val()))
+  $('.dot2umlaut').click(->
+    location.hash = dot($(@).siblings('textarea.dot').val()))
 
-    @addEventListener("popstate", history_pop)
-    # ff hack
-    if location.hash
-        history_pop()
+  @addEventListener("popstate", history_pop)
+  # ff hack
+  if location.hash
+    history_pop()

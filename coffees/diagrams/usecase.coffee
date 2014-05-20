@@ -16,55 +16,55 @@
 # along with this program.  If not, see http://www.gnu.org/licenses/.
 
 class Diagrams.UseCase extends Diagram
-    label: 'UML Use Case Diagram'
-    types: @init_types()
+  label: 'UML Use Case Diagram'
+  types: @init_types()
 
-    constructor: ->
-        super
-        @linkstyle = new LinkStyles.Diagonal()
+  constructor: ->
+    super
+    @linkstyle = new LinkStyles.Diagonal()
 
 
 class Diagrams.UseCase::types.elements.Case extends Ellipsis
 
 class Diagrams.UseCase::types.elements.Actor extends Element
-    constructor: ->
-        super
+  constructor: ->
+    super
 
-        @anchors[cardinal.E] = =>
-            x: @x + (@width() - @super('txt_width')) / 2
-            y: @y
+    @anchors[cardinal.E] = =>
+      x: @x + (@width() - @super('txt_width')) / 2
+      y: @y
 
-        @anchors[cardinal.W] = =>
-            x: @x - (@width() - @super('txt_width')) / 2
-            y: @y
+    @anchors[cardinal.W] = =>
+      x: @x - (@width() - @super('txt_width')) / 2
+      y: @y
 
-    txt_y: ->
-        @height() / 2 - @super('txt_height') + 2 + 4 * @margin.y
+  txt_y: ->
+    @height() / 2 - @super('txt_height') + 2 + 4 * @margin.y
 
-    txt_height: ->
-        super() + 50
+  txt_height: ->
+    super() + 50
 
-    txt_width: ->
-        super() + 25
+  txt_width: ->
+    super() + 25
 
-    path: ->
-        wstick = (@width() - @super('txt_width')) / 2
-        hstick = (@height() - @super('txt_height')) / 4
-        bottom = @txt_y() - 4 * @margin.y
+  path: ->
+    wstick = (@width() - @super('txt_width')) / 2
+    hstick = (@height() - @super('txt_height')) / 4
+    bottom = @txt_y() - 4 * @margin.y
 
-        "M #{-wstick} #{bottom}
-         L 0 #{bottom - hstick}
-         M #{wstick} #{bottom}
-         L 0 #{bottom - hstick}
-         M 0 #{bottom - hstick}
-         L 0 #{bottom - 2 * hstick}
-         M #{-wstick} #{bottom - 1.75 * hstick}
-         L #{wstick} #{bottom - 2.25 * hstick}
-         M 0 #{bottom - 2 * hstick}
-         L 0 #{bottom - 3 * hstick}
-         A #{.5 * wstick} #{.5 * hstick} 0 1 1 0 #{bottom - 4 * hstick}
-         A #{.5 * wstick} #{.5 * hstick} 0 1 1 0 #{bottom - 3 * hstick}
-         "
+    "M #{-wstick} #{bottom}
+     L 0 #{bottom - hstick}
+     M #{wstick} #{bottom}
+     L 0 #{bottom - hstick}
+     M 0 #{bottom - hstick}
+     L 0 #{bottom - 2 * hstick}
+     M #{-wstick} #{bottom - 1.75 * hstick}
+     L #{wstick} #{bottom - 2.25 * hstick}
+     M 0 #{bottom - 2 * hstick}
+     L 0 #{bottom - 3 * hstick}
+     A #{.5 * wstick} #{.5 * hstick} 0 1 1 0 #{bottom - 4 * hstick}
+     A #{.5 * wstick} #{.5 * hstick} 0 1 1 0 #{bottom - 3 * hstick}
+     "
 
 
 class Diagrams.UseCase::types.elements.System extends Group

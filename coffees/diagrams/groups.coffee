@@ -17,31 +17,31 @@
 
 
 class Group extends Element
-    contains: (elt) ->
-        w2 = @width() / 2
-        h2 = @height() / 2
+  contains: (elt) ->
+    w2 = @width() / 2
+    h2 = @height() / 2
 
-        @x - w2 < elt.x < @x + w2 and @y - h2 < elt.y < @y + h2
+    @x - w2 < elt.x < @x + w2 and @y - h2 < elt.y < @y + h2
 
-    txt_y: ->
-        lines = @text.split('\n').length
-        @margin.y - @height() / 2 + @_txt_bbox.height - (@_txt_bbox.height * (lines - 1) / lines)
+  txt_y: ->
+    lines = @text.split('\n').length
+    @margin.y - @height() / 2 + @_txt_bbox.height - (@_txt_bbox.height * (lines - 1) / lines)
 
-    path: ->
-        w2 = @width() / 2
-        h2 = @height() / 2
-        h2l = -h2 + @txt_height() + @margin.y
-        "M #{-w2} #{-h2}
-         L #{w2} #{-h2}
-         L #{w2} #{h2l}
-         L #{-w2} #{h2l}
-         z
-         M #{w2} #{h2l}
-         L #{w2} #{h2}
+  path: ->
+    w2 = @width() / 2
+    h2 = @height() / 2
+    h2l = -h2 + @txt_height() + @margin.y
+    "M #{-w2} #{-h2}
+     L #{w2} #{-h2}
+     L #{w2} #{h2l}
+     L #{-w2} #{h2l}
+     z
+     M #{w2} #{h2l}
+     L #{w2} #{h2}
 
-         M #{-w2} #{h2l}
-         L #{-w2} #{h2}
+     M #{-w2} #{h2l}
+     L #{-w2} #{h2}
 
-         M #{-w2} #{h2}
-         L #{w2} #{h2}
-        "
+     M #{-w2} #{h2}
+     L #{w2} #{h2}
+    "

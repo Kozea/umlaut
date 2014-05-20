@@ -18,40 +18,40 @@
 
 
 list_local = ->
-    $tbody = $('.table.local tbody')
-    $tbody.find('tr').remove()
-    $('.local').show()
-    for key, b64_diagram of localStorage
-        [type, title] = key.split('|')
-        if not title?
-            continue
-        $tbody.append($tr = $('<tr>'))
-        $tr.append(
-            $('<td>').text(title),
-            $('<td>').text((new (Diagrams._get(type))()).label),
-            $('<td>')
-                .append($('<a>').attr('href', "##{b64_diagram}").append($('<i>', class: 'glyphicon glyphicon-folder-open')))
-                .append($('<a>').attr('href', "#").append($('<i>', class: 'glyphicon glyphicon-trash')).on('click', ((k) -> ->
-                    localStorage.removeItem k
-                    $(@).closest('tr').remove()
-                    false)(key))))
-    if not $tbody.find('tr').size()
-        $('.local').hide()
+  $tbody = $('.table.local tbody')
+  $tbody.find('tr').remove()
+  $('.local').show()
+  for key, b64_diagram of localStorage
+    [type, title] = key.split('|')
+    if not title?
+      continue
+    $tbody.append($tr = $('<tr>'))
+    $tr.append(
+      $('<td>').text(title),
+      $('<td>').text((new (Diagrams._get(type))()).label),
+      $('<td>')
+        .append($('<a>').attr('href', "##{b64_diagram}").append($('<i>', class: 'glyphicon glyphicon-folder-open')))
+        .append($('<a>').attr('href', "#").append($('<i>', class: 'glyphicon glyphicon-trash')).on('click', ((k) -> ->
+          localStorage.removeItem k
+          $(@).closest('tr').remove()
+          false)(key))))
+  if not $tbody.find('tr').size()
+    $('.local').hide()
 
 list_new = ->
-    $tbody = $('.table.new tbody')
-    $tbody.find('tr').remove()
-    for name, type of Diagrams
-        if name.match(/^_/)
-            continue
-        diagram = new type()
-        b64_diagram = diagram.hash()
-        $tbody.append($tr = $('<tr>'))
-        $tr.append(
-            $('<td>').text(diagram.label),
-            $('<td>').append($('<a>').attr('href', "##{b64_diagram}").append($('<i>', class: 'glyphicon glyphicon-file'))))
+  $tbody = $('.table.new tbody')
+  $tbody.find('tr').remove()
+  for name, type of Diagrams
+    if name.match(/^_/)
+      continue
+    diagram = new type()
+    b64_diagram = diagram.hash()
+    $tbody.append($tr = $('<tr>'))
+    $tr.append(
+      $('<td>').text(diagram.label),
+      $('<td>').append($('<a>').attr('href', "##{b64_diagram}").append($('<i>', class: 'glyphicon glyphicon-file'))))
 
 
 list_diagrams = ->
-    list_local()
-    list_new()
+  list_local()
+  list_new()

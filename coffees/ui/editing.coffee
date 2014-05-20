@@ -17,55 +17,55 @@
 
 
 edit = (getter, setter, color=true) ->
-    $overlay = $('#overlay').addClass('visible')
-    $textarea = $overlay.find('textarea')
+  $overlay = $('#overlay').addClass('visible')
+  $textarea = $overlay.find('textarea')
 
-    $textarea
-        .on('input', ->
-            setter((val or ' ' for val in @value.split('\n')).join('\n'))
-            svg.sync()
-        )
-        .on('keydown', (e) ->
-            if e.keyCode is 27
-                $overlay.click()
-        )
-    if color
-        $overlay.find('.with-color').show()
-        [text, fg, bg] = getter()
-        $('.color-box.fg').css 'background-color', fg or '#000000'
-        $('.color-box.bg').css 'background-color', bg or '#ffffff'
-    else
-        $overlay.find('.with-color').hide()
-        text = getter()
+  $textarea
+    .on('input', ->
+      setter((val or ' ' for val in @value.split('\n')).join('\n'))
+      svg.sync()
+    )
+    .on('keydown', (e) ->
+      if e.keyCode is 27
+        $overlay.click()
+    )
+  if color
+    $overlay.find('.with-color').show()
+    [text, fg, bg] = getter()
+    $('.color-box.fg').css 'background-color', fg or '#000000'
+    $('.color-box.bg').css 'background-color', bg or '#ffffff'
+  else
+    $overlay.find('.with-color').hide()
+    text = getter()
 
-    $textarea.val(text).select().focus()
+  $textarea.val(text).select().focus()
 
-    close = (e) ->
-        if e.target is @
-            $textarea.off('input')
-            $textarea.off('keydown')
-            $textarea.val('')
-            $overlay.removeClass('visible')
-            $('.color-box').colpickHide()
-            svg.sync(true)
+  close = (e) ->
+    if e.target is @
+      $textarea.off('input')
+      $textarea.off('keydown')
+      $textarea.val('')
+      $overlay.removeClass('visible')
+      $('.color-box').colpickHide()
+      svg.sync(true)
 
-    $overlay
-        .on('click', close)
-        .on('touchstart', close)
+  $overlay
+    .on('click', close)
+    .on('touchstart', close)
 
 $ =>
-    $('.color-box').colpick
-        layout: 'hex'
-        submit: 0
-        onChange: (hsb, hex, rgb, el) ->
-            $el = $ el
-            $el.css 'background-color', "##{hex}"
-            fg = $el.hasClass 'fg'
-            for node in diagram.selection
-                if not node.attrs
-                    node.attrs = {}
-                if fg
-                    node.attrs.color = '#' + hex
-                else
-                    node.attrs.fillcolor = '#' + hex
-            svg.sync()
+  $('.color-box').colpick
+    layout: 'hex'
+    submit: 0
+    onChange: (hsb, hex, rgb, el) ->
+      $el = $ el
+      $el.css 'background-color', "##{hex}"
+      fg = $el.hasClass 'fg'
+      for node in diagram.selection
+        if not node.attrs
+          node.attrs = {}
+        if fg
+          node.attrs.color = '#' + hex
+        else
+          node.attrs.fillcolor = '#' + hex
+      svg.sync()

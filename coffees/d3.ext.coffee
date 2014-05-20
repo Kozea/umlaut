@@ -17,12 +17,12 @@
 
 
 d3.selection::dblTap = (callback) ->
-    last = 0
-    @each ->
-        d3.select(this).on "touchstart", (e) ->
-            if (d3.event.timeStamp - last) < 500
-                rv = callback(e)
-                d3.event.preventDefault()
-                return rv
-            last = d3.event.timeStamp
+  last = 0
+  @each ->
+    d3.select(this).on "touchstart", (e) ->
+      if (d3.event.timeStamp - last) < 500
+        rv = callback(e)
+        d3.event.preventDefault()
+        return rv
+      last = d3.event.timeStamp
 
