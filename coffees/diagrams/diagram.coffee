@@ -155,6 +155,8 @@ class Diagram extends Base
       .attr('y', rect.height + 50)
       .attr('height', 39)
     content = svg_clone.html()
+    # There must be a better way
+    content = content.replace /&nbsp;/g, ' '
     # Some browser doesn't like innerHTML on <svg>
     if not content?
       content = $(svg_clone.node()).wrap('<div>').parent().html()
