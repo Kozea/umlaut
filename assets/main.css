@@ -10,7 +10,14 @@ body, html {
   height: 100%;
   margin: 0;
   padding: 0;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
   display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  -webkit-flex-direction: column;
+  -ms-flex-direction: column;
   flex-direction: column; }
   body > header h1, html > header h1 {
     font-size: 2em;
@@ -24,8 +31,18 @@ header h1 {
     font-size: 0; }
 
 body #editor {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
   display: flex;
+  -webkit-box-flex: 1;
+  -webkit-flex: 1;
+  -ms-flex: 1;
   flex: 1;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  -webkit-flex-direction: column;
+  -ms-flex-direction: column;
   flex-direction: column;
   margin: 1em;
   margin-right: 0; }
@@ -40,12 +57,24 @@ body #diagrams {
 body #main {
   -webkit-user-select: none;
   -moz-user-select: none;
+  -webkit-box-flex: 1;
+  -webkit-flex: 1;
+  -ms-flex: 1;
   flex: 1;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
   display: flex;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+  -webkit-flex-direction: row;
+  -ms-flex-direction: row;
   flex-direction: row; }
   body #main .waterlogo {
     background: url("../images/umlaut.svg") bottom center no-repeat;
+    max-width: -webkit-calc(30% - 100px);
     max-width: calc(30% - 100px);
+    -webkit-background-size: 100%;
     background-size: 100%;
     opacity: 0.6;
     position: absolute;
@@ -53,6 +82,7 @@ body #main {
     bottom: 10px;
     height: 131px;
     width: 333px;
+    -webkit-transition: 500ms;
     transition: 500ms; }
     body #main .waterlogo:hover {
       -webkit-filter: blur(5px); }
@@ -61,16 +91,30 @@ body #main {
     position: absolute;
     bottom: 24px;
     right: 124px;
+    max-width: -webkit-calc(75% - 100px);
     max-width: calc(75% - 100px); }
     body #main .btns .btn {
       margin: 0 3px 6px 3px; }
     body #main .btns .glyphicon {
       font-size: 20px; }
   body #main .outside {
+    -webkit-box-flex: 1;
+    -webkit-flex: 1;
+    -ms-flex: 1;
     flex: 1;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
     display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -webkit-flex-direction: column;
+    -ms-flex-direction: column;
     flex-direction: column; }
     body #main .outside .inside {
+      -webkit-box-flex: 1;
+      -webkit-flex: 1;
+      -ms-flex: 1;
       flex: 1; }
   body #main aside {
     padding: 0 0.5em 0 0;
@@ -83,7 +127,14 @@ body #main {
       font-size: 1.25em; }
     body #main aside .icons {
       overflow-y: auto;
+      display: -webkit-box;
+      display: -webkit-flex;
+      display: -ms-flexbox;
       display: flex;
+      -webkit-box-orient: vertical;
+      -webkit-box-direction: normal;
+      -webkit-flex-direction: column;
+      -ms-flex-direction: column;
       flex-direction: column; }
       body #main aside .icons .icon {
         margin: 0 0 6px;
@@ -93,12 +144,21 @@ body .colpick {
   z-index: 2000; }
 
 footer {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
   display: flex; }
   footer h4 {
+    -webkit-box-flex: 1;
+    -webkit-flex: 1;
+    -ms-flex: 1;
     flex: 1;
     margin: 0;
     padding: 0b; }
     footer h4:last-of-type {
+      -webkit-box-flex: 2;
+      -webkit-flex: 2;
+      -ms-flex: 2;
       flex: 2;
       text-align: right; }
 
@@ -142,6 +202,7 @@ footer {
     margin-bottom: 0.5em; }
 
 #diagram {
+  -webkit-box-shadow: 0 0 15px #aaa inset;
   box-shadow: 0 0 15px #aaa inset; }
 
 svg .fill-bg {
@@ -169,6 +230,7 @@ svg text {
   font-family: "sans";
   font-size: 14px; }
 svg .ghost {
+  -webkit-transition: stroke 500ms;
   transition: stroke 500ms; }
   svg .ghost:hover {
     stroke: rgba(0, 0, 255, 0.1); }
@@ -185,6 +247,7 @@ svg .group .ghost {
 svg .link:hover .shape, svg .element:hover .shape, svg .group:hover .shape {
   stroke-width: 2; }
 svg .shape {
+  -webkit-transition: stroke-width 500ms;
   transition: stroke-width 500ms; }
 svg .shape {
   stroke: #000;
@@ -206,6 +269,7 @@ svg .element, svg .group {
     fill: transparent;
     stroke: none; }
   svg .element .handle, svg .element .anchor, svg .group .handle, svg .group .anchor {
+    -webkit-transition: fill 500ms, stroke 500ms;
     transition: fill 500ms, stroke 500ms;
     fill: rgba(0, 0, 0, 0);
     stroke: rgba(0, 0, 0, 0); }
@@ -261,14 +325,30 @@ svg .selection {
   body > section#editor {
     margin: 1em; }
   body > section #main {
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -webkit-flex-direction: column;
+    -ms-flex-direction: column;
     flex-direction: column; }
     body > section #main > .outside {
+      -webkit-box-flex: 4;
+      -webkit-flex: 4;
+      -ms-flex: 4;
       flex: 4; }
     body > section #main > .sidebar {
+      -webkit-box-flex: 1;
+      -webkit-flex: 1;
+      -ms-flex: 1;
       flex: 1;
       width: auto; }
       body > section #main > .sidebar .icons {
+        -webkit-box-orient: horizontal;
+        -webkit-box-direction: normal;
+        -webkit-flex-direction: row;
+        -ms-flex-direction: row;
         flex-direction: row;
+        -webkit-flex-wrap: wrap;
+        -ms-flex-wrap: wrap;
         flex-wrap: wrap; }
         body > section #main > .sidebar .icons .icon {
           width: 20%;

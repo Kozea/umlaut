@@ -61,12 +61,17 @@ module.exports = (grunt) ->
         ext: '.css'
 
     sass_to_scss:
-      butterfly:
+      umlaut:
         expand: true
         cwd: 'sass/'
         src: '*.sass'
         dest: 'scss/'
         ext: '.scss'
+
+    autoprefixer:
+      umlaut:
+        files:
+          'assets/main.css': 'assets/main.css'
 
     coffee:
       options:
@@ -147,15 +152,17 @@ module.exports = (grunt) ->
   grunt.loadNpmTasks 'grunt-contrib-qunit'
   grunt.loadNpmTasks 'grunt-contrib-connect'
   grunt.loadNpmTasks 'grunt-coffeelint'
+  grunt.loadNpmTasks 'grunt-autoprefixer'
   grunt.loadNpmTasks 'grunt-sass'
   grunt.loadNpmTasks 'grunt-sass-to-scss'
 
   grunt.registerTask 'dev', [
     'coffeelint', 'coffee', 'sass_to_scss', 'sass', 'watch']
-  grunt.registerTask 'css', ['sass_to_scss', 'sass']
+  grunt.registerTask 'css', ['sass_to_scss', 'sass', 'autoprefixer']
   grunt.registerTask 'default', [
     'coffeelint', 'coffee',
     'sass_to_scss', 'sass',
+    'autoprefixer',
     'cssmin',
     'uglify']
   grunt.registerTask 'umlaut', [
