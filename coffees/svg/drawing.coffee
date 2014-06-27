@@ -62,7 +62,7 @@ write_text = (txt, text) ->
       .attr('x', 0)
     if i != 0
       tspan
-        .attr('dy', '1.2em')
+        .attr('dy', '17px')
 
 
 update_node = (nodes) ->

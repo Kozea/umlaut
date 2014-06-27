@@ -4189,7 +4189,7 @@ write_text = function(txt, text) {
     line = _ref[i];
     tspan = txt.append('tspan').text(line).attr('x', 0);
     if (i !== 0) {
-      _results.push(tspan.attr('dy', '1.2em'));
+      _results.push(tspan.attr('dy', '17px'));
     } else {
       _results.push(void 0);
     }
