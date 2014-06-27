@@ -72,9 +72,8 @@ body #main {
   flex-direction: row; }
   body #main .waterlogo {
     background: url("../images/umlaut.svg") bottom center no-repeat;
-    max-width: -webkit-calc(30% - 100px);
     max-width: calc(30% - 100px);
-    -webkit-background-size: 100%;
+    -webkit-background-size: 100% 100%;
     background-size: 100%;
     opacity: 0.6;
     position: absolute;
@@ -91,7 +90,6 @@ body #main {
     position: absolute;
     bottom: 24px;
     right: 124px;
-    max-width: -webkit-calc(75% - 100px);
     max-width: calc(75% - 100px); }
     body #main .btns .btn {
       margin: 0 3px 6px 3px; }
