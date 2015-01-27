@@ -704,6 +704,7 @@ Element = (function(_super) {
     this.anchors = {};
     this.color = null;
     this.bg_color = null;
+    this.attrs = {};
     this.anchors[cardinal.N] = (function(_this) {
       return function() {
         return {
@@ -845,14 +846,13 @@ Element = (function(_super) {
   };
 
   Element.prototype.width = function(w) {
-    var _ref;
     if (w == null) {
       w = null;
     }
     if (w !== null) {
       return this._width = w;
     }
-    if ((_ref = this.attrs) != null ? _ref.width : void 0) {
+    if (this.attrs.width) {
       this._width = this.attrs.width * this.txt_width();
       delete this.attrs.width;
     }
@@ -860,14 +860,13 @@ Element = (function(_super) {
   };
 
   Element.prototype.height = function(h) {
-    var _ref;
     if (h == null) {
       h = null;
     }
     if (h !== null) {
       return this._height = h;
     }
-    if ((_ref = this.attrs) != null ? _ref.height : void 0) {
+    if (this.attrs.height) {
       this._height = this.attrs.height * this.txt_height();
       delete this.attrs.height;
     }
@@ -963,6 +962,7 @@ Link = (function(_super) {
       target: (text != null ? text.target : void 0) || ''
     };
     this.color = null;
+    this.attrs = {};
   }
 
   Link.prototype.objectify = function(elements) {
@@ -3350,10 +3350,10 @@ commands = {
   edit: {
     fun: function() {
       return edit((function() {
-        var e, _ref, _ref1;
+        var e;
         if (diagram.selection.length === 1) {
           e = diagram.selection[0];
-          return [e.text, (_ref = e.attrs) != null ? _ref.color : void 0, (_ref1 = e.attrs) != null ? _ref1.fillcolor : void 0];
+          return [e.text, e.attrs.color, e.attrs.fillcolor];
         } else {
           return ['', '#ffffff', '#000000'];
         }
@@ -4009,8 +4009,7 @@ anchor_link_drag = d3.behavior.drag().on("dragstart.link", function(anchor) {
 mouse_node = function(nodes) {
   return nodes.call(edit_it, function(node) {
     return edit((function() {
-      var _ref, _ref1;
-      return [node.text, (_ref = node.attrs) != null ? _ref.color : void 0, (_ref1 = node.attrs) != null ? _ref1.fillcolor : void 0];
+      return [node.text, node.attrs.color, node.attrs.fillcolor];
     }), (function(txt) {
       return node.text = txt;
     }));
@@ -4435,7 +4434,8 @@ Svg = (function(_super) {
     this.width = article.clientWidth;
     this.height = article.clientHeight || 500;
     this.zoom = zoom.scale(diagram.zoom.scale).translate(diagram.zoom.translate).scaleExtent([.05, 5]).on("zoom", function() {
-      if (!d3.event.sourceEvent.shiftKey) {
+      var _ref;
+      if (!((_ref = d3.event.sourceEvent) != null ? _ref.shiftKey : void 0)) {
         diagram.zoom.translate = d3.event.translate;
         diagram.zoom.scale = d3.event.scale;
         return svg.sync_transform();

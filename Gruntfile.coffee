@@ -21,7 +21,7 @@ module.exports = (grunt) ->
             'bower_components/jquery/dist/jquery.min.js'
             'bower_components/d3/d3.min.js'
             'bower_components/mousetrap/mousetrap.min.js'
-            'bower_components/lz-string/libs/lz-string-1.3.3-min.js'
+            'bower_components/lz-string/libs/lz-string.min.js'
             'bower_components/colpick/js/colpick.js'
           ]
 

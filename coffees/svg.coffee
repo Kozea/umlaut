@@ -36,7 +36,7 @@ class Svg extends Base
       .translate(diagram.zoom.translate)
       .scaleExtent([.05, 5])
       .on("zoom", ->
-        if not d3.event.sourceEvent.shiftKey
+        unless d3.event.sourceEvent?.shiftKey
           diagram.zoom.translate = d3.event.translate
           diagram.zoom.scale = d3.event.scale
           svg.sync_transform()

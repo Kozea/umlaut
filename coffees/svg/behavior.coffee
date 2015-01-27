@@ -289,7 +289,7 @@ anchor_link_drag = d3.behavior.drag()
 
 mouse_node = (nodes) ->
   nodes.call(edit_it, (node) ->
-    edit((-> [node.text, node.attrs?.color, node.attrs?.fillcolor]),
+    edit((-> [node.text, node.attrs.color, node.attrs.fillcolor]),
      ((txt) -> node.text = txt)))
 
 

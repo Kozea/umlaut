@@ -30,6 +30,7 @@ class Link extends Base
       source: text?.source or ''
       target: text?.target or ''
     @color = null
+    @attrs = {}
 
   objectify: (elements=diagram.elements)->
     name: @constructor.name

@@ -175,7 +175,7 @@ commands =
       edit((->
         if diagram.selection.length == 1
           e = diagram.selection[0]
-          return [e.text, e.attrs?.color, e.attrs?.fillcolor]
+          return [e.text, e.attrs.color, e.attrs.fillcolor]
         else
           return ['', '#ffffff', '#000000']), ((txt) ->
         for node in diagram.selection

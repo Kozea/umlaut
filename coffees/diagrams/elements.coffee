@@ -33,6 +33,7 @@ class Element extends Base
     @anchors = {}
     @color = null
     @bg_color = null
+    @attrs = {}
 
     @anchors[cardinal.N] = =>
       x: @x
@@ -115,7 +116,7 @@ class Element extends Base
     if w != null
       return @_width = w
 
-    if @attrs?.width
+    if @attrs.width
       @_width = @attrs.width * @txt_width()
       delete @attrs.width
 
@@ -125,7 +126,7 @@ class Element extends Base
     if h != null
       return @_height = h
 
-    if @attrs?.height
+    if @attrs.height
       @_height = @attrs.height * @txt_height()
       delete @attrs.height
 
