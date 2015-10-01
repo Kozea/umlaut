@@ -46,14 +46,16 @@ clip =
   elements: []
   links: []
 
-cut = ->
+cut = (e) ->
+  return true if $(e.target).is('textarea')
   copy()
   remove diagram.selection
   diagram.selection = []
   svg.sync true
   false
 
-copy = ->
+copy = (e) ->
+  return true if $(e.target).is('textarea')
   clip.elements = []
   clip.links = []
 
@@ -69,7 +71,8 @@ copy = ->
         clip.links.push node.objectify(elts)
   false
 
-paste = ->
+paste = (e) ->
+  return true if $(e.target).is('textarea')
   elts = []
   diagram.selection = []
   if not diagram.force
@@ -178,8 +181,8 @@ commands =
           return [e.text, e.attrs.color, e.attrs.fillcolor]
         else
           return ['', '#ffffff', '#000000']), ((txt) ->
-        for node in diagram.selection
-          node.text = txt))
+            for node in diagram.selection
+              node.text = txt))
     label: 'Edit elements text'
     glyph: 'edit'
     hotkey: 'e'

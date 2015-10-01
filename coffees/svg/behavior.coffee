@@ -83,7 +83,7 @@ svg_selection_drag = d3.behavior.drag()
             link.target is elt and
             link.source in diagram.selection and
             link not in diagram.selection)
-            diagram.selection.push link
+              diagram.selection.push link
       else if not inside and selected
         # Element not in selection anymore
         diagram.selection.splice(diagram.selection.indexOf(elt), 1)
@@ -98,7 +98,7 @@ svg_selection_drag = d3.behavior.drag()
             link.target is elt and
             link.source not in diagram.selection and
             link in diagram.selection)
-            diagram.selection.splice(diagram.selection.indexOf(link), 1)
+              diagram.selection.splice(diagram.selection.indexOf(link), 1)
     )
     svg.tick())
   .on("dragend.selection", ->

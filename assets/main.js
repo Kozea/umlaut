@@ -1,8 +1,8 @@
 var Aggregation, Assign, Association, Attribute, Attributes, BRACES, Base, Brace, COMPASS_PTS, Comment, Composition, DELIMITERS, Delimiter, Diagram, Diagrams, E, Edge, Electric, Element, Ellipsis, Graph, Group, Hexagon, House, Id, Inheritance, KEYWORDS, Keyword, L, Link, LinkStyle, LinkStyles, Lozenge, Marker, Markers, Mouse, Node, Note, Number, OPERATORS, Octogon, Operator, PANIC_THRESHOLD, Parallelogram, ParserError, Pentagon, Polygon, QuotedId, RE_ALPHA, RE_ALPHADIGIT, RE_COMMENT, RE_DIGIT, RE_SPACE, Rect, Septagon, Star, Statement, SubGraph, Svg, Token, Transistor, Trapezium, Triangle, anchor_link_drag, angle_to_cardinal, atan2, attach_self, capitalize, cardinal, cardinal_to_direction, clip, commands, copy, cut, dist, dot, dot_lex, dot_tokenize, edit, edit_it, enter_link, enter_marker, enter_node, extern_drag, floating, generate_url, history_pop, init_commands, last_command, link_drag, list_diagrams, list_local, list_new, load, marker_to_dot, merge, merge_copy, mod2pi, mouse_link, mouse_node, mouse_xy, move_drag, next, node_add, node_style, nsweo_resize_drag, o_copy, order, paste, pi, remove, rotate, save, svg_selection_drag, text_style, tick_link, tick_node, timestamp, to_deg, to_rad, to_svg_angle, update_anchors, update_handles, update_link, update_marker, update_node, wrap, write_text, zoom,
-  __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; },
-  __hasProp = {}.hasOwnProperty,
-  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
-  __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+  indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; },
+  extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
+  hasProp = {}.hasOwnProperty,
+  bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
 pi = Math.PI;
 
@@ -150,26 +150,26 @@ merge_copy = function(o1, o2) {
 };
 
 node_style = function(node) {
-  var attrs, fillcolor, style, styles, _ref;
+  var attrs, fillcolor, ref, style, styles;
   if (!node.attrs) {
     return void 0;
   }
   styles = [];
   attrs = node.attrs;
-  style = ((_ref = attrs.style) != null ? _ref.split(',') : void 0) || [];
-  if (__indexOf.call(style, 'invisible') >= 0) {
+  style = ((ref = attrs.style) != null ? ref.split(',') : void 0) || [];
+  if (indexOf.call(style, 'invisible') >= 0) {
     styles.push('display: none');
   }
-  if (__indexOf.call(style, 'dashed') >= 0) {
+  if (indexOf.call(style, 'dashed') >= 0) {
     styles.push('stroke-dasharray: 10, 5');
   }
-  if (__indexOf.call(style, 'dotted') >= 0) {
+  if (indexOf.call(style, 'dotted') >= 0) {
     styles.push('stroke-dasharray: 2, 6');
   }
-  if (__indexOf.call(style, 'bold') >= 0) {
+  if (indexOf.call(style, 'bold') >= 0) {
     styles.push('stroke-width: 2.5');
   }
-  if (__indexOf.call(style, 'filled') >= 0) {
+  if (indexOf.call(style, 'filled') >= 0) {
     fillcolor = attrs.fillcolor || attrs.color;
   } else {
     fillcolor = attrs.fillcolor;
@@ -188,16 +188,16 @@ text_style = function() {
 };
 
 attach_self = function(list, self) {
-  var l, _i, _len, _results;
-  _results = [];
-  for (_i = 0, _len = list.length; _i < _len; _i++) {
-    l = list[_i];
-    _results.push({
+  var j, l, len1, results;
+  results = [];
+  for (j = 0, len1 = list.length; j < len1; j++) {
+    l = list[j];
+    results.push({
       key: l,
       self: self
     });
   }
-  return _results;
+  return results;
 };
 
 d3.selection.prototype.dblTap = function(callback) {
@@ -237,8 +237,8 @@ Base = (function() {
 
 LinkStyles = {};
 
-LinkStyle = (function(_super) {
-  __extends(LinkStyle, _super);
+LinkStyle = (function(superClass) {
+  extend(LinkStyle, superClass);
 
   function LinkStyle() {
     return LinkStyle.__super__.constructor.apply(this, arguments);
@@ -252,8 +252,8 @@ LinkStyle = (function(_super) {
 
 })(Base);
 
-LinkStyles.Diagonal = (function(_super) {
-  __extends(Diagonal, _super);
+LinkStyles.Diagonal = (function(superClass) {
+  extend(Diagonal, superClass);
 
   function Diagonal() {
     return Diagonal.__super__.constructor.apply(this, arguments);
@@ -263,8 +263,8 @@ LinkStyles.Diagonal = (function(_super) {
 
 })(LinkStyle);
 
-LinkStyles.Rectangular = (function(_super) {
-  __extends(Rectangular, _super);
+LinkStyles.Rectangular = (function(superClass) {
+  extend(Rectangular, superClass);
 
   function Rectangular() {
     return Rectangular.__super__.constructor.apply(this, arguments);
@@ -276,25 +276,25 @@ LinkStyles.Rectangular = (function(_super) {
     horizontal_2 = Math.abs(o2 % pi) < pi / 4;
     path = "M " + a1.x + " " + a1.y + " L";
     if (!horizontal_1 && horizontal_2) {
-      path = "" + path + " " + a1.x + " " + a2.y;
+      path = path + " " + a1.x + " " + a2.y;
     } else if (horizontal_1 && !horizontal_2) {
-      path = "" + path + " " + a2.x + " " + a1.y;
+      path = path + " " + a2.x + " " + a1.y;
     } else if (horizontal_1 && horizontal_2) {
       mid = a1.x + .5 * (a2.x - a1.x);
-      path = "" + path + " " + mid + " " + a1.y + " L " + mid + " " + a2.y;
+      path = path + " " + mid + " " + a1.y + " L " + mid + " " + a2.y;
     } else if (!horizontal_1 && !horizontal_2) {
       mid = a1.y + .5 * (a2.y - a1.y);
-      path = "" + path + " " + a1.x + " " + mid + " L " + a2.x + " " + mid;
+      path = path + " " + a1.x + " " + mid + " L " + a2.x + " " + mid;
     }
-    return "" + path + " L " + a2.x + " " + a2.y;
+    return path + " L " + a2.x + " " + a2.y;
   };
 
   return Rectangular;
 
 })(LinkStyle);
 
-LinkStyles.Arc = (function(_super) {
-  __extends(Arc, _super);
+LinkStyles.Arc = (function(superClass) {
+  extend(Arc, superClass);
 
   function Arc() {
     return Arc.__super__.constructor.apply(this, arguments);
@@ -313,8 +313,8 @@ LinkStyles.Arc = (function(_super) {
 
 })(LinkStyle);
 
-LinkStyles.Demicurve = (function(_super) {
-  __extends(Demicurve, _super);
+LinkStyles.Demicurve = (function(superClass) {
+  extend(Demicurve, superClass);
 
   function Demicurve() {
     return Demicurve.__super__.constructor.apply(this, arguments);
@@ -330,24 +330,24 @@ LinkStyles.Demicurve = (function(_super) {
       y: .5 * (a1.y + a2.y)
     };
     if (horizontal_1) {
-      path = "" + path + " " + m.x + " " + a1.y;
+      path = path + " " + m.x + " " + a1.y;
     } else {
-      path = "" + path + " " + a1.x + " " + m.y;
+      path = path + " " + a1.x + " " + m.y;
     }
     if (horizontal_2) {
-      path = "" + path + " " + m.x + " " + a2.y;
+      path = path + " " + m.x + " " + a2.y;
     } else {
-      path = "" + path + " " + a2.x + " " + m.y;
+      path = path + " " + a2.x + " " + m.y;
     }
-    return "" + path + " " + a2.x + " " + a2.y;
+    return path + " " + a2.x + " " + a2.y;
   };
 
   return Demicurve;
 
 })(LinkStyle);
 
-LinkStyles.Curve = (function(_super) {
-  __extends(Curve, _super);
+LinkStyles.Curve = (function(superClass) {
+  extend(Curve, superClass);
 
   function Curve() {
     return Curve.__super__.constructor.apply(this, arguments);
@@ -366,19 +366,19 @@ LinkStyles.Curve = (function(_super) {
     }
     dx = Math.cos(o1) * d;
     dy = Math.sin(o1) * d;
-    path = "" + path + " " + (a1.x + dx) + " " + (a1.y + dy);
+    path = path + " " + (a1.x + dx) + " " + (a1.y + dy);
     dx = Math.cos(o2) * d;
     dy = Math.sin(o2) * d;
-    path = "" + path + " " + (a2.x + dx) + " " + (a2.y + dy);
-    return "" + path + " " + a2.x + " " + a2.y;
+    path = path + " " + (a2.x + dx) + " " + (a2.y + dy);
+    return path + " " + a2.x + " " + a2.y;
   };
 
   return Curve;
 
 })(LinkStyle);
 
-LinkStyles.Rationalcurve = (function(_super) {
-  __extends(Rationalcurve, _super);
+LinkStyles.Rationalcurve = (function(superClass) {
+  extend(Rationalcurve, superClass);
 
   function Rationalcurve() {
     return Rationalcurve.__super__.constructor.apply(this, arguments);
@@ -399,14 +399,14 @@ LinkStyles.Rationalcurve = (function(_super) {
       dx *= 4;
       dy *= 4;
     }
-    path = "" + path + " " + (a1.x + dx) + " " + (a1.y + dy);
+    path = path + " " + (a1.x + dx) + " " + (a1.y + dy);
     dx = Math.cos(o2) * target.width();
     dy = Math.sin(o2) * target.height();
     if (source === target) {
       dx *= 4;
       dy *= 4;
     }
-    return path = "" + path + " " + (a2.x + dx) + " " + (a2.y + dy) + " " + a2.x + " " + a2.y;
+    return path = path + " " + (a2.x + dx) + " " + (a2.y + dy) + " " + a2.x + " " + a2.y;
   };
 
   return Rationalcurve;
@@ -415,8 +415,8 @@ LinkStyles.Rationalcurve = (function(_super) {
 
 Markers = {};
 
-Marker = (function(_super) {
-  __extends(Marker, _super);
+Marker = (function(superClass) {
+  extend(Marker, superClass);
 
   Marker.prototype.margin = function() {
     return 6;
@@ -447,12 +447,12 @@ Marker = (function(_super) {
       lw = this.margin() / 2 - w;
     }
     h = this.height() + this.margin();
-    return "" + lw + " " + (-h / 2) + " " + w + " " + h;
+    return lw + " " + (-h / 2) + " " + w + " " + h;
   };
 
-  function Marker(open, start) {
-    this.open = open != null ? open : false;
-    this.start = start != null ? start : false;
+  function Marker(open1, start1) {
+    this.open = open1 != null ? open1 : false;
+    this.start = start1 != null ? start1 : false;
     Marker.__super__.constructor.apply(this, arguments);
     this.id = this.cls.name;
     this.open && (this.id += 'Open');
@@ -463,8 +463,8 @@ Marker = (function(_super) {
 
 })(Base);
 
-Markers.None = (function(_super) {
-  __extends(None, _super);
+Markers.None = (function(superClass) {
+  extend(None, superClass);
 
   function None() {
     return None.__super__.constructor.apply(this, arguments);
@@ -478,8 +478,8 @@ Markers.None = (function(_super) {
 
 })(Marker);
 
-Markers.Vee = (function(_super) {
-  __extends(Vee, _super);
+Markers.Vee = (function(superClass) {
+  extend(Vee, superClass);
 
   function Vee() {
     return Vee.__super__.constructor.apply(this, arguments);
@@ -498,8 +498,8 @@ Markers.Vee = (function(_super) {
 
 })(Marker);
 
-Markers.Crow = (function(_super) {
-  __extends(Crow, _super);
+Markers.Crow = (function(superClass) {
+  extend(Crow, superClass);
 
   function Crow() {
     return Crow.__super__.constructor.apply(this, arguments);
@@ -518,8 +518,8 @@ Markers.Crow = (function(_super) {
 
 })(Marker);
 
-Markers.Normal = (function(_super) {
-  __extends(Normal, _super);
+Markers.Normal = (function(superClass) {
+  extend(Normal, superClass);
 
   function Normal() {
     return Normal.__super__.constructor.apply(this, arguments);
@@ -536,8 +536,8 @@ Markers.Normal = (function(_super) {
 
 })(Marker);
 
-Markers.Inv = (function(_super) {
-  __extends(Inv, _super);
+Markers.Inv = (function(superClass) {
+  extend(Inv, superClass);
 
   function Inv() {
     return Inv.__super__.constructor.apply(this, arguments);
@@ -554,8 +554,8 @@ Markers.Inv = (function(_super) {
 
 })(Marker);
 
-Markers.Diamond = (function(_super) {
-  __extends(Diamond, _super);
+Markers.Diamond = (function(superClass) {
+  extend(Diamond, superClass);
 
   function Diamond() {
     return Diamond.__super__.constructor.apply(this, arguments);
@@ -577,8 +577,8 @@ Markers.Diamond = (function(_super) {
 
 })(Marker);
 
-Markers.Dot = (function(_super) {
-  __extends(Dot, _super);
+Markers.Dot = (function(superClass) {
+  extend(Dot, superClass);
 
   function Dot() {
     return Dot.__super__.constructor.apply(this, arguments);
@@ -596,8 +596,8 @@ Markers.Dot = (function(_super) {
 
 })(Marker);
 
-Markers.Box = (function(_super) {
-  __extends(Box, _super);
+Markers.Box = (function(superClass) {
+  extend(Box, superClass);
 
   function Box() {
     return Box.__super__.constructor.apply(this, arguments);
@@ -615,8 +615,8 @@ Markers.Box = (function(_super) {
 
 })(Marker);
 
-Markers.Tee = (function(_super) {
-  __extends(Tee, _super);
+Markers.Tee = (function(superClass) {
+  extend(Tee, superClass);
 
   function Tee() {
     return Tee.__super__.constructor.apply(this, arguments);
@@ -674,8 +674,8 @@ Markers._cycle = function(link, start) {
   return link[marker] = Markers._get(link.attrs[arrow], start);
 };
 
-Element = (function(_super) {
-  __extends(Element, _super);
+Element = (function(superClass) {
+  extend(Element, superClass);
 
   Element.handle_size = 10;
 
@@ -687,12 +687,14 @@ Element = (function(_super) {
 
   Element.stroke = 'fg';
 
-  function Element(x, y, text, fixed) {
-    this.x = x;
-    this.y = y;
-    this.text = text;
-    this.fixed = fixed != null ? fixed : false;
+  function Element(x1, y1, text1, fixed1) {
+    this.x = x1;
+    this.y = y1;
+    this.text = text1;
+    this.fixed = fixed1 != null ? fixed1 : false;
     Element.__super__.constructor.apply(this, arguments);
+    this.x = this.x || 0;
+    this.y = this.y || 0;
     this.ts = timestamp();
     this.margin = {
       x: 10,
@@ -874,13 +876,13 @@ Element = (function(_super) {
   };
 
   Element.prototype.direction = function(x, y) {
-    var anchor, deviation, diff, min_anchor, min_diff, pi2, pos, target, _ref;
+    var anchor, deviation, diff, min_anchor, min_diff, pi2, pos, ref, target;
     pi2 = 2 * pi;
     target = atan2(y - this.y, x - this.x);
     min_diff = Infinity;
-    _ref = this.anchors;
-    for (anchor in _ref) {
-      pos = _ref[anchor];
+    ref = this.anchors;
+    for (anchor in ref) {
+      pos = ref[anchor];
       deviation = target - (+anchor) - this._rotation;
       diff = Math.min(Math.abs(deviation) % pi2, Math.abs(deviation - pi2) % pi2);
       if (diff < min_diff) {
@@ -920,8 +922,8 @@ Element = (function(_super) {
 
 })(Base);
 
-Mouse = (function(_super) {
-  __extends(Mouse, _super);
+Mouse = (function(superClass) {
+  extend(Mouse, superClass);
 
   function Mouse() {
     return Mouse.__super__.constructor.apply(this, arguments);
@@ -941,8 +943,8 @@ Mouse = (function(_super) {
 
 })(Element);
 
-Link = (function(_super) {
-  __extends(Link, _super);
+Link = (function(superClass) {
+  extend(Link, superClass);
 
   Link.marker_start = new Markers.None(false, true);
 
@@ -952,9 +954,9 @@ Link = (function(_super) {
 
   Link.prototype.text_margin = 10;
 
-  function Link(source, target, text) {
-    this.source = source;
-    this.target = target;
+  function Link(source1, target1, text) {
+    this.source = source1;
+    this.target = target1;
     Link.__super__.constructor.apply(this, arguments);
     this.a1 = this.a2 = 0;
     this.text = {
@@ -1019,8 +1021,8 @@ Link = (function(_super) {
 
 })(Base);
 
-Diagram = (function(_super) {
-  __extends(Diagram, _super);
+Diagram = (function(superClass) {
+  extend(Diagram, superClass);
 
   Diagram.init_types = function() {
     return {
@@ -1091,12 +1093,12 @@ Diagram = (function(_super) {
   };
 
   Diagram.prototype.to_svg = function() {
-    var content, css, margin, rect, rule, svg_clone, _i, _len, _ref, _ref1;
+    var content, css, j, len1, margin, rect, ref, ref1, rule, svg_clone;
     css = '';
-    _ref = d3.select('#style').node().sheet.cssRules;
-    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-      rule = _ref[_i];
-      if ((_ref1 = rule.selectorText) != null ? _ref1.match(/^svg\s/) : void 0) {
+    ref = d3.select('#style').node().sheet.cssRules;
+    for (j = 0, len1 = ref.length; j < len1; j++) {
+      rule = ref[j];
+      if ((ref1 = rule.selectorText) != null ? ref1.match(/^svg\s/) : void 0) {
         if (!rule.cssText.match(/:hover/) && !rule.cssText.match(/:active/) && !rule.cssText.match(/transition/)) {
           css += rule.cssText.replace(/svg\s/g, '');
         }
@@ -1142,7 +1144,7 @@ Diagram = (function(_super) {
   };
 
   Diagram.prototype.loads = function(obj) {
-    var elt, lnk, _i, _j, _len, _len1, _ref, _ref1;
+    var elt, j, len1, len2, lnk, n, ref, ref1;
     if (obj.title) {
       this.title = obj.title;
     }
@@ -1152,14 +1154,14 @@ Diagram = (function(_super) {
     if (obj.zoom) {
       this.zoom = obj.zoom;
     }
-    _ref = obj.elements;
-    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-      elt = _ref[_i];
+    ref = obj.elements;
+    for (j = 0, len1 = ref.length; j < len1; j++) {
+      elt = ref[j];
       this.elements.push(this.elementify(elt));
     }
-    _ref1 = obj.links;
-    for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
-      lnk = _ref1[_j];
+    ref1 = obj.links;
+    for (n = 0, len2 = ref1.length; n < len2; n++) {
+      lnk = ref1[n];
       this.links.push(this.linkify(lnk));
     }
     if (obj.force) {
@@ -1207,8 +1209,8 @@ Diagrams = {
   }
 };
 
-Rect = (function(_super) {
-  __extends(Rect, _super);
+Rect = (function(superClass) {
+  extend(Rect, superClass);
 
   function Rect() {
     return Rect.__super__.constructor.apply(this, arguments);
@@ -1225,8 +1227,8 @@ Rect = (function(_super) {
 
 })(Element);
 
-Ellipsis = (function(_super) {
-  __extends(Ellipsis, _super);
+Ellipsis = (function(superClass) {
+  extend(Ellipsis, superClass);
 
   function Ellipsis() {
     return Ellipsis.__super__.constructor.apply(this, arguments);
@@ -1251,8 +1253,8 @@ Ellipsis = (function(_super) {
 
 })(Element);
 
-Note = (function(_super) {
-  __extends(Note, _super);
+Note = (function(superClass) {
+  extend(Note, superClass);
 
   function Note() {
     return Note.__super__.constructor.apply(this, arguments);
@@ -1283,8 +1285,8 @@ Note = (function(_super) {
 
 })(Element);
 
-Lozenge = (function(_super) {
-  __extends(Lozenge, _super);
+Lozenge = (function(superClass) {
+  extend(Lozenge, superClass);
 
   function Lozenge() {
     return Lozenge.__super__.constructor.apply(this, arguments);
@@ -1313,8 +1315,8 @@ Lozenge = (function(_super) {
 
 })(Element);
 
-Triangle = (function(_super) {
-  __extends(Triangle, _super);
+Triangle = (function(superClass) {
+  extend(Triangle, superClass);
 
   function Triangle() {
     return Triangle.__super__.constructor.apply(this, arguments);
@@ -1343,8 +1345,8 @@ Triangle = (function(_super) {
 
 })(Element);
 
-Parallelogram = (function(_super) {
-  __extends(Parallelogram, _super);
+Parallelogram = (function(superClass) {
+  extend(Parallelogram, superClass);
 
   function Parallelogram() {
     Parallelogram.__super__.constructor.apply(this, arguments);
@@ -1382,8 +1384,8 @@ Parallelogram = (function(_super) {
 
 })(Element);
 
-Trapezium = (function(_super) {
-  __extends(Trapezium, _super);
+Trapezium = (function(superClass) {
+  extend(Trapezium, superClass);
 
   function Trapezium() {
     return Trapezium.__super__.constructor.apply(this, arguments);
@@ -1401,8 +1403,8 @@ Trapezium = (function(_super) {
 
 })(Parallelogram);
 
-House = (function(_super) {
-  __extends(House, _super);
+House = (function(superClass) {
+  extend(House, superClass);
 
   House.prototype.shift = 1.5;
 
@@ -1458,8 +1460,8 @@ House = (function(_super) {
 
 })(Element);
 
-Polygon = (function(_super) {
-  __extends(Polygon, _super);
+Polygon = (function(superClass) {
+  extend(Polygon, superClass);
 
   Polygon.prototype.n = 4;
 
@@ -1524,23 +1526,23 @@ Polygon = (function(_super) {
   };
 
   Polygon.prototype.path = function() {
-    var angle, h2, i, path, w2, _i, _ref;
+    var angle, h2, i, j, path, ref, w2;
     w2 = this.width() / 2;
     h2 = this.height() / 2;
     angle = 2 * pi / this.n;
     path = '';
-    for (i = _i = 0, _ref = this.n; 0 <= _ref ? _i <= _ref : _i >= _ref; i = 0 <= _ref ? ++_i : --_i) {
-      path = "" + path + " " + (i === 0 ? 'M' : 'L') + " " + (w2 * Math.sin(i * angle + this.shift)) + " " + (-h2 * Math.cos(i * angle + this.shift));
+    for (i = j = 0, ref = this.n; 0 <= ref ? j <= ref : j >= ref; i = 0 <= ref ? ++j : --j) {
+      path = path + " " + (i === 0 ? 'M' : 'L') + " " + (w2 * Math.sin(i * angle + this.shift)) + " " + (-h2 * Math.cos(i * angle + this.shift));
     }
-    return "" + path + " z";
+    return path + " z";
   };
 
   return Polygon;
 
 })(Element);
 
-Triangle = (function(_super) {
-  __extends(Triangle, _super);
+Triangle = (function(superClass) {
+  extend(Triangle, superClass);
 
   function Triangle() {
     return Triangle.__super__.constructor.apply(this, arguments);
@@ -1554,8 +1556,8 @@ Triangle = (function(_super) {
 
 })(Polygon);
 
-Pentagon = (function(_super) {
-  __extends(Pentagon, _super);
+Pentagon = (function(superClass) {
+  extend(Pentagon, superClass);
 
   function Pentagon() {
     return Pentagon.__super__.constructor.apply(this, arguments);
@@ -1569,8 +1571,8 @@ Pentagon = (function(_super) {
 
 })(Polygon);
 
-Hexagon = (function(_super) {
-  __extends(Hexagon, _super);
+Hexagon = (function(superClass) {
+  extend(Hexagon, superClass);
 
   function Hexagon() {
     return Hexagon.__super__.constructor.apply(this, arguments);
@@ -1584,8 +1586,8 @@ Hexagon = (function(_super) {
 
 })(Polygon);
 
-Septagon = (function(_super) {
-  __extends(Septagon, _super);
+Septagon = (function(superClass) {
+  extend(Septagon, superClass);
 
   function Septagon() {
     return Septagon.__super__.constructor.apply(this, arguments);
@@ -1599,8 +1601,8 @@ Septagon = (function(_super) {
 
 })(Polygon);
 
-Octogon = (function(_super) {
-  __extends(Octogon, _super);
+Octogon = (function(superClass) {
+  extend(Octogon, superClass);
 
   function Octogon() {
     return Octogon.__super__.constructor.apply(this, arguments);
@@ -1614,8 +1616,8 @@ Octogon = (function(_super) {
 
 })(Polygon);
 
-Star = (function(_super) {
-  __extends(Star, _super);
+Star = (function(superClass) {
+  extend(Star, superClass);
 
   function Star() {
     return Star.__super__.constructor.apply(this, arguments);
@@ -1630,7 +1632,7 @@ Star = (function(_super) {
   };
 
   Star.prototype.path = function() {
-    var angle, h2, i, lh2, lw2, magic, path, w2, _i, _ref;
+    var angle, h2, i, j, lh2, lw2, magic, path, ref, w2;
     angle = 2 * pi / this.n;
     w2 = this.width() / 2;
     h2 = this.height() / 2;
@@ -1638,18 +1640,18 @@ Star = (function(_super) {
     lw2 = w2 / magic;
     lh2 = h2 / magic;
     path = "M 0 " + (-h2);
-    for (i = _i = 0, _ref = this.n; 0 <= _ref ? _i <= _ref : _i >= _ref; i = 0 <= _ref ? ++_i : --_i) {
-      path = "" + path + " L " + (w2 * Math.sin(i * angle)) + " " + (-h2 * Math.cos(i * angle)) + " L " + (lw2 * Math.sin((i + .5) * angle)) + " " + (-lh2 * Math.cos((i + .5) * angle));
+    for (i = j = 0, ref = this.n; 0 <= ref ? j <= ref : j >= ref; i = 0 <= ref ? ++j : --j) {
+      path = path + " L " + (w2 * Math.sin(i * angle)) + " " + (-h2 * Math.cos(i * angle)) + " L " + (lw2 * Math.sin((i + .5) * angle)) + " " + (-lh2 * Math.cos((i + .5) * angle));
     }
-    return "" + path + " z";
+    return path + " z";
   };
 
   return Star;
 
 })(Pentagon);
 
-Association = (function(_super) {
-  __extends(Association, _super);
+Association = (function(superClass) {
+  extend(Association, superClass);
 
   function Association() {
     return Association.__super__.constructor.apply(this, arguments);
@@ -1661,8 +1663,8 @@ Association = (function(_super) {
 
 })(Link);
 
-Inheritance = (function(_super) {
-  __extends(Inheritance, _super);
+Inheritance = (function(superClass) {
+  extend(Inheritance, superClass);
 
   function Inheritance() {
     return Inheritance.__super__.constructor.apply(this, arguments);
@@ -1674,8 +1676,8 @@ Inheritance = (function(_super) {
 
 })(Link);
 
-Composition = (function(_super) {
-  __extends(Composition, _super);
+Composition = (function(superClass) {
+  extend(Composition, superClass);
 
   function Composition() {
     return Composition.__super__.constructor.apply(this, arguments);
@@ -1687,8 +1689,8 @@ Composition = (function(_super) {
 
 })(Link);
 
-Comment = (function(_super) {
-  __extends(Comment, _super);
+Comment = (function(superClass) {
+  extend(Comment, superClass);
 
   function Comment() {
     return Comment.__super__.constructor.apply(this, arguments);
@@ -1702,8 +1704,8 @@ Comment = (function(_super) {
 
 })(Link);
 
-Aggregation = (function(_super) {
-  __extends(Aggregation, _super);
+Aggregation = (function(superClass) {
+  extend(Aggregation, superClass);
 
   function Aggregation() {
     return Aggregation.__super__.constructor.apply(this, arguments);
@@ -1715,18 +1717,18 @@ Aggregation = (function(_super) {
 
 })(Link);
 
-Group = (function(_super) {
-  __extends(Group, _super);
+Group = (function(superClass) {
+  extend(Group, superClass);
 
   function Group() {
     return Group.__super__.constructor.apply(this, arguments);
   }
 
   Group.prototype.contains = function(elt) {
-    var h2, w2, _ref, _ref1;
+    var h2, ref, ref1, w2;
     w2 = this.width() / 2;
     h2 = this.height() / 2;
-    return (this.x - w2 < (_ref = elt.x) && _ref < this.x + w2) && (this.y - h2 < (_ref1 = elt.y) && _ref1 < this.y + h2);
+    return (this.x - w2 < (ref = elt.x) && ref < this.x + w2) && (this.y - h2 < (ref1 = elt.y) && ref1 < this.y + h2);
   };
 
   Group.prototype.txt_y = function() {
@@ -1747,8 +1749,8 @@ Group = (function(_super) {
 
 })(Element);
 
-Diagrams.FlowChart = (function(_super) {
-  __extends(FlowChart, _super);
+Diagrams.FlowChart = (function(superClass) {
+  extend(FlowChart, superClass);
 
   function FlowChart() {
     return FlowChart.__super__.constructor.apply(this, arguments);
@@ -1764,8 +1766,8 @@ Diagrams.FlowChart = (function(_super) {
 
 E = Diagrams.FlowChart.prototype.types.elements;
 
-E.Process = (function(_super) {
-  __extends(Process, _super);
+E.Process = (function(superClass) {
+  extend(Process, superClass);
 
   function Process() {
     return Process.__super__.constructor.apply(this, arguments);
@@ -1775,8 +1777,8 @@ E.Process = (function(_super) {
 
 })(Rect);
 
-E.IO = (function(_super) {
-  __extends(IO, _super);
+E.IO = (function(superClass) {
+  extend(IO, superClass);
 
   function IO() {
     return IO.__super__.constructor.apply(this, arguments);
@@ -1786,8 +1788,8 @@ E.IO = (function(_super) {
 
 })(Parallelogram);
 
-E.Terminator = (function(_super) {
-  __extends(Terminator, _super);
+E.Terminator = (function(superClass) {
+  extend(Terminator, superClass);
 
   function Terminator() {
     return Terminator.__super__.constructor.apply(this, arguments);
@@ -1805,8 +1807,8 @@ E.Terminator = (function(_super) {
 
 })(Element);
 
-E.Decision = (function(_super) {
-  __extends(Decision, _super);
+E.Decision = (function(superClass) {
+  extend(Decision, superClass);
 
   function Decision() {
     return Decision.__super__.constructor.apply(this, arguments);
@@ -1816,8 +1818,8 @@ E.Decision = (function(_super) {
 
 })(Lozenge);
 
-E.Delay = (function(_super) {
-  __extends(Delay, _super);
+E.Delay = (function(superClass) {
+  extend(Delay, superClass);
 
   function Delay() {
     Delay.__super__.constructor.apply(this, arguments);
@@ -1858,8 +1860,8 @@ E.Delay = (function(_super) {
 
 })(Element);
 
-E.SubProcess = (function(_super) {
-  __extends(SubProcess, _super);
+E.SubProcess = (function(superClass) {
+  extend(SubProcess, superClass);
 
   function SubProcess() {
     return SubProcess.__super__.constructor.apply(this, arguments);
@@ -1880,15 +1882,15 @@ E.SubProcess = (function(_super) {
     w2 = this.width() / 2;
     lw2 = w2 - this.shift_width() / 2;
     h2 = this.height() / 2;
-    return "" + (SubProcess.__super__.path.call(this)) + " M " + (-lw2) + " " + (-h2) + " L " + (-lw2) + " " + h2 + " M " + lw2 + " " + (-h2) + " L " + lw2 + " " + h2;
+    return (SubProcess.__super__.path.call(this)) + " M " + (-lw2) + " " + (-h2) + " L " + (-lw2) + " " + h2 + " M " + lw2 + " " + (-h2) + " L " + lw2 + " " + h2;
   };
 
   return SubProcess;
 
 })(E.Process);
 
-E.Document = (function(_super) {
-  __extends(Document, _super);
+E.Document = (function(superClass) {
+  extend(Document, superClass);
 
   function Document() {
     return Document.__super__.constructor.apply(this, arguments);
@@ -1913,8 +1915,8 @@ E.Document = (function(_super) {
 
 })(Element);
 
-E.Database = (function(_super) {
-  __extends(Database, _super);
+E.Database = (function(superClass) {
+  extend(Database, superClass);
 
   function Database() {
     return Database.__super__.constructor.apply(this, arguments);
@@ -1944,8 +1946,8 @@ E.Database = (function(_super) {
 
 })(Element);
 
-E.HardDisk = (function(_super) {
-  __extends(HardDisk, _super);
+E.HardDisk = (function(superClass) {
+  extend(HardDisk, superClass);
 
   function HardDisk() {
     return HardDisk.__super__.constructor.apply(this, arguments);
@@ -1975,8 +1977,8 @@ E.HardDisk = (function(_super) {
 
 })(Element);
 
-E.ManualInput = (function(_super) {
-  __extends(ManualInput, _super);
+E.ManualInput = (function(superClass) {
+  extend(ManualInput, superClass);
 
   ManualInput.prototype.shift = 2;
 
@@ -2024,8 +2026,8 @@ E.ManualInput = (function(_super) {
 
 })(Element);
 
-E.Preparation = (function(_super) {
-  __extends(Preparation, _super);
+E.Preparation = (function(superClass) {
+  extend(Preparation, superClass);
 
   function Preparation() {
     return Preparation.__super__.constructor.apply(this, arguments);
@@ -2035,8 +2037,8 @@ E.Preparation = (function(_super) {
 
 })(Hexagon);
 
-E.InternalStorage = (function(_super) {
-  __extends(InternalStorage, _super);
+E.InternalStorage = (function(superClass) {
+  extend(InternalStorage, superClass);
 
   function InternalStorage() {
     return InternalStorage.__super__.constructor.apply(this, arguments);
@@ -2076,15 +2078,15 @@ E.InternalStorage = (function(_super) {
     lw2 = w2 - this.shift_width();
     h2 = this.height() / 2;
     lh2 = h2 - this.shift_height();
-    return "" + (InternalStorage.__super__.path.call(this)) + " M " + (-lw2) + " " + (-h2) + " L " + (-lw2) + " " + h2 + " M " + (-w2) + " " + (-lh2) + " L " + w2 + " " + (-lh2);
+    return (InternalStorage.__super__.path.call(this)) + " M " + (-lw2) + " " + (-h2) + " L " + (-lw2) + " " + h2 + " M " + (-w2) + " " + (-lh2) + " L " + w2 + " " + (-lh2);
   };
 
   return InternalStorage;
 
 })(E.Process);
 
-Diagrams.FlowChart.prototype.types.links.Flow = (function(_super) {
-  __extends(Flow, _super);
+Diagrams.FlowChart.prototype.types.links.Flow = (function(superClass) {
+  extend(Flow, superClass);
 
   function Flow() {
     return Flow.__super__.constructor.apply(this, arguments);
@@ -2096,8 +2098,8 @@ Diagrams.FlowChart.prototype.types.links.Flow = (function(_super) {
 
 })(Link);
 
-Diagrams.FlowChart.prototype.types.elements.Container = (function(_super) {
-  __extends(Container, _super);
+Diagrams.FlowChart.prototype.types.elements.Container = (function(superClass) {
+  extend(Container, superClass);
 
   function Container() {
     return Container.__super__.constructor.apply(this, arguments);
@@ -2107,8 +2109,8 @@ Diagrams.FlowChart.prototype.types.elements.Container = (function(_super) {
 
 })(Group);
 
-Diagrams.Dot = (function(_super) {
-  __extends(Dot, _super);
+Diagrams.Dot = (function(superClass) {
+  extend(Dot, superClass);
 
   Dot.prototype.label = 'Dot diagram';
 
@@ -2135,13 +2137,13 @@ Diagrams.Dot = (function(_super) {
   };
 
   Dot.prototype.to_dot = function() {
-    var attrs, directed, dot, element, key, link, op, shape, val, _i, _j, _len, _len1, _ref, _ref1, _ref2, _ref3;
+    var attrs, directed, dot, element, j, key, len1, len2, link, n, op, ref, ref1, ref2, ref3, shape, val;
     directed = false;
     dot = "graph umlaut {\n";
-    _ref = diagram.elements;
-    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-      element = _ref[_i];
-      dot = "" + dot + "  \"" + element.text + "\"";
+    ref = diagram.elements;
+    for (j = 0, len1 = ref.length; j < len1; j++) {
+      element = ref[j];
+      dot = dot + "  \"" + element.text + "\"";
       attrs = [];
       shape = element.cls.name.toLowerCase();
       if (shape !== 'ellipse') {
@@ -2156,28 +2158,28 @@ Diagrams.Dot = (function(_super) {
       if (!diagram.force) {
         attrs.push("pos=\"" + (element.x.toFixed()) + ", " + (element.y.toFixed()) + (element.fixed ? '!' : '') + "\"");
       }
-      _ref1 = element.attrs;
-      for (key in _ref1) {
-        val = _ref1[key];
+      ref1 = element.attrs;
+      for (key in ref1) {
+        val = ref1[key];
         if (key !== 'shape' && key !== 'label') {
-          attrs.push("" + key + "=\"" + val + "\"");
+          attrs.push(key + "=\"" + val + "\"");
         }
       }
       if (attrs.length) {
-        dot = "" + dot + "[" + (attrs.join(',')) + "]";
+        dot = dot + "[" + (attrs.join(',')) + "]";
       }
-      dot = "" + dot + ";\n";
+      dot = dot + ";\n";
     }
-    _ref2 = diagram.links;
-    for (_j = 0, _len1 = _ref2.length; _j < _len1; _j++) {
-      link = _ref2[_j];
+    ref2 = diagram.links;
+    for (n = 0, len2 = ref2.length; n < len2; n++) {
+      link = ref2[n];
       if (!link.marker_end) {
         op = '--';
       } else {
         op = '->';
         directed = true;
       }
-      dot = "" + dot + "  \"" + link.source.text + "\" " + op + " \"" + link.target.text + "\"";
+      dot = dot + "  \"" + link.source.text + "\" " + op + " \"" + link.target.text + "\"";
       attrs = [];
       if (link.marker_start) {
         attrs.push("arrowhead=" + (marker_to_dot(link.marker_start)));
@@ -2191,19 +2193,19 @@ Diagrams.Dot = (function(_super) {
       if (link.text.target) {
         attrs.push("headlabel=\"" + link.text.target + "\"");
       }
-      _ref3 = link.attrs;
-      for (key in _ref3) {
-        val = _ref3[key];
+      ref3 = link.attrs;
+      for (key in ref3) {
+        val = ref3[key];
         if (key !== 'arrowhead' && key !== 'arrowtail' && key !== 'headlabel' && key !== 'taillabel') {
-          attrs.push("" + key + "=\"" + val + "\"");
+          attrs.push(key + "=\"" + val + "\"");
         }
       }
       if (attrs.length) {
-        dot = "" + dot + "[" + (attrs.join(',')) + "]";
+        dot = dot + "[" + (attrs.join(',')) + "]";
       }
-      dot = "" + dot + ";\n";
+      dot = dot + ";\n";
     }
-    dot = "" + dot + "}";
+    dot = dot + "}";
     if (directed) {
       dot = "di" + dot;
     }
@@ -2218,8 +2220,8 @@ E = Diagrams.Dot.prototype.types.elements;
 
 L = Diagrams.Dot.prototype.types.links;
 
-E.Box = (function(_super) {
-  __extends(Box, _super);
+E.Box = (function(superClass) {
+  extend(Box, superClass);
 
   function Box() {
     return Box.__super__.constructor.apply(this, arguments);
@@ -2229,8 +2231,8 @@ E.Box = (function(_super) {
 
 })(Rect);
 
-E.Polygon = (function(_super) {
-  __extends(Polygon, _super);
+E.Polygon = (function(superClass) {
+  extend(Polygon, superClass);
 
   function Polygon() {
     return Polygon.__super__.constructor.apply(this, arguments);
@@ -2240,8 +2242,8 @@ E.Polygon = (function(_super) {
 
 })(Polygon);
 
-E.Ellipse = (function(_super) {
-  __extends(Ellipse, _super);
+E.Ellipse = (function(superClass) {
+  extend(Ellipse, superClass);
 
   function Ellipse() {
     return Ellipse.__super__.constructor.apply(this, arguments);
@@ -2251,8 +2253,8 @@ E.Ellipse = (function(_super) {
 
 })(Ellipsis);
 
-E.Oval = (function(_super) {
-  __extends(Oval, _super);
+E.Oval = (function(superClass) {
+  extend(Oval, superClass);
 
   function Oval() {
     return Oval.__super__.constructor.apply(this, arguments);
@@ -2264,8 +2266,8 @@ E.Oval = (function(_super) {
 
 })(E.Ellipse);
 
-E.Circle = (function(_super) {
-  __extends(Circle, _super);
+E.Circle = (function(superClass) {
+  extend(Circle, superClass);
 
   function Circle() {
     return Circle.__super__.constructor.apply(this, arguments);
@@ -2283,8 +2285,8 @@ E.Circle = (function(_super) {
 
 })(E.Ellipse);
 
-E.Point = (function(_super) {
-  __extends(Point, _super);
+E.Point = (function(superClass) {
+  extend(Point, superClass);
 
   Point.fill = 'fg';
 
@@ -2314,8 +2316,8 @@ E.Point = (function(_super) {
 
 })(Element);
 
-E.Egg = (function(_super) {
-  __extends(Egg, _super);
+E.Egg = (function(superClass) {
+  extend(Egg, superClass);
 
   Egg.prototype.shift = 1.5;
 
@@ -2352,8 +2354,8 @@ E.Egg = (function(_super) {
 
 })(E.Ellipse);
 
-E.Triangle = (function(_super) {
-  __extends(Triangle, _super);
+E.Triangle = (function(superClass) {
+  extend(Triangle, superClass);
 
   function Triangle() {
     return Triangle.__super__.constructor.apply(this, arguments);
@@ -2363,8 +2365,8 @@ E.Triangle = (function(_super) {
 
 })(Triangle);
 
-E.Plaintext = (function(_super) {
-  __extends(Plaintext, _super);
+E.Plaintext = (function(superClass) {
+  extend(Plaintext, superClass);
 
   function Plaintext() {
     return Plaintext.__super__.constructor.apply(this, arguments);
@@ -2378,8 +2380,8 @@ E.Plaintext = (function(_super) {
 
 })(Element);
 
-E.Diamond = (function(_super) {
-  __extends(Diamond, _super);
+E.Diamond = (function(superClass) {
+  extend(Diamond, superClass);
 
   function Diamond() {
     return Diamond.__super__.constructor.apply(this, arguments);
@@ -2389,8 +2391,8 @@ E.Diamond = (function(_super) {
 
 })(Lozenge);
 
-E.Trapezium = (function(_super) {
-  __extends(Trapezium, _super);
+E.Trapezium = (function(superClass) {
+  extend(Trapezium, superClass);
 
   function Trapezium() {
     return Trapezium.__super__.constructor.apply(this, arguments);
@@ -2400,8 +2402,8 @@ E.Trapezium = (function(_super) {
 
 })(Trapezium);
 
-E.Parallelogram = (function(_super) {
-  __extends(Parallelogram, _super);
+E.Parallelogram = (function(superClass) {
+  extend(Parallelogram, superClass);
 
   function Parallelogram() {
     return Parallelogram.__super__.constructor.apply(this, arguments);
@@ -2411,8 +2413,8 @@ E.Parallelogram = (function(_super) {
 
 })(Parallelogram);
 
-E.House = (function(_super) {
-  __extends(House, _super);
+E.House = (function(superClass) {
+  extend(House, superClass);
 
   function House() {
     return House.__super__.constructor.apply(this, arguments);
@@ -2422,8 +2424,8 @@ E.House = (function(_super) {
 
 })(House);
 
-E.Pentagon = (function(_super) {
-  __extends(Pentagon, _super);
+E.Pentagon = (function(superClass) {
+  extend(Pentagon, superClass);
 
   function Pentagon() {
     return Pentagon.__super__.constructor.apply(this, arguments);
@@ -2433,8 +2435,8 @@ E.Pentagon = (function(_super) {
 
 })(Pentagon);
 
-E.Hexagon = (function(_super) {
-  __extends(Hexagon, _super);
+E.Hexagon = (function(superClass) {
+  extend(Hexagon, superClass);
 
   function Hexagon() {
     return Hexagon.__super__.constructor.apply(this, arguments);
@@ -2444,8 +2446,8 @@ E.Hexagon = (function(_super) {
 
 })(Hexagon);
 
-E.Septagon = (function(_super) {
-  __extends(Septagon, _super);
+E.Septagon = (function(superClass) {
+  extend(Septagon, superClass);
 
   function Septagon() {
     return Septagon.__super__.constructor.apply(this, arguments);
@@ -2455,8 +2457,8 @@ E.Septagon = (function(_super) {
 
 })(Septagon);
 
-E.Octogon = (function(_super) {
-  __extends(Octogon, _super);
+E.Octogon = (function(superClass) {
+  extend(Octogon, superClass);
 
   function Octogon() {
     return Octogon.__super__.constructor.apply(this, arguments);
@@ -2466,8 +2468,8 @@ E.Octogon = (function(_super) {
 
 })(Octogon);
 
-E.Rect = (function(_super) {
-  __extends(Rect, _super);
+E.Rect = (function(superClass) {
+  extend(Rect, superClass);
 
   function Rect() {
     return Rect.__super__.constructor.apply(this, arguments);
@@ -2479,8 +2481,8 @@ E.Rect = (function(_super) {
 
 })(E.Box);
 
-E.Rectangle = (function(_super) {
-  __extends(Rectangle, _super);
+E.Rectangle = (function(superClass) {
+  extend(Rectangle, superClass);
 
   function Rectangle() {
     return Rectangle.__super__.constructor.apply(this, arguments);
@@ -2492,8 +2494,8 @@ E.Rectangle = (function(_super) {
 
 })(E.Box);
 
-E.Square = (function(_super) {
-  __extends(Square, _super);
+E.Square = (function(superClass) {
+  extend(Square, superClass);
 
   function Square() {
     return Square.__super__.constructor.apply(this, arguments);
@@ -2511,8 +2513,8 @@ E.Square = (function(_super) {
 
 })(E.Box);
 
-E.Star = (function(_super) {
-  __extends(Star, _super);
+E.Star = (function(superClass) {
+  extend(Star, superClass);
 
   function Star() {
     return Star.__super__.constructor.apply(this, arguments);
@@ -2522,8 +2524,8 @@ E.Star = (function(_super) {
 
 })(Star);
 
-E.None = (function(_super) {
-  __extends(None, _super);
+E.None = (function(superClass) {
+  extend(None, superClass);
 
   function None() {
     return None.__super__.constructor.apply(this, arguments);
@@ -2535,8 +2537,8 @@ E.None = (function(_super) {
 
 })(E.Plaintext);
 
-E.Underline = (function(_super) {
-  __extends(Underline, _super);
+E.Underline = (function(superClass) {
+  extend(Underline, superClass);
 
   function Underline() {
     return Underline.__super__.constructor.apply(this, arguments);
@@ -2553,8 +2555,8 @@ E.Underline = (function(_super) {
 
 })(Element);
 
-E.Note = (function(_super) {
-  __extends(Note, _super);
+E.Note = (function(superClass) {
+  extend(Note, superClass);
 
   function Note() {
     return Note.__super__.constructor.apply(this, arguments);
@@ -2564,8 +2566,8 @@ E.Note = (function(_super) {
 
 })(Note);
 
-L.Link = (function(_super) {
-  __extends(Link, _super);
+L.Link = (function(superClass) {
+  extend(Link, superClass);
 
   function Link() {
     return Link.__super__.constructor.apply(this, arguments);
@@ -2575,8 +2577,8 @@ L.Link = (function(_super) {
 
 })(Link);
 
-Diagrams.UseCase = (function(_super) {
-  __extends(UseCase, _super);
+Diagrams.UseCase = (function(superClass) {
+  extend(UseCase, superClass);
 
   UseCase.prototype.label = 'UML Use Case Diagram';
 
@@ -2591,8 +2593,8 @@ Diagrams.UseCase = (function(_super) {
 
 })(Diagram);
 
-Diagrams.UseCase.prototype.types.elements.Case = (function(_super) {
-  __extends(Case, _super);
+Diagrams.UseCase.prototype.types.elements.Case = (function(superClass) {
+  extend(Case, superClass);
 
   function Case() {
     return Case.__super__.constructor.apply(this, arguments);
@@ -2602,8 +2604,8 @@ Diagrams.UseCase.prototype.types.elements.Case = (function(_super) {
 
 })(Ellipsis);
 
-Diagrams.UseCase.prototype.types.elements.Actor = (function(_super) {
-  __extends(Actor, _super);
+Diagrams.UseCase.prototype.types.elements.Actor = (function(superClass) {
+  extend(Actor, superClass);
 
   function Actor() {
     Actor.__super__.constructor.apply(this, arguments);
@@ -2649,8 +2651,8 @@ Diagrams.UseCase.prototype.types.elements.Actor = (function(_super) {
 
 })(Element);
 
-Diagrams.UseCase.prototype.types.elements.System = (function(_super) {
-  __extends(System, _super);
+Diagrams.UseCase.prototype.types.elements.System = (function(superClass) {
+  extend(System, superClass);
 
   function System() {
     return System.__super__.constructor.apply(this, arguments);
@@ -2660,8 +2662,8 @@ Diagrams.UseCase.prototype.types.elements.System = (function(_super) {
 
 })(Group);
 
-Diagrams.UseCase.prototype.types.links.Association = (function(_super) {
-  __extends(Association, _super);
+Diagrams.UseCase.prototype.types.links.Association = (function(superClass) {
+  extend(Association, superClass);
 
   function Association() {
     return Association.__super__.constructor.apply(this, arguments);
@@ -2671,8 +2673,8 @@ Diagrams.UseCase.prototype.types.links.Association = (function(_super) {
 
 })(Association);
 
-Diagrams.UseCase.prototype.types.links.Inheritance = (function(_super) {
-  __extends(Inheritance, _super);
+Diagrams.UseCase.prototype.types.links.Inheritance = (function(superClass) {
+  extend(Inheritance, superClass);
 
   function Inheritance() {
     return Inheritance.__super__.constructor.apply(this, arguments);
@@ -2682,8 +2684,8 @@ Diagrams.UseCase.prototype.types.links.Inheritance = (function(_super) {
 
 })(Inheritance);
 
-Diagrams.UseCase.prototype.types.links.Aggregation = (function(_super) {
-  __extends(Aggregation, _super);
+Diagrams.UseCase.prototype.types.links.Aggregation = (function(superClass) {
+  extend(Aggregation, superClass);
 
   function Aggregation() {
     return Aggregation.__super__.constructor.apply(this, arguments);
@@ -2693,8 +2695,8 @@ Diagrams.UseCase.prototype.types.links.Aggregation = (function(_super) {
 
 })(Aggregation);
 
-Diagrams.UseCase.prototype.types.links.Composition = (function(_super) {
-  __extends(Composition, _super);
+Diagrams.UseCase.prototype.types.links.Composition = (function(superClass) {
+  extend(Composition, superClass);
 
   function Composition() {
     return Composition.__super__.constructor.apply(this, arguments);
@@ -2704,8 +2706,8 @@ Diagrams.UseCase.prototype.types.links.Composition = (function(_super) {
 
 })(Composition);
 
-Diagrams.UseCase.prototype.types.links.Comment = (function(_super) {
-  __extends(Comment, _super);
+Diagrams.UseCase.prototype.types.links.Comment = (function(superClass) {
+  extend(Comment, superClass);
 
   function Comment() {
     return Comment.__super__.constructor.apply(this, arguments);
@@ -2715,8 +2717,8 @@ Diagrams.UseCase.prototype.types.links.Comment = (function(_super) {
 
 })(Comment);
 
-Diagrams.Electric = (function(_super) {
-  __extends(Electric, _super);
+Diagrams.Electric = (function(superClass) {
+  extend(Electric, superClass);
 
   Electric.prototype.label = 'Electric Diagram';
 
@@ -2734,8 +2736,8 @@ Diagrams.Electric = (function(_super) {
 
 E = Diagrams.Electric.prototype.types.elements;
 
-Electric = (function(_super) {
-  __extends(Electric, _super);
+Electric = (function(superClass) {
+  extend(Electric, superClass);
 
   function Electric() {
     return Electric.__super__.constructor.apply(this, arguments);
@@ -2781,8 +2783,8 @@ Electric = (function(_super) {
 
 })(Element);
 
-E.Junction = (function(_super) {
-  __extends(Junction, _super);
+E.Junction = (function(superClass) {
+  extend(Junction, superClass);
 
   Junction.fill = 'fg';
 
@@ -2816,8 +2818,8 @@ E.Junction = (function(_super) {
 
 })(Electric);
 
-E.Resistor = (function(_super) {
-  __extends(Resistor, _super);
+E.Resistor = (function(superClass) {
+  extend(Resistor, superClass);
 
   function Resistor() {
     return Resistor.__super__.constructor.apply(this, arguments);
@@ -2830,23 +2832,23 @@ E.Resistor = (function(_super) {
   };
 
   Resistor.prototype.path = function() {
-    var h2, lw2, path, w, w2, _i;
+    var h2, j, lw2, path, w, w2;
     w2 = this.width() / 2;
     h2 = this.height() / 2;
     lw2 = w2 - this.wire_margin();
     path = "M " + (-w2) + " 0 L " + (-lw2) + " 0";
-    for (w = _i = -3; _i <= 2; w = ++_i) {
-      path = "" + path + " L " + (lw2 * w / 3 + lw2 / 6) + " " + (h2 * (w % 2 ? -1 : 1));
+    for (w = j = -3; j <= 2; w = ++j) {
+      path = path + " L " + (lw2 * w / 3 + lw2 / 6) + " " + (h2 * (w % 2 ? -1 : 1));
     }
-    return "" + path + " L " + lw2 + " 0 L " + w2 + " 0";
+    return path + " L " + lw2 + " 0 L " + w2 + " 0";
   };
 
   return Resistor;
 
 })(Electric);
 
-E.Diode = (function(_super) {
-  __extends(Diode, _super);
+E.Diode = (function(superClass) {
+  extend(Diode, superClass);
 
   function Diode() {
     return Diode.__super__.constructor.apply(this, arguments);
@@ -2864,8 +2866,8 @@ E.Diode = (function(_super) {
 
 })(Electric);
 
-E.Battery = (function(_super) {
-  __extends(Battery, _super);
+E.Battery = (function(superClass) {
+  extend(Battery, superClass);
 
   function Battery() {
     return Battery.__super__.constructor.apply(this, arguments);
@@ -2895,8 +2897,8 @@ E.Battery = (function(_super) {
 
 })(Electric);
 
-Transistor = (function(_super) {
-  __extends(Transistor, _super);
+Transistor = (function(superClass) {
+  extend(Transistor, superClass);
 
   function Transistor() {
     Transistor.__super__.constructor.apply(this, arguments);
@@ -2952,8 +2954,8 @@ Transistor = (function(_super) {
 
 })(Electric);
 
-E.PNPTransistor = (function(_super) {
-  __extends(PNPTransistor, _super);
+E.PNPTransistor = (function(superClass) {
+  extend(PNPTransistor, superClass);
 
   function PNPTransistor() {
     return PNPTransistor.__super__.constructor.apply(this, arguments);
@@ -2971,15 +2973,15 @@ E.PNPTransistor = (function(_super) {
     ha = lh2 * .7;
     wb = lw2 * .3;
     hb = lh2 * .4;
-    return "" + (PNPTransistor.__super__.path.call(this)) + " M " + ww + " " + (-hw) + " L " + wa + " " + (-ha) + " M " + ww + " " + (-hw) + " L " + wb + " " + (-hb);
+    return (PNPTransistor.__super__.path.call(this)) + " M " + ww + " " + (-hw) + " L " + wa + " " + (-ha) + " M " + ww + " " + (-hw) + " L " + wb + " " + (-hb);
   };
 
   return PNPTransistor;
 
 })(Transistor);
 
-E.NPNTransistor = (function(_super) {
-  __extends(NPNTransistor, _super);
+E.NPNTransistor = (function(superClass) {
+  extend(NPNTransistor, superClass);
 
   function NPNTransistor() {
     return NPNTransistor.__super__.constructor.apply(this, arguments);
@@ -2997,15 +2999,15 @@ E.NPNTransistor = (function(_super) {
     ha = lh2 * .7;
     wb = lw2 * .3;
     hb = lh2 * .4;
-    return "" + (NPNTransistor.__super__.path.call(this)) + " M " + ww + " " + hw + " L " + wa + " " + ha + " M " + ww + " " + hw + " L " + wb + " " + hb;
+    return (NPNTransistor.__super__.path.call(this)) + " M " + ww + " " + hw + " L " + wa + " " + ha + " M " + ww + " " + hw + " L " + wb + " " + hb;
   };
 
   return NPNTransistor;
 
 })(Transistor);
 
-Diagrams.Electric.prototype.types.links.Wire = (function(_super) {
-  __extends(Wire, _super);
+Diagrams.Electric.prototype.types.links.Wire = (function(superClass) {
+  extend(Wire, superClass);
 
   function Wire() {
     return Wire.__super__.constructor.apply(this, arguments);
@@ -3015,8 +3017,8 @@ Diagrams.Electric.prototype.types.links.Wire = (function(_super) {
 
 })(Link);
 
-Diagrams.Class = (function(_super) {
-  __extends(Class, _super);
+Diagrams.Class = (function(superClass) {
+  extend(Class, superClass);
 
   Class.prototype.label = 'UML Class Diagram';
 
@@ -3031,8 +3033,8 @@ Diagrams.Class = (function(_super) {
 
 })(Diagram);
 
-Diagrams.Class.prototype.types.elements.Note = (function(_super) {
-  __extends(Note, _super);
+Diagrams.Class.prototype.types.elements.Note = (function(superClass) {
+  extend(Note, superClass);
 
   function Note() {
     return Note.__super__.constructor.apply(this, arguments);
@@ -3042,8 +3044,8 @@ Diagrams.Class.prototype.types.elements.Note = (function(_super) {
 
 })(Note);
 
-Diagrams.Class.prototype.types.elements.Class = (function(_super) {
-  __extends(Class, _super);
+Diagrams.Class.prototype.types.elements.Class = (function(superClass) {
+  extend(Class, superClass);
 
   function Class() {
     return Class.__super__.constructor.apply(this, arguments);
@@ -3063,15 +3065,15 @@ Diagrams.Class.prototype.types.elements.Class = (function(_super) {
     var h2, w2;
     w2 = this.width() / 2;
     h2 = this.height() / 2;
-    return "" + (Class.__super__.path.call(this)) + " M " + (-w2) + " " + (h2 - this.shift) + " L " + w2 + " " + (h2 - this.shift) + " M " + (-w2) + " " + (h2 - 2 * this.shift) + " L " + w2 + " " + (h2 - 2 * this.shift);
+    return (Class.__super__.path.call(this)) + " M " + (-w2) + " " + (h2 - this.shift) + " L " + w2 + " " + (h2 - this.shift) + " M " + (-w2) + " " + (h2 - 2 * this.shift) + " L " + w2 + " " + (h2 - 2 * this.shift);
   };
 
   return Class;
 
 })(Rect);
 
-Diagrams.Class.prototype.types.elements.System = (function(_super) {
-  __extends(System, _super);
+Diagrams.Class.prototype.types.elements.System = (function(superClass) {
+  extend(System, superClass);
 
   function System() {
     return System.__super__.constructor.apply(this, arguments);
@@ -3083,8 +3085,8 @@ Diagrams.Class.prototype.types.elements.System = (function(_super) {
 
 L = Diagrams.Class.prototype.types.links;
 
-L.Association = (function(_super) {
-  __extends(Association, _super);
+L.Association = (function(superClass) {
+  extend(Association, superClass);
 
   function Association() {
     return Association.__super__.constructor.apply(this, arguments);
@@ -3094,8 +3096,8 @@ L.Association = (function(_super) {
 
 })(Association);
 
-L.Inheritance = (function(_super) {
-  __extends(Inheritance, _super);
+L.Inheritance = (function(superClass) {
+  extend(Inheritance, superClass);
 
   function Inheritance() {
     return Inheritance.__super__.constructor.apply(this, arguments);
@@ -3105,8 +3107,8 @@ L.Inheritance = (function(_super) {
 
 })(Inheritance);
 
-L.Aggregation = (function(_super) {
-  __extends(Aggregation, _super);
+L.Aggregation = (function(superClass) {
+  extend(Aggregation, superClass);
 
   function Aggregation() {
     return Aggregation.__super__.constructor.apply(this, arguments);
@@ -3116,8 +3118,8 @@ L.Aggregation = (function(_super) {
 
 })(Aggregation);
 
-L.Composition = (function(_super) {
-  __extends(Composition, _super);
+L.Composition = (function(superClass) {
+  extend(Composition, superClass);
 
   function Composition() {
     return Composition.__super__.constructor.apply(this, arguments);
@@ -3127,8 +3129,8 @@ L.Composition = (function(_super) {
 
 })(Composition);
 
-L.Comment = (function(_super) {
-  __extends(Comment, _super);
+L.Comment = (function(superClass) {
+  extend(Comment, superClass);
 
   function Comment() {
     return Comment.__super__.constructor.apply(this, arguments);
@@ -3149,7 +3151,7 @@ node_add = function(type, x, y) {
   nth = diagram.elements.filter(function(node) {
     return node instanceof cls;
   }).length + 1;
-  new_node = new cls(x, y, "" + type + " #" + nth, !diagram.force);
+  new_node = new cls(x, y, type + " #" + nth, !diagram.force);
   diagram.elements.push(new_node);
   if (d3.event) {
     diagram.selection = [new_node];
@@ -3158,31 +3160,31 @@ node_add = function(type, x, y) {
 };
 
 remove = function(nodes) {
-  var lnk, node, _i, _len, _results;
-  _results = [];
-  for (_i = 0, _len = nodes.length; _i < _len; _i++) {
-    node = nodes[_i];
-    if (__indexOf.call(diagram.elements, node) >= 0) {
+  var j, len1, lnk, node, results;
+  results = [];
+  for (j = 0, len1 = nodes.length; j < len1; j++) {
+    node = nodes[j];
+    if (indexOf.call(diagram.elements, node) >= 0) {
       diagram.elements.splice(diagram.elements.indexOf(node), 1);
-    } else if (__indexOf.call(diagram.links, node) >= 0) {
+    } else if (indexOf.call(diagram.links, node) >= 0) {
       diagram.links.splice(diagram.links.indexOf(node), 1);
     }
-    _results.push((function() {
-      var _j, _len1, _ref, _results1;
-      _ref = diagram.links.slice();
-      _results1 = [];
-      for (_j = 0, _len1 = _ref.length; _j < _len1; _j++) {
-        lnk = _ref[_j];
+    results.push((function() {
+      var len2, n, ref, results1;
+      ref = diagram.links.slice();
+      results1 = [];
+      for (n = 0, len2 = ref.length; n < len2; n++) {
+        lnk = ref[n];
         if (node === lnk.source || node === lnk.target) {
-          _results1.push(diagram.links.splice(diagram.links.indexOf(lnk), 1));
+          results1.push(diagram.links.splice(diagram.links.indexOf(lnk), 1));
         } else {
-          _results1.push(void 0);
+          results1.push(void 0);
         }
       }
-      return _results1;
+      return results1;
     })());
   }
-  return _results;
+  return results;
 };
 
 clip = {
@@ -3190,7 +3192,10 @@ clip = {
   links: []
 };
 
-cut = function() {
+cut = function(e) {
+  if ($(e.target).is('textarea')) {
+    return true;
+  }
   copy();
   remove(diagram.selection);
   diagram.selection = [];
@@ -3198,24 +3203,27 @@ cut = function() {
   return false;
 };
 
-copy = function() {
-  var elts, node, _i, _j, _len, _len1, _ref, _ref1, _ref2, _ref3;
+copy = function(e) {
+  var elts, j, len1, len2, n, node, ref, ref1, ref2, ref3;
+  if ($(e.target).is('textarea')) {
+    return true;
+  }
   clip.elements = [];
   clip.links = [];
   elts = [];
-  _ref = diagram.selection;
-  for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-    node = _ref[_i];
-    if (__indexOf.call(diagram.elements, node) >= 0) {
+  ref = diagram.selection;
+  for (j = 0, len1 = ref.length; j < len1; j++) {
+    node = ref[j];
+    if (indexOf.call(diagram.elements, node) >= 0) {
       clip.elements.push(node.objectify());
       elts.push(node);
     }
   }
-  _ref1 = diagram.selection;
-  for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
-    node = _ref1[_j];
-    if (__indexOf.call(diagram.links, node) >= 0) {
-      if ((_ref2 = node.source, __indexOf.call(diagram.selection, _ref2) >= 0) && (_ref3 = node.target, __indexOf.call(diagram.selection, _ref3) >= 0)) {
+  ref1 = diagram.selection;
+  for (n = 0, len2 = ref1.length; n < len2; n++) {
+    node = ref1[n];
+    if (indexOf.call(diagram.links, node) >= 0) {
+      if ((ref2 = node.source, indexOf.call(diagram.selection, ref2) >= 0) && (ref3 = node.target, indexOf.call(diagram.selection, ref3) >= 0)) {
         clip.links.push(node.objectify(elts));
       }
     }
@@ -3223,8 +3231,11 @@ copy = function() {
   return false;
 };
 
-paste = function() {
-  var elt, elts, link, node, shift, _i, _j, _len, _len1, _ref, _ref1;
+paste = function(e) {
+  var elt, elts, j, len1, len2, link, n, node, ref, ref1, shift;
+  if ($(e.target).is('textarea')) {
+    return true;
+  }
   elts = [];
   diagram.selection = [];
   if (!diagram.force) {
@@ -3238,9 +3249,9 @@ paste = function() {
       y: 0
     };
   }
-  _ref = clip.elements;
-  for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-    node = _ref[_i];
+  ref = clip.elements;
+  for (j = 0, len1 = ref.length; j < len1; j++) {
+    node = ref[j];
     elt = diagram.elementify(node);
     elt.x += shift.x;
     elt.y += shift.y;
@@ -3248,9 +3259,9 @@ paste = function() {
     elts.push(elt);
     diagram.selection.push(elt);
   }
-  _ref1 = clip.links;
-  for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
-    node = _ref1[_j];
+  ref1 = clip.links;
+  for (n = 0, len2 = ref1.length; n < len2; n++) {
+    node = ref1[n];
     link = diagram.linkify(node, elts);
     diagram.links.push(link);
     diagram.selection.push(link);
@@ -3317,7 +3328,7 @@ commands = {
         href: URL.createObjectURL(new Blob([svgout], {
           type: 'image/svg+xml'
         })),
-        download: "" + diagram.title + ".svg"
+        download: diagram.title + ".svg"
       }));
       $a[0].click();
       return $a.remove();
@@ -3358,14 +3369,14 @@ commands = {
           return ['', '#ffffff', '#000000'];
         }
       }), (function(txt) {
-        var node, _i, _len, _ref, _results;
-        _ref = diagram.selection;
-        _results = [];
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          node = _ref[_i];
-          _results.push(node.text = txt);
+        var j, len1, node, ref, results;
+        ref = diagram.selection;
+        results = [];
+        for (j = 0, len1 = ref.length; j < len1; j++) {
+          node = ref[j];
+          results.push(node.text = txt);
         }
-        return _results;
+        return results;
       }));
     },
     label: 'Edit elements text',
@@ -3427,10 +3438,10 @@ commands = {
   },
   snaptogrid: {
     fun: function() {
-      var node, _i, _len, _ref;
-      _ref = diagram.elements;
-      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        node = _ref[_i];
+      var j, len1, node, ref;
+      ref = diagram.elements;
+      for (j = 0, len1 = ref.length; j < len1; j++) {
+        node = ref[j];
         node.x = node.px = diagram.snap.x * Math.floor(node.x / diagram.snap.x);
         node.y = node.py = diagram.snap.y * Math.floor(node.y / diagram.snap.y);
       }
@@ -3442,18 +3453,18 @@ commands = {
   },
   "switch": {
     fun: function() {
-      var link, node, _i, _j, _len, _len1, _ref, _ref1, _ref2, _ref3;
-      _ref = diagram.selection;
-      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        node = _ref[_i];
+      var j, len1, len2, link, n, node, ref, ref1, ref2, ref3;
+      ref = diagram.selection;
+      for (j = 0, len1 = ref.length; j < len1; j++) {
+        node = ref[j];
         if (node instanceof Link) {
-          _ref1 = [node.target, node.source], node.source = _ref1[0], node.target = _ref1[1];
+          ref1 = [node.target, node.source], node.source = ref1[0], node.target = ref1[1];
         }
         if (node instanceof Element) {
-          _ref2 = diagram.links;
-          for (_j = 0, _len1 = _ref2.length; _j < _len1; _j++) {
-            link = _ref2[_j];
-            _ref3 = [link.target, link.source], link.source = _ref3[0], link.target = _ref3[1];
+          ref2 = diagram.links;
+          for (n = 0, len2 = ref2.length; n < len2; n++) {
+            link = ref2[n];
+            ref3 = [link.target, link.source], link.source = ref3[0], link.target = ref3[1];
           }
         }
       }
@@ -3465,17 +3476,17 @@ commands = {
   },
   cycle_start_marker: {
     fun: function() {
-      var link, node, _i, _j, _len, _len1, _ref, _ref1;
-      _ref = diagram.selection;
-      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        node = _ref[_i];
+      var j, len1, len2, link, n, node, ref, ref1;
+      ref = diagram.selection;
+      for (j = 0, len1 = ref.length; j < len1; j++) {
+        node = ref[j];
         if (node instanceof Link) {
           Markers._cycle(node, true);
         }
         if (node instanceof Element) {
-          _ref1 = diagram.links;
-          for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
-            link = _ref1[_j];
+          ref1 = diagram.links;
+          for (n = 0, len2 = ref1.length; n < len2; n++) {
+            link = ref1[n];
             Markers._cycle(link, true);
           }
         }
@@ -3488,17 +3499,17 @@ commands = {
   },
   cycle_end_marker: {
     fun: function() {
-      var link, node, _i, _j, _len, _len1, _ref, _ref1;
-      _ref = diagram.selection;
-      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        node = _ref[_i];
+      var j, len1, len2, link, n, node, ref, ref1;
+      ref = diagram.selection;
+      for (j = 0, len1 = ref.length; j < len1; j++) {
+        node = ref[j];
         if (node instanceof Link) {
           Markers._cycle(node);
         }
         if (node instanceof Element) {
-          _ref1 = diagram.links;
-          for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
-            link = _ref1[_j];
+          ref1 = diagram.links;
+          for (n = 0, len2 = ref1.length; n < len2; n++) {
+            link = ref1[n];
             Markers._cycle(link);
           }
         }
@@ -3542,7 +3553,7 @@ $(function() {
   for (name in commands) {
     command = commands[name];
     if (command.glyph) {
-      button = d3.select('.btns').append('button').attr('title', "" + command.label + " [" + command.hotkey + "]").attr('class', 'btn btn-default btn-sm').on('click', command.fun).append('span').attr('class', "glyphicon glyphicon-" + command.glyph);
+      button = d3.select('.btns').append('button').attr('title', command.label + " [" + command.hotkey + "]").attr('class', 'btn btn-default btn-sm').on('click', command.fun).append('span').attr('class', "glyphicon glyphicon-" + command.glyph);
     }
     Mousetrap.bind(command.hotkey, wrap(command.fun));
   }
@@ -3560,16 +3571,16 @@ $(function() {
 });
 
 init_commands = function() {
-  var cls, conf, e1, e2, element, first, fun, hotkey, i, icon, inc, key, link, margin, name, svgicon, taken_hotkeys, val, way, _ref, _ref1, _ref2, _ref3, _results;
-  _ref = diagram.force_conf;
-  for (conf in _ref) {
-    val = _ref[conf];
-    _ref1 = {
+  var cls, conf, e1, e2, element, first, fun, hotkey, i, icon, inc, key, link, margin, name, ref, ref1, ref2, ref3, results, svgicon, taken_hotkeys, val, way;
+  ref = diagram.force_conf;
+  for (conf in ref) {
+    val = ref[conf];
+    ref1 = {
       increase: 1.1,
       decrease: 0.9
     };
-    for (way in _ref1) {
-      inc = _ref1[way];
+    for (way in ref1) {
+      inc = ref1[way];
       Mousetrap.bind("f " + conf[0] + " " + (way === 'increase' ? '+' : '-'), (function(c, i) {
         return wrap(function(e) {
           if (diagram.force) {
@@ -3587,15 +3598,15 @@ init_commands = function() {
   });
   $('aside .icons svg').remove();
   $('aside h3').attr('id', diagram.cls.name).addClass('specific').text(diagram.label);
-  _ref2 = diagram.types.elements;
-  for (name in _ref2) {
-    cls = _ref2[name];
+  ref2 = diagram.types.elements;
+  for (name in ref2) {
+    cls = ref2[name];
     if (cls.alias) {
       continue;
     }
     i = 1;
     key = name[0].toLowerCase();
-    while (i < name.length && __indexOf.call(taken_hotkeys, key) >= 0) {
+    while (i < name.length && indexOf.call(taken_hotkeys, key) >= 0) {
       key = name[i++].toLowerCase();
     }
     taken_hotkeys.push(key);
@@ -3606,23 +3617,23 @@ init_commands = function() {
     })(cls);
     hotkey = "a " + key;
     icon = new cls(0, 0, name);
-    svgicon = d3.select('aside .icons').append('svg').attr('class', 'icon specific draggable btn btn-default').attr('title', "" + name + " [" + hotkey + "]").attr('data-hotkey', hotkey).attr('data-type', name).call(extern_drag);
+    svgicon = d3.select('aside .icons').append('svg').attr('class', 'icon specific draggable btn btn-default').attr('title', name + " [" + hotkey + "]").attr('data-hotkey', hotkey).attr('data-type', name).call(extern_drag);
     element = svgicon.selectAll('g.element').data([icon]);
     element.enter().call(enter_node, false);
     element.call(update_node);
     margin = 3;
-    svgicon.attr('viewBox', "" + (-icon.width() / 2 - margin) + " " + (-icon.height() / 2 - margin) + " " + (icon.width() + 2 * margin) + " " + (icon.height() + 2 * margin)).attr('width', icon.width()).attr('height', icon.height()).attr('preserveAspectRatio', 'xMidYMid meet');
+    svgicon.attr('viewBox', (-icon.width() / 2 - margin) + " " + (-icon.height() / 2 - margin) + " " + (icon.width() + 2 * margin) + " " + (icon.height() + 2 * margin)).attr('width', icon.width()).attr('height', icon.height()).attr('preserveAspectRatio', 'xMidYMid meet');
     Mousetrap.bind(hotkey, wrap(fun));
   }
   taken_hotkeys = [];
   first = true;
-  _ref3 = diagram.types.links;
-  _results = [];
-  for (name in _ref3) {
-    cls = _ref3[name];
+  ref3 = diagram.types.links;
+  results = [];
+  for (name in ref3) {
+    cls = ref3[name];
     i = 1;
     key = name[0].toLowerCase();
-    while (i < name.length && __indexOf.call(taken_hotkeys, key) >= 0) {
+    while (i < name.length && indexOf.call(taken_hotkeys, key) >= 0) {
       key = name[i++].toLowerCase();
     }
     taken_hotkeys.push(key);
@@ -3643,7 +3654,7 @@ init_commands = function() {
         return d3.select(this).classed('active', true);
       };
     };
-    svgicon = d3.select('aside .icons').append('svg').attr('class', "icon specific btn btn-default link " + name).attr('title', "" + name + " [" + hotkey + "]").attr('data-hotkey', hotkey).classed('active', first).on('click', fun(cls));
+    svgicon = d3.select('aside .icons').append('svg').attr('class', "icon specific btn btn-default link " + name).attr('title', name + " [" + hotkey + "]").attr('data-hotkey', hotkey).classed('active', first).on('click', fun(cls));
     link = svgicon.selectAll('g.link').data([icon]);
     link.enter().call(enter_link, false);
     link.call(update_link);
@@ -3652,16 +3663,16 @@ init_commands = function() {
     Mousetrap.bind(hotkey, wrap(fun));
     if (first) {
       diagram.last_types.link = cls;
-      _results.push(first = false);
+      results.push(first = false);
     } else {
-      _results.push(void 0);
+      results.push(void 0);
     }
   }
-  return _results;
+  return results;
 };
 
 edit = function(getter, setter, color) {
-  var $overlay, $textarea, bg, close, fg, text, _ref;
+  var $overlay, $textarea, bg, close, fg, ref, text;
   if (color == null) {
     color = true;
   }
@@ -3670,14 +3681,14 @@ edit = function(getter, setter, color) {
   $textarea.on('input', function() {
     var val;
     setter(((function() {
-      var _i, _len, _ref, _results;
-      _ref = this.value.split('\n');
-      _results = [];
-      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        val = _ref[_i];
-        _results.push(val || ' ');
+      var j, len1, ref, results;
+      ref = this.value.split('\n');
+      results = [];
+      for (j = 0, len1 = ref.length; j < len1; j++) {
+        val = ref[j];
+        results.push(val || ' ');
       }
-      return _results;
+      return results;
     }).call(this)).join('\n'));
     return svg.sync();
   }).on('keydown', function(e) {
@@ -3687,9 +3698,9 @@ edit = function(getter, setter, color) {
   });
   if (color) {
     $overlay.find('.with-color').show();
-    _ref = getter(), text = _ref[0], fg = _ref[1], bg = _ref[2];
-    $('.color-box.fg').css('background-color', fg || '#000000');
-    $('.color-box.bg').css('background-color', bg || '#ffffff');
+    ref = getter(), text = ref[0], fg = ref[1], bg = ref[2];
+    $('.color-box.fg').spectrum('set', fg || '#000000');
+    $('.color-box.bg').spectrum('set', bg || '#ffffff');
   } else {
     $overlay.find('.with-color').hide();
     text = getter();
@@ -3701,7 +3712,7 @@ edit = function(getter, setter, color) {
       $textarea.off('keydown');
       $textarea.val('');
       $overlay.removeClass('visible');
-      $('.color-box').colpickHide();
+      $('.color-box').spectrum('hide');
       return svg.sync(true);
     }
   };
@@ -3758,36 +3769,36 @@ svg_selection_drag = d3.behavior.drag().on("dragstart.selection", function() {
   rect.height = Math.max(0, rect.height);
   sel.attr(rect);
   svg.svg.selectAll('g.element').each(function(elt) {
-    var g, inside, link, selected, _i, _j, _len, _len1, _ref, _ref1, _ref2, _ref3, _ref4, _ref5, _results, _results1;
+    var g, inside, j, len1, len2, link, n, ref, ref1, ref2, ref3, ref4, ref5, results, results1, selected;
     g = d3.select(this);
-    selected = __indexOf.call(diagram.selection, elt) >= 0;
+    selected = indexOf.call(diagram.selection, elt) >= 0;
     inside = elt["in"](rect);
     if (inside && !selected) {
       diagram.selection.push(elt);
-      _ref = diagram.links;
-      _results = [];
-      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        link = _ref[_i];
-        if ((link.source === elt && (_ref1 = link.target, __indexOf.call(diagram.selection, _ref1) >= 0) && __indexOf.call(diagram.selection, link) < 0) || (link.target === elt && (_ref2 = link.source, __indexOf.call(diagram.selection, _ref2) >= 0) && __indexOf.call(diagram.selection, link) < 0)) {
-          _results.push(diagram.selection.push(link));
+      ref = diagram.links;
+      results = [];
+      for (j = 0, len1 = ref.length; j < len1; j++) {
+        link = ref[j];
+        if ((link.source === elt && (ref1 = link.target, indexOf.call(diagram.selection, ref1) >= 0) && indexOf.call(diagram.selection, link) < 0) || (link.target === elt && (ref2 = link.source, indexOf.call(diagram.selection, ref2) >= 0) && indexOf.call(diagram.selection, link) < 0)) {
+          results.push(diagram.selection.push(link));
         } else {
-          _results.push(void 0);
+          results.push(void 0);
         }
       }
-      return _results;
+      return results;
     } else if (!inside && selected) {
       diagram.selection.splice(diagram.selection.indexOf(elt), 1);
-      _ref3 = diagram.links;
-      _results1 = [];
-      for (_j = 0, _len1 = _ref3.length; _j < _len1; _j++) {
-        link = _ref3[_j];
-        if ((link.source === elt && (_ref4 = link.target, __indexOf.call(diagram.selection, _ref4) < 0) && __indexOf.call(diagram.selection, link) >= 0) || (link.target === elt && (_ref5 = link.source, __indexOf.call(diagram.selection, _ref5) < 0) && __indexOf.call(diagram.selection, link) >= 0)) {
-          _results1.push(diagram.selection.splice(diagram.selection.indexOf(link), 1));
+      ref3 = diagram.links;
+      results1 = [];
+      for (n = 0, len2 = ref3.length; n < len2; n++) {
+        link = ref3[n];
+        if ((link.source === elt && (ref4 = link.target, indexOf.call(diagram.selection, ref4) < 0) && indexOf.call(diagram.selection, link) >= 0) || (link.target === elt && (ref5 = link.source, indexOf.call(diagram.selection, ref5) < 0) && indexOf.call(diagram.selection, link) >= 0)) {
+          results1.push(diagram.selection.splice(diagram.selection.indexOf(link), 1));
         } else {
-          _results1.push(void 0);
+          results1.push(void 0);
         }
       }
-      return _results1;
+      return results1;
     }
   });
   return svg.tick();
@@ -3809,7 +3820,7 @@ move_drag = d3.behavior.drag().origin(function(i) {
 }).on('dragstart.move', function(node) {
   svg.svg.classed('dragging', true);
   svg.svg.classed('translating', true);
-  if (__indexOf.call(diagram.selection, node) < 0) {
+  if (indexOf.call(diagram.selection, node) < 0) {
     if (d3.event.sourceEvent.shiftKey) {
       diagram.selection.push(node);
     } else {
@@ -3824,15 +3835,15 @@ move_drag = d3.behavior.drag().origin(function(i) {
   svg.tick();
   return d3.event.sourceEvent.stopPropagation();
 }).on("drag.move", function(node) {
-  var delta, nod, x, y, _i, _j, _len, _len1, _ref, _ref1, _ref2;
+  var delta, j, len1, len2, n, nod, ref, ref1, ref2, x, y;
   x = diagram.force ? 'px' : 'x';
   y = diagram.force ? 'py' : 'y';
-  if (_ref = !node, __indexOf.call(diagram.selection, _ref) >= 0) {
+  if (ref = !node, indexOf.call(diagram.selection, ref) >= 0) {
     diagram.selection.push(node);
   }
-  _ref1 = diagram.selection;
-  for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
-    nod = _ref1[_i];
+  ref1 = diagram.selection;
+  for (j = 0, len1 = ref1.length; j < len1; j++) {
+    nod = ref1[j];
     nod.fixed = true;
   }
   if (d3.event.sourceEvent.shiftKey) {
@@ -3846,9 +3857,9 @@ move_drag = d3.behavior.drag().origin(function(i) {
       y: node[y] - diagram.snap.y * Math.floor(d3.event.y / diagram.snap.y)
     };
   }
-  _ref2 = diagram.selection;
-  for (_j = 0, _len1 = _ref2.length; _j < _len1; _j++) {
-    nod = _ref2[_j];
+  ref2 = diagram.selection;
+  for (n = 0, len2 = ref2.length; n < len2; n++) {
+    nod = ref2[n];
     nod[x] -= delta.x;
     nod[y] -= delta.y;
   }
@@ -3858,25 +3869,25 @@ move_drag = d3.behavior.drag().origin(function(i) {
     return svg.tick();
   }
 }).on('dragend.move', function(node) {
-  var index, lnk, _i, _j, _k, _len, _len1, _len2, _ref, _ref1, _ref2;
+  var index, j, len1, len2, len3, lnk, n, p, ref, ref1, ref2;
   svg.svg.classed('dragging', false);
   svg.svg.classed('translating', false);
-  _ref = diagram.elements;
-  for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-    node = _ref[_i];
+  ref = diagram.elements;
+  for (j = 0, len1 = ref.length; j < len1; j++) {
+    node = ref[j];
     node.fixed = false;
   }
   diagram.dragging = false;
   if (!$(d3.event.sourceEvent.target).closest('.inside').size()) {
-    _ref1 = diagram.selection;
-    for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
-      node = _ref1[_j];
-      if (__indexOf.call(diagram.elements, node) >= 0) {
+    ref1 = diagram.selection;
+    for (n = 0, len2 = ref1.length; n < len2; n++) {
+      node = ref1[n];
+      if (indexOf.call(diagram.elements, node) >= 0) {
         diagram.elements.splice(diagram.elements.indexOf(node), 1);
       }
-      _ref2 = diagram.links.slice();
-      for (_k = 0, _len2 = _ref2.length; _k < _len2; _k++) {
-        lnk = _ref2[_k];
+      ref2 = diagram.links.slice();
+      for (p = 0, len3 = ref2.length; p < len3; p++) {
+        lnk = ref2[p];
         if (node === lnk.source || node === lnk.target) {
           index = diagram.links.indexOf(lnk);
           if (index >= 0) {
@@ -4180,20 +4191,20 @@ enter_node = function(nodes, connect) {
 };
 
 write_text = function(txt, text) {
-  var i, line, tspan, _i, _len, _ref, _results;
+  var i, j, len1, line, ref, results, tspan;
   txt.selectAll('tspan').remove();
-  _ref = text.split('\n');
-  _results = [];
-  for (i = _i = 0, _len = _ref.length; _i < _len; i = ++_i) {
-    line = _ref[i];
+  ref = text.split('\n');
+  results = [];
+  for (i = j = 0, len1 = ref.length; j < len1; i = ++j) {
+    line = ref[i];
     tspan = txt.append('tspan').text(line).attr('x', 0);
     if (i !== 0) {
-      _results.push(tspan.attr('dy', '17px'));
+      results.push(tspan.attr('dy', '17px'));
     } else {
-      _results.push(void 0);
+      results.push(void 0);
     }
   }
-  return _results;
+  return results;
 };
 
 update_node = function(nodes) {
@@ -4242,11 +4253,11 @@ enter_link = function(links, connect) {
   g.append("path").attr('class', function(link) {
     return "shape " + link.cls.type;
   }).attr("marker-start", function(link) {
-    var _ref;
-    return "url(#" + (((_ref = link.marker_start) != null ? _ref.id : void 0) || link.cls.marker_start.id) + ")";
+    var ref;
+    return "url(#" + (((ref = link.marker_start) != null ? ref.id : void 0) || link.cls.marker_start.id) + ")";
   }).attr("marker-end", function(link) {
-    var _ref;
-    return "url(#" + (((_ref = link.marker_end) != null ? _ref.id : void 0) || link.cls.marker_end.id) + ")";
+    var ref;
+    return "url(#" + (((ref = link.marker_end) != null ? ref.id : void 0) || link.cls.marker_end.id) + ")";
   });
   g.each(function(link) {
     var node, txt;
@@ -4268,8 +4279,8 @@ enter_link = function(links, connect) {
 
 update_link = function(links) {
   links.each(function(link) {
-    var _ref, _ref1;
-    return d3.select(this).selectAll('path').attr('d', link.path()).attr("marker-start", "url(#" + (((_ref1 = link.marker_start) != null ? _ref1.id : void 0) || link.cls.marker_start.id) + ")").attr("marker-end", "url(#" + (((_ref = link.marker_end) != null ? _ref.id : void 0) || link.cls.marker_end.id) + ")");
+    var ref, ref1;
+    return d3.select(this).selectAll('path').attr('d', link.path()).attr("marker-start", "url(#" + (((ref1 = link.marker_start) != null ? ref1.id : void 0) || link.cls.marker_start.id) + ")").attr("marker-end", "url(#" + (((ref = link.marker_end) != null ? ref.id : void 0) || link.cls.marker_end.id) + ")");
   });
   links.each(function(link) {
     var g, txt;
@@ -4356,13 +4367,13 @@ tick_node = function(nodes) {
   return nodes.attr("transform", (function(node) {
     return "translate(" + node.x + "," + node.y + ")rotate(" + (to_svg_angle(node._rotation)) + ")";
   })).classed('selected', function(node) {
-    return __indexOf.call(diagram.selection, node) >= 0;
+    return indexOf.call(diagram.selection, node) >= 0;
   });
 };
 
 tick_link = function(links) {
   links.classed('selected', function(link) {
-    return __indexOf.call(diagram.selection, link) >= 0;
+    return indexOf.call(diagram.selection, link) >= 0;
   });
   links.each(function(link) {
     return d3.select(this).selectAll('path').attr('d', link.path());
@@ -4423,19 +4434,19 @@ mouse_xy = function(e) {
 
 zoom = d3.behavior.zoom();
 
-Svg = (function(_super) {
-  __extends(Svg, _super);
+Svg = (function(superClass) {
+  extend(Svg, superClass);
 
   function Svg() {
-    this.create = __bind(this.create, this);
+    this.create = bind(this.create, this);
     var article;
     Svg.__super__.constructor.apply(this, arguments);
     article = d3.select("article").node();
     this.width = article.clientWidth;
     this.height = article.clientHeight || 500;
     this.zoom = zoom.scale(diagram.zoom.scale).translate(diagram.zoom.translate).scaleExtent([.05, 5]).on("zoom", function() {
-      var _ref;
-      if (!((_ref = d3.event.sourceEvent) != null ? _ref.shiftKey : void 0)) {
+      var ref;
+      if (!((ref = d3.event.sourceEvent) != null ? ref.shiftKey : void 0)) {
         diagram.zoom.translate = d3.event.translate;
         diagram.zoom.scale = d3.event.scale;
         return svg.sync_transform();
@@ -4538,7 +4549,7 @@ load = function(data) {
 };
 
 save = function() {
-  return localStorage.setItem("" + diagram.cls.name + "|" + diagram.title, diagram.hash());
+  return localStorage.setItem(diagram.cls.name + "|" + diagram.title, diagram.hash());
 };
 
 generate_url = function() {
@@ -4610,13 +4621,13 @@ history_pop = function() {
 };
 
 list_local = function() {
-  var $tbody, $tr, b64_diagram, key, title, type, _ref;
+  var $tbody, $tr, b64_diagram, key, ref, title, type;
   $tbody = $('.table.local tbody');
   $tbody.find('tr').remove();
   $('.local').show();
   for (key in localStorage) {
     b64_diagram = localStorage[key];
-    _ref = key.split('|'), type = _ref[0], title = _ref[1];
+    ref = key.split('|'), type = ref[0], title = ref[1];
     if (title == null) {
       continue;
     }
@@ -4639,10 +4650,10 @@ list_local = function() {
 };
 
 list_new = function() {
-  var $tbody, $tr, b64_diagram, diagram, name, type, _results;
+  var $tbody, $tr, b64_diagram, diagram, name, results, type;
   $tbody = $('.table.new tbody');
   $tbody.find('tr').remove();
-  _results = [];
+  results = [];
   for (name in Diagrams) {
     type = Diagrams[name];
     if (name.match(/^_/)) {
@@ -4651,11 +4662,11 @@ list_new = function() {
     diagram = new type();
     b64_diagram = diagram.hash();
     $tbody.append($tr = $('<tr>'));
-    _results.push($tr.append($('<td>').text(diagram.label), $('<td>').append($('<a>').attr('href', "#" + b64_diagram).append($('<i>', {
+    results.push($tr.append($('<td>').text(diagram.label), $('<td>').append($('<a>').attr('href', "#" + b64_diagram).append($('<i>', {
       "class": 'glyphicon glyphicon-file'
     })))));
   }
-  return _results;
+  return results;
 };
 
 list_diagrams = function() {
@@ -4703,8 +4714,8 @@ Token = (function() {
 
 })();
 
-Keyword = (function(_super) {
-  __extends(Keyword, _super);
+Keyword = (function(superClass) {
+  extend(Keyword, superClass);
 
   function Keyword() {
     return Keyword.__super__.constructor.apply(this, arguments);
@@ -4714,8 +4725,8 @@ Keyword = (function(_super) {
 
 })(Token);
 
-Id = (function(_super) {
-  __extends(Id, _super);
+Id = (function(superClass) {
+  extend(Id, superClass);
 
   function Id() {
     return Id.__super__.constructor.apply(this, arguments);
@@ -4725,8 +4736,8 @@ Id = (function(_super) {
 
 })(Token);
 
-Number = (function(_super) {
-  __extends(Number, _super);
+Number = (function(superClass) {
+  extend(Number, superClass);
 
   function Number() {
     return Number.__super__.constructor.apply(this, arguments);
@@ -4736,8 +4747,8 @@ Number = (function(_super) {
 
 })(Id);
 
-QuotedId = (function(_super) {
-  __extends(QuotedId, _super);
+QuotedId = (function(superClass) {
+  extend(QuotedId, superClass);
 
   function QuotedId() {
     return QuotedId.__super__.constructor.apply(this, arguments);
@@ -4747,8 +4758,8 @@ QuotedId = (function(_super) {
 
 })(Id);
 
-Brace = (function(_super) {
-  __extends(Brace, _super);
+Brace = (function(superClass) {
+  extend(Brace, superClass);
 
   function Brace() {
     return Brace.__super__.constructor.apply(this, arguments);
@@ -4758,8 +4769,8 @@ Brace = (function(_super) {
 
 })(Token);
 
-Delimiter = (function(_super) {
-  __extends(Delimiter, _super);
+Delimiter = (function(superClass) {
+  extend(Delimiter, superClass);
 
   function Delimiter() {
     return Delimiter.__super__.constructor.apply(this, arguments);
@@ -4769,8 +4780,8 @@ Delimiter = (function(_super) {
 
 })(Token);
 
-Assign = (function(_super) {
-  __extends(Assign, _super);
+Assign = (function(superClass) {
+  extend(Assign, superClass);
 
   function Assign() {
     return Assign.__super__.constructor.apply(this, arguments);
@@ -4780,8 +4791,8 @@ Assign = (function(_super) {
 
 })(Token);
 
-Operator = (function(_super) {
-  __extends(Operator, _super);
+Operator = (function(superClass) {
+  extend(Operator, superClass);
 
   function Operator() {
     return Operator.__super__.constructor.apply(this, arguments);
@@ -4792,7 +4803,7 @@ Operator = (function(_super) {
 })(Token);
 
 dot_tokenize = function(s) {
-  var chr, col, escape, id, last_chr, len, op, pos, row, token, tokens, _ref, _ref1;
+  var chr, col, escape, id, last_chr, len, op, pos, ref, ref1, row, token, tokens;
   pos = 0;
   row = 0;
   col = 0;
@@ -4814,20 +4825,20 @@ dot_tokenize = function(s) {
       token = new Assign(chr);
     } else if (chr === '-') {
       op = chr + s[pos++];
-      if (__indexOf.call(OPERATORS, op) >= 0) {
+      if (indexOf.call(OPERATORS, op) >= 0) {
         token = new Operator(op);
       }
-    } else if (__indexOf.call(BRACES, chr) >= 0) {
+    } else if (indexOf.call(BRACES, chr) >= 0) {
       token = new Brace(chr);
-    } else if (__indexOf.call(DELIMITERS, chr) >= 0) {
+    } else if (indexOf.call(DELIMITERS, chr) >= 0) {
       token = new Delimiter(chr);
     } else if (chr.match(RE_ALPHA)) {
       id = chr;
-      while ((_ref = (chr = s[pos++])) != null ? _ref.match(RE_ALPHADIGIT) : void 0) {
+      while ((ref = (chr = s[pos++])) != null ? ref.match(RE_ALPHADIGIT) : void 0) {
         id += chr;
       }
       pos--;
-      if (__indexOf.call(KEYWORDS, id) >= 0) {
+      if (indexOf.call(KEYWORDS, id) >= 0) {
         token = new Keyword(id);
       } else {
         token = new Id(id);
@@ -4861,7 +4872,7 @@ dot_tokenize = function(s) {
       token = new QuotedId(id);
     } else if (chr.match(RE_DIGIT)) {
       id = chr;
-      while ((_ref1 = (chr = s[pos++])) != null ? _ref1.match(RE_DIGIT) : void 0) {
+      while ((ref1 = (chr = s[pos++])) != null ? ref1.match(RE_DIGIT) : void 0) {
         id += chr;
       }
       pos--;
@@ -4898,10 +4909,10 @@ dot_tokenize = function(s) {
 };
 
 Graph = (function() {
-  function Graph(type, id, strict) {
-    this.type = type;
-    this.id = id;
-    this.strict = strict;
+  function Graph(type1, id1, strict1) {
+    this.type = type1;
+    this.id = id1;
+    this.strict = strict1;
     this.statements = [];
   }
 
@@ -4913,11 +4924,11 @@ Statement = (function() {
   function Statement() {}
 
   Statement.prototype.get_attrs = function() {
-    var attribute, attrs, _i, _len, _ref;
+    var attribute, attrs, j, len1, ref;
     attrs = {};
-    _ref = this.attributes;
-    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-      attribute = _ref[_i];
+    ref = this.attributes;
+    for (j = 0, len1 = ref.length; j < len1; j++) {
+      attribute = ref[j];
       attrs[attribute.left] = attribute.right;
     }
     return attrs;
@@ -4928,8 +4939,8 @@ Statement = (function() {
 })();
 
 SubGraph = (function() {
-  function SubGraph(id) {
-    this.id = id;
+  function SubGraph(id1) {
+    this.id = id1;
     this.statements = [];
   }
 
@@ -4937,21 +4948,21 @@ SubGraph = (function() {
 
 })();
 
-Node = (function(_super) {
-  __extends(Node, _super);
+Node = (function(superClass) {
+  extend(Node, superClass);
 
-  function Node(id, port, compass_pt) {
-    this.id = id;
-    this.port = port;
-    this.compass_pt = compass_pt;
+  function Node(id1, port1, compass_pt1) {
+    this.id = id1;
+    this.port = port1;
+    this.compass_pt = compass_pt1;
   }
 
   return Node;
 
 })(Statement);
 
-Edge = (function(_super) {
-  __extends(Edge, _super);
+Edge = (function(superClass) {
+  extend(Edge, superClass);
 
   function Edge() {
     this.nodes = [];
@@ -4963,20 +4974,20 @@ Edge = (function(_super) {
 })(Statement);
 
 Attribute = (function() {
-  function Attribute(left, right) {
-    this.left = left;
-    this.right = right;
+  function Attribute(left1, right1) {
+    this.left = left1;
+    this.right = right1;
   }
 
   return Attribute;
 
 })();
 
-Attributes = (function(_super) {
-  __extends(Attributes, _super);
+Attributes = (function(superClass) {
+  extend(Attributes, superClass);
 
-  function Attributes(type) {
-    this.type = type;
+  function Attributes(type1) {
+    this.type = type1;
     this.attributes = [];
   }
 
@@ -5072,7 +5083,7 @@ dot_lex = function(tokens) {
     return subgraph;
   };
   parse_node = function() {
-    var compass_pt, node, port, _ref;
+    var compass_pt, node, port, ref;
     if (tokens[pos] instanceof Keyword && tokens[pos].value === 'subgraph') {
       node = parse_subgraph();
     } else if (tokens[pos] instanceof Brace && tokens[pos].value === '{') {
@@ -5092,12 +5103,12 @@ dot_lex = function(tokens) {
         port = tokens[pos].value;
         if (tokens[pos + 1] instanceof Delimiter && tokens[pos + 1].value === ':') {
           pos += 2;
-          if (!(tokens[pos] instanceof Id) || (_ref = tokens[pos].value, __indexOf.call(COMPASS_PTS, _ref) < 0)) {
+          if (!(tokens[pos] instanceof Id) || (ref = tokens[pos].value, indexOf.call(COMPASS_PTS, ref) < 0)) {
             throw new ParserError("Invalid compass point '" + tokens[pos].value + "'");
           }
           compass_pt = tokens[pos].value;
         }
-        if (port && !compass_pt && __indexOf.call(COMPASS_PTS, port) >= 0) {
+        if (port && !compass_pt && indexOf.call(COMPASS_PTS, port) >= 0) {
           compass_pt = port;
           port = null;
         }
@@ -5116,12 +5127,12 @@ dot_lex = function(tokens) {
     return node_list;
   };
   parse_statement = function() {
-    var left, statement, _ref;
+    var left, ref, statement;
     if (tokens[pos] instanceof Brace && tokens[pos].value === '}') {
       return null;
     }
     if (tokens[pos] instanceof Keyword && tokens[pos].value !== 'subgraph') {
-      if ((_ref = tokens[pos].value) !== 'graph' && _ref !== 'node' && _ref !== 'edge') {
+      if ((ref = tokens[pos].value) !== 'graph' && ref !== 'node' && ref !== 'edge') {
         throw new ParserError('Unexpected keyword ' + tokens[pos]);
       }
       statement = new Attributes(tokens[pos++].value);
@@ -5182,7 +5193,7 @@ dot_lex = function(tokens) {
 };
 
 dot = function(src) {
-  var attributes, copy_attributes, d, e, elements_by_id, elt, fixed, graph, id, l, links_by_id, lnk, nodes_by_id, populate, tokens, x, y, _i, _len, _ref;
+  var attributes, copy_attributes, d, e, elements_by_id, elt, fixed, graph, id, j, l, len1, links_by_id, lnk, nodes_by_id, populate, ref, tokens, x, y;
   tokens = dot_tokenize(src);
   graph = dot_lex(tokens);
   d = window.diagram = new Diagrams.Dot();
@@ -5202,10 +5213,10 @@ dot = function(src) {
     };
   };
   populate = function(statements) {
-    var Type, current_attributes, i, label, ltype, node, old_attributes, prev_node, statement, sub_node, sub_prev_node, sub_prev_statement, sub_statement, type, _i, _len, _results;
-    _results = [];
-    for (_i = 0, _len = statements.length; _i < _len; _i++) {
-      statement = statements[_i];
+    var Type, current_attributes, i, j, label, len1, ltype, node, old_attributes, prev_node, results, statement, sub_node, sub_prev_node, sub_prev_statement, sub_statement, type;
+    results = [];
+    for (j = 0, len1 = statements.length; j < len1; j++) {
+      statement = statements[j];
       if (statement instanceof Attributes) {
         merge(attributes[statement.type], statement.get_attrs());
         continue;
@@ -5224,12 +5235,12 @@ dot = function(src) {
       } else {
         merge(current_attributes.edge, statement.get_attrs());
       }
-      _results.push((function() {
-        var _j, _len1, _ref, _results1;
-        _ref = statement.nodes;
-        _results1 = [];
-        for (i = _j = 0, _len1 = _ref.length; _j < _len1; i = ++_j) {
-          node = _ref[i];
+      results.push((function() {
+        var len2, n, ref, results1;
+        ref = statement.nodes;
+        results1 = [];
+        for (i = n = 0, len2 = ref.length; n < len2; i = ++n) {
+          node = ref[i];
           if (node instanceof SubGraph) {
             old_attributes = copy_attributes();
             populate(node.statements);
@@ -5250,32 +5261,32 @@ dot = function(src) {
             prev_node = statement.nodes[i - 1];
             ltype = d.types.links.Link;
             if (prev_node instanceof SubGraph) {
-              _results1.push((function() {
-                var _k, _len2, _ref1, _results2;
-                _ref1 = prev_node.statements;
-                _results2 = [];
-                for (_k = 0, _len2 = _ref1.length; _k < _len2; _k++) {
-                  sub_prev_statement = _ref1[_k];
-                  _results2.push((function() {
-                    var _l, _len3, _ref2, _results3;
-                    _ref2 = sub_prev_statement.nodes;
-                    _results3 = [];
-                    for (_l = 0, _len3 = _ref2.length; _l < _len3; _l++) {
-                      sub_prev_node = _ref2[_l];
+              results1.push((function() {
+                var len3, p, ref1, results2;
+                ref1 = prev_node.statements;
+                results2 = [];
+                for (p = 0, len3 = ref1.length; p < len3; p++) {
+                  sub_prev_statement = ref1[p];
+                  results2.push((function() {
+                    var len4, q, ref2, results3;
+                    ref2 = sub_prev_statement.nodes;
+                    results3 = [];
+                    for (q = 0, len4 = ref2.length; q < len4; q++) {
+                      sub_prev_node = ref2[q];
                       if (node instanceof SubGraph) {
-                        _results3.push((function() {
-                          var _len4, _m, _ref3, _results4;
-                          _ref3 = node.statements;
-                          _results4 = [];
-                          for (_m = 0, _len4 = _ref3.length; _m < _len4; _m++) {
-                            sub_statement = _ref3[_m];
-                            _results4.push((function() {
-                              var _len5, _n, _ref4, _results5;
-                              _ref4 = sub_statement.nodes;
-                              _results5 = [];
-                              for (_n = 0, _len5 = _ref4.length; _n < _len5; _n++) {
-                                sub_node = _ref4[_n];
-                                _results5.push(links_by_id.push({
+                        results3.push((function() {
+                          var len5, ref3, results4, u;
+                          ref3 = node.statements;
+                          results4 = [];
+                          for (u = 0, len5 = ref3.length; u < len5; u++) {
+                            sub_statement = ref3[u];
+                            results4.push((function() {
+                              var len6, ref4, results5, v;
+                              ref4 = sub_statement.nodes;
+                              results5 = [];
+                              for (v = 0, len6 = ref4.length; v < len6; v++) {
+                                sub_node = ref4[v];
+                                results5.push(links_by_id.push({
                                   type: ltype,
                                   id1: sub_prev_node.id,
                                   id2: sub_node.id,
@@ -5283,13 +5294,13 @@ dot = function(src) {
                                   attrs: current_attributes.edge
                                 }));
                               }
-                              return _results5;
+                              return results5;
                             })());
                           }
-                          return _results4;
+                          return results4;
                         })());
                       } else {
-                        _results3.push(links_by_id.push({
+                        results3.push(links_by_id.push({
                           type: ltype,
                           id1: sub_prev_node.id,
                           id2: node.id,
@@ -5298,26 +5309,26 @@ dot = function(src) {
                         }));
                       }
                     }
-                    return _results3;
+                    return results3;
                   })());
                 }
-                return _results2;
+                return results2;
               })());
             } else {
               if (node instanceof SubGraph) {
-                _results1.push((function() {
-                  var _k, _len2, _ref1, _results2;
-                  _ref1 = node.statements;
-                  _results2 = [];
-                  for (_k = 0, _len2 = _ref1.length; _k < _len2; _k++) {
-                    sub_statement = _ref1[_k];
-                    _results2.push((function() {
-                      var _l, _len3, _ref2, _results3;
-                      _ref2 = sub_statement.nodes;
-                      _results3 = [];
-                      for (_l = 0, _len3 = _ref2.length; _l < _len3; _l++) {
-                        sub_node = _ref2[_l];
-                        _results3.push(links_by_id.push({
+                results1.push((function() {
+                  var len3, p, ref1, results2;
+                  ref1 = node.statements;
+                  results2 = [];
+                  for (p = 0, len3 = ref1.length; p < len3; p++) {
+                    sub_statement = ref1[p];
+                    results2.push((function() {
+                      var len4, q, ref2, results3;
+                      ref2 = sub_statement.nodes;
+                      results3 = [];
+                      for (q = 0, len4 = ref2.length; q < len4; q++) {
+                        sub_node = ref2[q];
+                        results3.push(links_by_id.push({
                           type: ltype,
                           id1: prev_node.id,
                           id2: sub_node.id,
@@ -5325,13 +5336,13 @@ dot = function(src) {
                           attrs: current_attributes.edge
                         }));
                       }
-                      return _results3;
+                      return results3;
                     })());
                   }
-                  return _results2;
+                  return results2;
                 })());
               } else {
-                _results1.push(links_by_id.push({
+                results1.push(links_by_id.push({
                   type: ltype,
                   id1: prev_node.id,
                   id2: node.id,
@@ -5341,13 +5352,13 @@ dot = function(src) {
               }
             }
           } else {
-            _results1.push(void 0);
+            results1.push(void 0);
           }
         }
-        return _results1;
+        return results1;
       })());
     }
-    return _results;
+    return results;
   };
   populate(graph.statements);
   elements_by_id = {};
@@ -5360,7 +5371,7 @@ dot = function(src) {
         e.fixed = true;
         elt.attrs.pos = elt.attrs.pos.slice(0, -1);
       }
-      _ref = elt.attrs.pos.split(','), x = _ref[0], y = _ref[1];
+      ref = elt.attrs.pos.split(','), x = ref[0], y = ref[1];
       e.x = +x;
       e.y = +y;
       delete elt.attrs.pos;
@@ -5370,8 +5381,8 @@ dot = function(src) {
     e.attrs = elt.attrs;
     diagram.elements.push(e);
   }
-  for (_i = 0, _len = links_by_id.length; _i < _len; _i++) {
-    lnk = links_by_id[_i];
+  for (j = 0, len1 = links_by_id.length; j < len1; j++) {
+    lnk = links_by_id[j];
     l = new lnk.type(elements_by_id[lnk.id1], elements_by_id[lnk.id2]);
     l.text.source = lnk.label;
     if (graph.type === 'directed' && !lnk.attrs.arrowhead) {
@@ -5411,24 +5422,23 @@ $((function(_this) {
       return location.hash = dot($(this).siblings('textarea.dot').val());
     });
     _this.addEventListener("popstate", history_pop);
-    $('.color-box').colpick({
-      layout: 'hex',
-      submit: 0,
-      onChange: function(hsb, hex, rgb, el) {
-        var $el, fg, node, _i, _len, _ref;
-        $el = $(el);
-        $el.css('background-color', "#" + hex);
+    $('.color-box').spectrum({
+      showAlpha: true,
+      change: function(color) {
+        var $el, fg, j, len1, node, ref;
+        $el = $(this);
+        $el.css('background-color', color.toRgbString());
         fg = $el.hasClass('fg');
-        _ref = diagram.selection;
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          node = _ref[_i];
+        ref = diagram.selection;
+        for (j = 0, len1 = ref.length; j < len1; j++) {
+          node = ref[j];
           if (!node.attrs) {
             node.attrs = {};
           }
           if (fg) {
-            node.attrs.color = '#' + hex;
+            node.attrs.color = color.toRgbString();
           } else {
-            node.attrs.fillcolor = '#' + hex;
+            node.attrs.fillcolor = color.toRgbString();
           }
         }
         return svg.sync();

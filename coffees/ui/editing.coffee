@@ -32,8 +32,8 @@ edit = (getter, setter, color=true) ->
   if color
     $overlay.find('.with-color').show()
     [text, fg, bg] = getter()
-    $('.color-box.fg').css 'background-color', fg or '#000000'
-    $('.color-box.bg').css 'background-color', bg or '#ffffff'
+    $('.color-box.fg').spectrum 'set', fg or '#000000'
+    $('.color-box.bg').spectrum 'set', bg or '#ffffff'
   else
     $overlay.find('.with-color').hide()
     text = getter()
@@ -46,7 +46,7 @@ edit = (getter, setter, color=true) ->
       $textarea.off('keydown')
       $textarea.val('')
       $overlay.removeClass('visible')
-      $('.color-box').colpickHide()
+      $('.color-box').spectrum('hide')
       svg.sync(true)
 
   $overlay

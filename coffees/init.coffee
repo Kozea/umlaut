@@ -26,20 +26,19 @@ $ =>
 
   @addEventListener("popstate", history_pop)
 
-  $('.color-box').colpick
-    layout: 'hex'
-    submit: 0
-    onChange: (hsb, hex, rgb, el) ->
-      $el = $ el
-      $el.css 'background-color', "##{hex}"
+  $('.color-box').spectrum
+    showAlpha: true
+    change: (color) ->
+      $el = $ @
+      $el.css 'background-color', color.toRgbString()
       fg = $el.hasClass 'fg'
       for node in diagram.selection
         if not node.attrs
           node.attrs = {}
         if fg
-          node.attrs.color = '#' + hex
+          node.attrs.color = color.toRgbString()
         else
-          node.attrs.fillcolor = '#' + hex
+          node.attrs.fillcolor = color.toRgbString()
       svg.sync()
 
   history_pop() if location.hash

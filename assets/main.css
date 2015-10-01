@@ -1,3 +1,15 @@
+/* This file is part of umlaut */
+/* Copyright (C) 2013 Kozea - Mounier Florian <paradoxxx.zero->gmail.com> */
+/* umlaut is free software: you can redistribute it and/or modify */
+/* it under the terms of the GNU Affero General Public License as */
+/* published by the Free Software Foundation, either version 3 of the */
+/* License, or any later version. */
+/* umlaut is distributed in the hope that it will be useful, */
+/* but WITHOUT ANY WARRANTY; without even the implied warranty of */
+/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the */
+/* GNU Affero General Public License for more details. */
+/* You should have received a copy of the GNU Affero General Public License */
+/* along with this program.  If not, see http://www.gnu.org/licenses/. */
 .hidden {
   display: none; }
 
@@ -17,11 +29,11 @@ body, html {
   -webkit-box-orient: vertical;
   -webkit-box-direction: normal;
   -webkit-flex-direction: column;
-  -ms-flex-direction: column;
-  flex-direction: column; }
+      -ms-flex-direction: column;
+          flex-direction: column; }
   body > header h1, html > header h1 {
     font-size: 2em;
-    margin: 0.5em; }
+    margin: .5em; }
 
 header h1 {
   background: url("../images/umlaut.svg") center no-repeat;
@@ -37,15 +49,16 @@ body #editor {
   display: flex;
   -webkit-box-flex: 1;
   -webkit-flex: 1;
-  -ms-flex: 1;
-  flex: 1;
+      -ms-flex: 1;
+          flex: 1;
   -webkit-box-orient: vertical;
   -webkit-box-direction: normal;
   -webkit-flex-direction: column;
-  -ms-flex-direction: column;
-  flex-direction: column;
+      -ms-flex-direction: column;
+          flex-direction: column;
   margin: 1em;
   margin-right: 0; }
+
 body #diagrams {
   margin: 1em; }
   body #diagrams li {
@@ -54,13 +67,14 @@ body #diagrams {
     margin-top: 1em; }
   body #diagrams td i {
     margin: 0 0.5em; }
+
 body #main {
   -webkit-user-select: none;
   -moz-user-select: none;
   -webkit-box-flex: 1;
   -webkit-flex: 1;
-  -ms-flex: 1;
-  flex: 1;
+      -ms-flex: 1;
+          flex: 1;
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -68,21 +82,20 @@ body #main {
   -webkit-box-orient: horizontal;
   -webkit-box-direction: normal;
   -webkit-flex-direction: row;
-  -ms-flex-direction: row;
-  flex-direction: row; }
+      -ms-flex-direction: row;
+          flex-direction: row; }
   body #main .waterlogo {
     background: url("../images/umlaut.svg") bottom center no-repeat;
     max-width: calc(30% - 100px);
-    -webkit-background-size: 100% 100%;
     background-size: 100%;
-    opacity: 0.6;
+    opacity: .6;
     position: absolute;
     left: 10px;
     bottom: 10px;
     height: 131px;
     width: 333px;
     -webkit-transition: 500ms;
-    transition: 500ms; }
+            transition: 500ms; }
     body #main .waterlogo:hover {
       -webkit-filter: blur(5px); }
   body #main .btns {
@@ -98,8 +111,8 @@ body #main {
   body #main .outside {
     -webkit-box-flex: 1;
     -webkit-flex: 1;
-    -ms-flex: 1;
-    flex: 1;
+        -ms-flex: 1;
+            flex: 1;
     display: -webkit-box;
     display: -webkit-flex;
     display: -ms-flexbox;
@@ -107,13 +120,13 @@ body #main {
     -webkit-box-orient: vertical;
     -webkit-box-direction: normal;
     -webkit-flex-direction: column;
-    -ms-flex-direction: column;
-    flex-direction: column; }
+        -ms-flex-direction: column;
+            flex-direction: column; }
     body #main .outside .inside {
       -webkit-box-flex: 1;
       -webkit-flex: 1;
-      -ms-flex: 1;
-      flex: 1; }
+          -ms-flex: 1;
+              flex: 1; }
   body #main aside {
     padding: 0 0.5em 0 0;
     margin: 0 0 0 0.5em;
@@ -132,12 +145,13 @@ body #main {
       -webkit-box-orient: vertical;
       -webkit-box-direction: normal;
       -webkit-flex-direction: column;
-      -ms-flex-direction: column;
-      flex-direction: column; }
+          -ms-flex-direction: column;
+              flex-direction: column; }
       body #main aside .icons .icon {
         margin: 0 0 6px;
         width: 100%;
         height: auto; }
+
 body .colpick {
   z-index: 2000; }
 
@@ -149,15 +163,15 @@ footer {
   footer h4 {
     -webkit-box-flex: 1;
     -webkit-flex: 1;
-    -ms-flex: 1;
-    flex: 1;
+        -ms-flex: 1;
+            flex: 1;
     margin: 0;
     padding: 0b; }
     footer h4:last-of-type {
       -webkit-box-flex: 2;
       -webkit-flex: 2;
-      -ms-flex: 2;
-      flex: 2;
+          -ms-flex: 2;
+              flex: 2;
       text-align: right; }
 
 #overlay {
@@ -197,70 +211,91 @@ footer {
     border: 1px solid #888;
     width: 100%;
     height: 75px;
-    margin-bottom: 0.5em; }
+    margin-bottom: .5em; }
 
 #diagram {
-  -webkit-box-shadow: 0 0 15px #aaa inset;
   box-shadow: 0 0 15px #aaa inset; }
 
 svg .fill-bg {
   fill: #fff; }
+
 svg .fill-fg {
   fill: #000; }
+
 svg .fill-none {
   fill: transparent; }
+
 svg .stroke-bg {
   stroke: #fff; }
+
 svg .stroke-fg {
   stroke: #000; }
+
 svg .stroke-none {
   stroke: transparent; }
+
 svg #title {
   text-anchor: middle;
   font-size: 28px; }
+
 svg #grid path {
   fill: transparent;
   stroke: rgba(0, 0, 255, 0.12); }
+
 svg .background.move {
   cursor: move; }
+
 svg text {
   text-anchor: middle;
   font-family: "sans";
   font-size: 14px; }
+
 svg .ghost {
   -webkit-transition: stroke 500ms;
-  transition: stroke 500ms; }
+          transition: stroke 500ms; }
   svg .ghost:hover {
     stroke: rgba(0, 0, 255, 0.1); }
   svg .ghost:active {
     stroke: rgba(0, 0, 255, 0.2); }
+
 svg .link .dashed {
   stroke-dasharray: 5 5; }
+
 svg .link .ghost {
   fill: none;
   stroke-width: 30;
   stroke: rgba(0, 0, 255, 0); }
+
 svg .group .ghost {
   cursor: crosshair; }
+
 svg .link:hover .shape, svg .element:hover .shape, svg .group:hover .shape {
   stroke-width: 2; }
+
 svg .shape {
   -webkit-transition: stroke-width 500ms;
-  transition: stroke-width 500ms; }
+          transition: stroke-width 500ms; }
+
 svg .shape {
   stroke: #000;
   stroke-width: 1.3; }
+
 svg .selected .shape {
   stroke: #00f !important; }
+
 svg .selected.moving .shape {
   stroke: #f0f !important; }
+
 svg .moving .shape {
   stroke: #f00 !important; }
+
 svg .link .shape {
   fill: none !important; }
+
 svg .link text {
   fill: #000;
   stroke: none; }
+
 svg .element, svg .group {
   cursor: move; }
   svg .element .ghost, svg .group .ghost {
@@ -268,9 +303,9 @@ svg .element, svg .group {
     stroke: none; }
   svg .element .handle, svg .element .anchor, svg .group .handle, svg .group .anchor {
     -webkit-transition: fill 500ms, stroke 500ms;
-    transition: fill 500ms, stroke 500ms;
-    fill: rgba(0, 0, 0, 0);
-    stroke: rgba(0, 0, 0, 0); }
+            transition: fill 500ms, stroke 500ms;
+    fill: transparent;
+    stroke: transparent; }
   svg .element .handle.nw, svg .group .handle.nw {
     cursor: nw-resize; }
   svg .element .handle.ne, svg .group .handle.ne {
@@ -295,12 +330,14 @@ svg .element, svg .group {
   svg .element:hover .anchor, svg .group:hover .anchor {
     fill: rgba(255, 0, 0, 0.05);
     stroke: rgba(255, 0, 0, 0.5); }
+
 svg.linking .anchor {
   fill: rgba(0, 255, 0, 0.05);
   stroke: rgba(0, 255, 0, 0.7); }
   svg.linking .anchor.active {
     fill: rgba(0, 255, 0, 0.5);
     stroke: lime; }
+
 svg .selection {
   fill: rgba(0, 0, 255, 0.05);
   stroke: rgba(0, 0, 255, 0.3);
@@ -326,28 +363,28 @@ svg .selection {
     -webkit-box-orient: vertical;
     -webkit-box-direction: normal;
     -webkit-flex-direction: column;
-    -ms-flex-direction: column;
-    flex-direction: column; }
+        -ms-flex-direction: column;
+            flex-direction: column; }
     body > section #main > .outside {
       -webkit-box-flex: 4;
       -webkit-flex: 4;
-      -ms-flex: 4;
-      flex: 4; }
+          -ms-flex: 4;
+              flex: 4; }
     body > section #main > .sidebar {
       -webkit-box-flex: 1;
       -webkit-flex: 1;
-      -ms-flex: 1;
-      flex: 1;
+          -ms-flex: 1;
+              flex: 1;
       width: auto; }
       body > section #main > .sidebar .icons {
         -webkit-box-orient: horizontal;
         -webkit-box-direction: normal;
         -webkit-flex-direction: row;
-        -ms-flex-direction: row;
-        flex-direction: row;
+            -ms-flex-direction: row;
+                flex-direction: row;
         -webkit-flex-wrap: wrap;
-        -ms-flex-wrap: wrap;
-        flex-wrap: wrap; }
+            -ms-flex-wrap: wrap;
+                flex-wrap: wrap; }
         body > section #main > .sidebar .icons .icon {
           width: 20%;
           height: 40px; } }

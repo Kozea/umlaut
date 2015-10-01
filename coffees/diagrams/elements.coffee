@@ -25,6 +25,8 @@ class Element extends Base
 
   constructor: (@x, @y, @text, @fixed=false) ->
     super
+    @x = @x or 0
+    @y = @y or 0
     @ts = timestamp()
     @margin = x: 10, y: 5
     @_width = null

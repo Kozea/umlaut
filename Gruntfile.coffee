@@ -1,7 +1,37 @@
+js_deps = [
+  'bower_components/jquery/dist/jquery.min.js'
+  'bower_components/d3/d3.min.js'
+  'bower_components/mousetrap/mousetrap.min.js'
+  'bower_components/lz-string/libs/lz-string.min.js'
+  'bower_components/spectrum/spectrum.js'
+]
+
+css_deps = [
+  'bower_components/bootstrap/dist/css/bootstrap.min.css'
+  'bower_components/spectrum/spectrum.css'
+]
+
+
+js_test_deps = [
+  'bower_components/jquery/dist/jquery.min.js'
+  'bower_components/d3/d3.min.js'
+  'bower_components/mousetrap/mousetrap.min.js'
+  'bower_components/qunit/qunit/qunit.js'
+]
+
+css_test_deps = [
+  'bower_components/qunit/qunit/qunit.css'
+]
+
 module.exports = (grunt) ->
+
+  require('time-grunt') grunt
+  require('load-grunt-tasks') grunt
 
   grunt.initConfig
     pkg: grunt.file.readJSON('package.json')
+
+    fileExists: js_deps.concat js_test_deps.concat css_deps.concat css_test_deps
 
     uglify:
       options:
@@ -17,22 +47,11 @@ module.exports = (grunt) ->
 
       deps:
         files:
-          'assets/deps.min.js': [
-            'bower_components/jquery/dist/jquery.min.js'
-            'bower_components/d3/d3.min.js'
-            'bower_components/mousetrap/mousetrap.min.js'
-            'bower_components/lz-string/libs/lz-string.min.js'
-            'bower_components/colpick/js/colpick.js'
-          ]
+          'assets/deps.min.js': js_deps
 
       test:
         files:
-          'test/deps.min.js': [
-            'bower_components/jquery/dist/jquery.min.js'
-            'bower_components/d3/d3.min.js'
-            'bower_components/mousetrap/mousetrap.min.js'
-            'bower_components/qunit/qunit/qunit.js'
-          ]
+          'test/deps.min.js': js_test_deps
 
     cssmin:
       options:
@@ -41,32 +60,19 @@ module.exports = (grunt) ->
 
       deps:
         files:
-          'assets/deps.min.css': [
-            'bower_components/bootstrap/dist/css/bootstrap.min.css'
-            'bower_components/colpick/css/colpick.css'
-          ]
+          'assets/deps.min.css': css_deps
 
       test:
         files:
-          'test/deps.min.css': [
-            'bower_components/qunit/qunit/qunit.css'
-          ]
+          'test/deps.min.css': css_test_deps
 
     sass:
       umlaut:
         expand: true
-        cwd: 'scss/'
-        src: '*.scss'
-        dest: 'assets/'
-        ext: '.css'
-
-    sass_to_scss:
-      umlaut:
-        expand: true
         cwd: 'sass/'
         src: '*.sass'
-        dest: 'scss/'
-        ext: '.scss'
+        dest: 'assets/'
+        ext: '.css'
 
     autoprefixer:
       umlaut:
@@ -145,23 +151,12 @@ module.exports = (grunt) ->
         ]
         tasks: ['sass']
 
-  grunt.loadNpmTasks 'grunt-contrib-coffee'
-  grunt.loadNpmTasks 'grunt-contrib-watch'
-  grunt.loadNpmTasks 'grunt-contrib-uglify'
-  grunt.loadNpmTasks 'grunt-contrib-cssmin'
-  grunt.loadNpmTasks 'grunt-contrib-qunit'
-  grunt.loadNpmTasks 'grunt-contrib-connect'
-  grunt.loadNpmTasks 'grunt-coffeelint'
-  grunt.loadNpmTasks 'grunt-autoprefixer'
-  grunt.loadNpmTasks 'grunt-sass'
-  grunt.loadNpmTasks 'grunt-sass-to-scss'
-
   grunt.registerTask 'dev', [
-    'coffeelint', 'coffee', 'sass_to_scss', 'sass', 'watch']
-  grunt.registerTask 'css', ['sass_to_scss', 'sass', 'autoprefixer']
+    'coffeelint', 'coffee', 'sass', 'watch']
+  grunt.registerTask 'css', ['sass', 'autoprefixer']
   grunt.registerTask 'default', [
     'coffeelint', 'coffee',
-    'sass_to_scss', 'sass',
+    'sass',
     'autoprefixer',
     'cssmin',
     'uglify']

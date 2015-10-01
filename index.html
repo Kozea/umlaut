@@ -80,8 +80,8 @@
         <textarea></textarea>
         <div class="with-color">
           <p>Change the color:</p>
-          <div class="fg-box">Foreground: <div class="color-box fg" tabindex="0"></div></div>
-          <div class="bg-box">Background: <div class="color-box bg" tabindex="0"></div></div>
+          <label for="fg-box">Foreground:</label><input type="text" name="fg-box" class="color-box fg" tabindex="0" />
+          <label for="bg-box">Background:</label><input type="text" name="bg-box" class="color-box bg" tabindex="0" />
         </div>
         <div class="bottom-tip">(Use [Esc] to close)</div>
       </div>
@@ -97,10 +97,6 @@
 
       ga('create', 'UA-5078036-24', 'kozea.github.io');
       ga('send', 'pageview');
-      (function() {
-      var d=document,t='script',p=d.createElement(t),s=d.getElementsByTagName(t)[0];
-      p.type='text/javascript';p.async=true;p.src="http://kozea.pystil.org/pystil.js";s.parentNode.insertBefore(p,s);
-      })();
     </script>
   </body>
 </html>
