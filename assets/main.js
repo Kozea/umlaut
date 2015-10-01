@@ -5424,6 +5424,7 @@ $((function(_this) {
     _this.addEventListener("popstate", history_pop);
     $('.color-box').spectrum({
       showAlpha: true,
+      clickoutFiresChange: true,
       change: function(color) {
         var $el, fg, j, len1, node, ref;
         $el = $(this);

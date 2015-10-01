@@ -28,6 +28,7 @@ $ =>
 
   $('.color-box').spectrum
     showAlpha: true
+    clickoutFiresChange: true
     change: (color) ->
       $el = $ @
       $el.css 'background-color', color.toRgbString()
